@@ -1,5 +1,6 @@
 package com.wind.security.authentication.jwt;
 
+import com.wind.security.authentication.JwtTokenCodecHelper;
 import com.wind.security.authentication.WindAuthenticationToken;
 import com.wind.security.authentication.WindAuthenticationUser;
 import org.junit.jupiter.api.Assertions;
@@ -13,7 +14,7 @@ import java.time.Duration;
 
 class JwtTokenCodecTests {
 
-    private final JwtTokenCodec jwtTokenCodec = createCodec(jwtProperties(Duration.ofMinutes(1)));
+    private final JwtTokenCodec jwtTokenCodec = JwtTokenCodecHelper.createCodec(Duration.ofMinutes(1));
 
     @Test
     void testCodecUserToken() {
@@ -50,7 +51,7 @@ class JwtTokenCodecTests {
 
     @Test
     void testCodecUserTokenExpired() throws Exception {
-        JwtTokenCodec codec = createCodec(jwtProperties(Duration.ofMillis(100)));
+        JwtTokenCodec codec = JwtTokenCodecHelper.createCodec(Duration.ofMillis(100));
         WindAuthenticationUser user = new WindAuthenticationUser(1L, "");
         WindAuthenticationToken token = codec.encoding(user);
         Thread.sleep(101);
@@ -74,7 +75,7 @@ class JwtTokenCodecTests {
 
     @Test
     void testRefreshTokenExpired() throws Exception {
-        JwtTokenCodec codec = createCodec(jwtProperties(Duration.ofMillis(100)));
+        JwtTokenCodec codec = JwtTokenCodecHelper.createCodec(JwtTokenCodecHelper.jwtProperties(Duration.ofMillis(100)));
         WindAuthenticationToken token = codec.encodingRefreshToken("1");
         Thread.sleep(101);
         String tokenValue = token.getTokenValue();
@@ -82,40 +83,5 @@ class JwtTokenCodecTests {
         Assertions.assertEquals("refresh token is expired", exception.getMessage());
     }
 
-    static JwtTokenCodec createCodec(JwtProperties properties) {
-        return JwtTokenCodec.builder()
-                .issuer(properties.getIssuer())
-                .audience(properties.getAudience())
-                .effectiveTime(properties.getEffectiveTime())
-                .refreshEffectiveTime(properties.getRefreshEffectiveTime())
-                .rsaKeyPair(properties.getKeyPair())
-                .build();
-    }
 
-
-    static JwtProperties jwtProperties(Duration duration) {
-        KeyPair keyPair = genKeyPir();
-        String publicKey = Base64Utils.encodeToString(keyPair.getPublic().getEncoded());
-        String privateKey = Base64Utils.encodeToString(keyPair.getPrivate().getEncoded());
-        JwtProperties result = new JwtProperties();
-        if (duration != null) {
-            result.setEffectiveTime(duration);
-            result.setRefreshEffectiveTime(duration);
-        }
-        result.setIssuer("test");
-        result.setAudience("test");
-        result.setRsaPublicKey(publicKey);
-        result.setRsaPrivateKey(privateKey);
-        return result;
-    }
-
-    private static KeyPair genKeyPir() {
-        try {
-            KeyPairGenerator keyPairGenerator = KeyPairGenerator.getInstance("RSA");
-            keyPairGenerator.initialize(2048);
-            return keyPairGenerator.genKeyPair();
-        } catch (NoSuchAlgorithmException e) {
-            throw new RuntimeException(e);
-        }
-    }
 }

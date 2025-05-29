@@ -1,11 +1,8 @@
-package com.wind.security.authentication.jwt;
+package com.wind.security.authentication;
 
 import com.wind.common.WindConstants;
 import com.wind.common.exception.AssertUtils;
-import com.wind.security.authentication.AuthenticationTokenCodecService;
-import com.wind.security.authentication.AuthenticationTokenUserMap;
-import com.wind.security.authentication.WindAuthenticationToken;
-import com.wind.security.authentication.WindAuthenticationUser;
+import com.wind.security.authentication.jwt.JwtTokenCodec;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 

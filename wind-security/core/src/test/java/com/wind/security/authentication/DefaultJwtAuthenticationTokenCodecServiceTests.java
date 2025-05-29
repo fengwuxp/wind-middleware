@@ -1,10 +1,7 @@
-package com.wind.security.authentication.jwt;
+package com.wind.security.authentication;
 
 import com.wind.common.exception.BaseException;
-import com.wind.security.authentication.AuthenticationTokenCodecService;
-import com.wind.security.authentication.AuthenticationTokenUserMap;
-import com.wind.security.authentication.WindAuthenticationToken;
-import com.wind.security.authentication.WindAuthenticationUser;
+import com.wind.security.authentication.jwt.JwtTokenCodec;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -57,7 +54,7 @@ class DefaultJwtAuthenticationTokenCodecServiceTests {
     }
 
     private AuthenticationTokenCodecService createCodeService(AuthenticationTokenUserMap tokenStore) {
-        JwtTokenCodec tokenCodec =  JwtTokenCodecTests.createCodec(JwtTokenCodecTests.jwtProperties(Duration.ofHours(1)));
+        JwtTokenCodec tokenCodec = JwtTokenCodecHelper.createCodec(Duration.ofHours(1));
         return new DefaultJwtAuthenticationTokenCodecService(tokenCodec, tokenStore);
     }
 

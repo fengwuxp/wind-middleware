@@ -1,8 +1,8 @@
 package com.wind.server.web.security;
 
 import com.wind.server.web.restful.RestfulApiRespFactory;
-import com.wind.web.util.HttpResponseMessageUtils;
-import com.wind.web.util.HttpServletRequestUtils;
+import com.wind.web.servlet.util.HttpResponseMessageUtils;
+import com.wind.web.servlet.util.HttpServletRequestUtils;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;

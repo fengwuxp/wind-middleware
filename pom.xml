@@ -37,6 +37,9 @@
         <module>sequence-generate</module>
         <module>tests</module>
         <module>wind-rocketmq</module>
+        <module>wind-sequence-jdbc</module>
+        <module>wind-webflux-server</module>
+        <module>wind-server-starter</module>
     </modules>
 
     <properties>
@@ -243,6 +246,11 @@
             </dependency>
             <dependency>
                 <groupId>com.wind.middleware</groupId>
+                <artifactId>wind-server-starter</artifactId>
+                <version>${revision}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.wind.middleware</groupId>
                 <artifactId>wind-web</artifactId>
                 <version>${revision}</version>
             </dependency>
@@ -274,6 +282,11 @@
             <dependency>
                 <groupId>com.wind.middleware</groupId>
                 <artifactId>wind-sequence-generate</artifactId>
+                <version>${revision}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.wind.middleware</groupId>
+                <artifactId>wind-sequence-jdbc</artifactId>
                 <version>${revision}</version>
             </dependency>
             <dependency>

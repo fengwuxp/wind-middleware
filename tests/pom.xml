@@ -60,6 +60,10 @@
         </dependency>
         <dependency>
             <groupId>com.wind.middleware</groupId>
+            <artifactId>wind-sequence-jdbc</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.wind.middleware</groupId>
             <artifactId>wind-server</artifactId>
         </dependency>
         <dependency>

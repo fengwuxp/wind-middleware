@@ -3,7 +3,7 @@ package com.wind.server.i18n;
 import com.wind.common.i18n.SpringI18nMessageUtils;
 import com.wind.server.web.restful.FriendlyExceptionMessageConverter;
 import com.wind.server.web.restful.RestfulApiRespFactory;
-import com.wind.web.util.HttpServletRequestUtils;
+import com.wind.web.servlet.util.HttpServletRequestUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.context.event.ApplicationStartedEvent;
 import org.springframework.boot.web.context.ConfigurableWebServerApplicationContext;

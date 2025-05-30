@@ -13,6 +13,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 
+import static com.wind.common.WindConstants.CURRENT_TRACE_THEAD_ID_NAME;
 import static com.wind.common.WindConstants.LOCAL_HOST_IP_V4;
 import static com.wind.common.WindConstants.TRACE_ID_NAME;
 
@@ -51,6 +52,7 @@ public final class WindThreadTracer implements WindTracer {
         }
         putVariable(TRACE_ID_NAME, traceId == null ? TRACE_GENERATOR.next() : traceId);
         putVariable(LOCAL_HOST_IP_V4, IpAddressUtils.getLocalIpv4WithCache());
+        putVariable(CURRENT_TRACE_THEAD_ID_NAME, Thread.currentThread().getId());
         Objects.requireNonNull(contextVariables, "argument contextVariables must not null").forEach(this::putVariable);
     }
 

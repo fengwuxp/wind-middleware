@@ -1,0 +1,11 @@
+# Application Listeners
+org.springframework.context.ApplicationListener=\
+com.wind.server.configcenter.WindGlobalPropertySourceInitializer,\
+com.wind.server.configcenter.WindPropertySourceInitializer
+
+# Auto Configuration
+org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
+com.wind.server.configuration.I18nMessageSourceAutoConfiguration
+# Environment PostProcessor
+org.springframework.boot.env.EnvironmentPostProcessor=\
+com.wind.server.env.ReorderSystemEnvironmentPostProcessor

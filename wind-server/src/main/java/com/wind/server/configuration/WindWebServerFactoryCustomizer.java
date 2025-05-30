@@ -23,7 +23,7 @@ import org.springframework.context.annotation.Import;
 public class WindWebServerFactoryCustomizer {
 
     /**
-     * tomcat 开启 nio2
+     * tomcat 开启 NIO2
      */
     @Configuration
     @ConditionalOnProperty(prefix = "wind.server.tomcat.http1-nio2", name = WindConstants.ENABLED_NAME)

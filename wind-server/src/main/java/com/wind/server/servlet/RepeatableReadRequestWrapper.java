@@ -1,7 +1,7 @@
 package com.wind.server.servlet;
 
 import com.wind.common.exception.BaseException;
-import com.wind.web.util.HttpQueryUtils;
+import com.wind.web.servlet.util.HttpQueryUtils;
 import org.springframework.http.MediaType;
 import org.springframework.lang.NonNull;
 import org.springframework.util.LinkedMultiValueMap;

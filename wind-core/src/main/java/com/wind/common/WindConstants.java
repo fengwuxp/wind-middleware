@@ -220,6 +220,11 @@ public final class WindConstants {
     public static final String TRACE_ID_NAME = "traceId";
 
     /**
+     * 当前 current 线程 id
+     */
+    public static final String CURRENT_TRACE_THEAD_ID_NAME = "traceThreadId";
+
+    /**
      * trace id http header name
      */
     public static final String WIND_TRANCE_ID_HEADER_NAME = "Wind-Trace-Id";

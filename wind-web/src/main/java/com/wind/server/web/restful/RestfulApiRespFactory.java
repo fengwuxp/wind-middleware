@@ -8,7 +8,7 @@ import com.wind.common.query.supports.Pagination;
 import com.wind.server.web.supports.ApiResp;
 import com.wind.server.web.supports.ImmutableWebApiResponse;
 import com.wind.trace.WindTracer;
-import com.wind.web.exception.GlobalExceptionLogDecisionMaker;
+import com.wind.web.servlet.exception.GlobalExceptionLogDecisionMaker;
 import org.springframework.http.HttpStatus;
 import org.springframework.util.StringUtils;
 

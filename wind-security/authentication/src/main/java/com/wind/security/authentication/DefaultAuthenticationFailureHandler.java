@@ -3,7 +3,7 @@ package com.wind.security.authentication;
 
 import com.wind.common.i18n.SpringI18nMessageUtils;
 import com.wind.server.web.restful.RestfulApiRespFactory;
-import com.wind.web.util.HttpResponseMessageUtils;
+import com.wind.web.servlet.util.HttpResponseMessageUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.AccessDeniedException;

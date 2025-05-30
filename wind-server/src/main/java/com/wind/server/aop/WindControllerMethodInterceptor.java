@@ -4,7 +4,7 @@ import com.wind.common.WindConstants;
 import com.wind.common.WindHttpConstants;
 import com.wind.context.injection.MethodParameterInjector;
 import com.wind.script.auditlog.ScriptAuditLogRecorder;
-import com.wind.web.util.HttpServletRequestUtils;
+import com.wind.web.servlet.util.HttpServletRequestUtils;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.aopalliance.intercept.MethodInterceptor;

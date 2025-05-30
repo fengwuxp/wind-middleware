@@ -6,7 +6,7 @@ import com.wind.common.exception.BaseException;
 import com.wind.common.i18n.SpringI18nMessageUtils;
 import com.wind.server.web.restful.RestfulApiRespFactory;
 import com.wind.server.web.supports.ApiResp;
-import com.wind.web.exception.GlobalExceptionLogDecisionMaker;
+import com.wind.web.servlet.exception.GlobalExceptionLogDecisionMaker;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;

@@ -32,9 +32,9 @@ import static com.wind.common.WindConstants.WIND_SERVER_OBJECT_MASK_ADVICE;
 @RestControllerAdvice()
 public class ObjectMaskingResponseBodyAdvice implements ResponseBodyAdvice<Object> {
 
-    public final static MaskRuleRegistry RESPONSE_BODY_REGISTRY = new MaskRuleRegistry();
+    public static final MaskRuleRegistry RESPONSE_BODY_REGISTRY = new MaskRuleRegistry();
 
-    private final static ObjectDataMasker MASKER = new ObjectDataMasker(RESPONSE_BODY_REGISTRY);
+    private static final ObjectDataMasker MASKER = new ObjectDataMasker(RESPONSE_BODY_REGISTRY);
 
     @Override
     public boolean supports(MethodParameter returnType, @NotNull Class<? extends HttpMessageConverter<?>> converterType) {

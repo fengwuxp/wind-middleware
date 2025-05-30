@@ -10,7 +10,7 @@ import com.wind.common.util.ServiceInfoUtils;
 import com.wind.server.servlet.RepeatableReadRequestWrapper;
 import com.wind.server.web.filters.WindWebFilterOrdered;
 import com.wind.server.web.restful.RestfulApiRespFactory;
-import com.wind.web.util.HttpResponseMessageUtils;
+import com.wind.web.servlet.util.HttpResponseMessageUtils;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.Ordered;

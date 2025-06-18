@@ -33,7 +33,7 @@ import org.springframework.context.SmartLifecycle;
 import org.springframework.core.OrderComparator;
 import org.springframework.core.annotation.AnnotationUtils;
 
-import javax.validation.constraints.NotNull;
+import jakarta.validation.constraints.NotNull;
 import java.lang.reflect.AnnotatedElement;
 import java.util.List;
 import java.util.Map;

@@ -7,7 +7,7 @@ import com.wind.common.exception.DefaultExceptionCode;
 import org.apache.commons.lang3.ArrayUtils;
 import org.springframework.util.ClassUtils;
 
-import javax.validation.constraints.NotNull;
+import jakarta.validation.constraints.NotNull;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;

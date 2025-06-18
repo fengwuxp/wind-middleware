@@ -17,6 +17,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
 import java.nio.charset.StandardCharsets;
+import java.util.Map;
 
 /**
  * @author wuxp
@@ -40,11 +41,6 @@ class ApiSignatureRequestInterceptorTests {
             @Override
             public HttpStatus getStatusCode() {
                 return HttpStatus.OK;
-            }
-
-            @Override
-            public int getRawStatusCode() {
-                return HttpStatus.OK.value();
             }
 
             @Override
@@ -73,8 +69,8 @@ class ApiSignatureRequestInterceptorTests {
         HttpHeaders httpHeaders = new HttpHeaders();
         return new HttpRequest() {
             @Override
-            public String getMethodValue() {
-                return HttpMethod.GET.name();
+            public HttpMethod getMethod() {
+                return HttpMethod.GET;
             }
 
             @Override
@@ -85,6 +81,11 @@ class ApiSignatureRequestInterceptorTests {
             @Override
             public HttpHeaders getHeaders() {
                 return httpHeaders;
+            }
+
+            @Override
+            public Map<String, Object> getAttributes() {
+                return Map.of();
             }
         };
     }

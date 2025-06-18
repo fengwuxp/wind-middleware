@@ -1,6 +1,6 @@
 package com.wind.websocket.core;
 
-import javax.validation.constraints.NotNull;
+import jakarta.validation.constraints.NotNull;
 
 /**
  * 远程路由连接，当 socket 是集群时，确认消息发送目标用户所在的真实节点，将消息路由到该节点。

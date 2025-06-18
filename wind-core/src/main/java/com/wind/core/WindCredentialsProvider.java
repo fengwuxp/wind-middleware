@@ -1,6 +1,6 @@
 package com.wind.core;
 
-import javax.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotBlank;
 
 /**
  * 凭据提供者

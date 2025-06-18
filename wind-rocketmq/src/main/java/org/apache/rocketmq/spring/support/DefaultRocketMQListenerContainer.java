@@ -147,7 +147,6 @@ public class DefaultRocketMQListenerContainer implements InitializingBean,
     private int replyTimeout;
     private String tlsEnable;
     private String namespace;
-    private String namespaceV2;
     private long awaitTerminationMillisWhenShutdown;
 
     private String instanceName;
@@ -168,7 +167,6 @@ public class DefaultRocketMQListenerContainer implements InitializingBean,
         this.replyTimeout = annotation.replyTimeout();
         this.tlsEnable = annotation.tlsEnable();
         this.namespace = annotation.namespace();
-//        this.namespaceV2 = annotation.namespaceV2();
         this.delayLevelWhenNextConsume = annotation.delayLevelWhenNextConsume();
         this.suspendCurrentQueueTimeMillis = annotation.suspendCurrentQueueTimeMillis();
         this.awaitTerminationMillisWhenShutdown = Math.max(0, annotation.awaitTerminationMillisWhenShutdown());
@@ -515,7 +513,6 @@ public class DefaultRocketMQListenerContainer implements InitializingBean,
                             resolveRequiredPlaceholders(this.rocketMQMessageListener.customizedTraceTopic()));
         }
         consumer.setNamespace(namespace);
-        consumer.setNamespaceV2(namespaceV2);
 
         String customizedNameServer = this.applicationContext.getEnvironment().resolveRequiredPlaceholders(this.rocketMQMessageListener.nameServer());
         if (StringUtils.hasText(customizedNameServer)) {

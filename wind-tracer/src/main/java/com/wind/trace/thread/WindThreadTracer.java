@@ -7,7 +7,7 @@ import com.wind.sequence.SequenceGenerator;
 import com.wind.trace.WindTracer;
 import org.slf4j.MDC;
 
-import javax.validation.constraints.NotNull;
+import jakarta.validation.constraints.NotNull;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;

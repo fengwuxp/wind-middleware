@@ -4,7 +4,7 @@ import com.wind.common.exception.AssertUtils;
 import org.springframework.lang.Nullable;
 import org.springframework.util.ReflectionUtils;
 
-import javax.validation.constraints.NotNull;
+import jakarta.validation.constraints.NotNull;
 import java.lang.reflect.Method;
 
 /**

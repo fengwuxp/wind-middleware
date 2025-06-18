@@ -5,7 +5,7 @@ import com.wind.common.exception.AssertUtils;
 import com.wind.mask.masker.MaskerFactory;
 import lombok.Data;
 
-import javax.validation.constraints.NotNull;
+import jakarta.validation.constraints.NotNull;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;

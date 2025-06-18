@@ -2,7 +2,7 @@ package com.wind.common.limit;
 
 import com.wind.common.WindConstants;
 
-import javax.validation.constraints.Null;
+import jakarta.validation.constraints.Null;
 import java.time.Duration;
 
 /**

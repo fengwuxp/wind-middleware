@@ -78,11 +78,6 @@ public class RocketMQProperties {
         private String namespace;
 
         /**
-         * The namespace v2 version of producer, it can not be used in combination with namespace.
-         */
-        private String namespaceV2;
-
-        /**
          * Millis of send message timeout.
          */
         private int sendMessageTimeout = 3000;
@@ -156,11 +151,6 @@ public class RocketMQProperties {
          * Namespace for this MQ Consumer instance.
          */
         private String namespace;
-
-        /**
-         * The namespace v2 version of consumer, it can not be used in combination with namespace.
-         */
-        private String namespaceV2;
 
         /**
          * Topic name of consumer.

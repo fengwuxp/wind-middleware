@@ -18,7 +18,6 @@
         <module>h2-functions-for-mysql</module>
         <module>mybatis-flex-codegen</module>
         <module>mybatis-flex-processor</module>
-        <module>mybatis-plus-annotation-processor</module>
     </modules>
 
     <properties>

@@ -5,7 +5,7 @@ import com.wind.common.exception.AssertUtils;
 import lombok.Data;
 import org.springframework.lang.NonNull;
 
-import javax.validation.constraints.NotNull;
+import jakarta.validation.constraints.NotNull;
 import java.beans.Transient;
 import java.util.concurrent.atomic.AtomicInteger;
 

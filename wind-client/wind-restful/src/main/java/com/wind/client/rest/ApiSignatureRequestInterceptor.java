@@ -56,7 +56,7 @@ public class ApiSignatureRequestInterceptor implements ClientHttpRequestIntercep
         ApiSecretAccount account = accountProvider.apply(request);
         AssertUtils.notNull(account, "ApiSecretAccount must not null");
         ApiSignatureRequest.ApiSignatureRequestBuilder builder = ApiSignatureRequest.builder();
-        builder.method(request.getMethodValue())
+        builder.method(request.getMethod().name())
                 .requestPath(request.getURI().getPath())
                 .nonce(SequenceGenerator.randomAlphanumeric(32))
                 .timestamp(String.valueOf(System.currentTimeMillis()))

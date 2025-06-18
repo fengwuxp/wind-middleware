@@ -6,8 +6,8 @@ import ${basePackage}.model.request.Create${name}Request;
 import ${basePackage}.model.request.Update${name}Request;
 import com.wind.common.query.supports.Pagination;
 
-import javax.validation.constraints.NotEmpty;
-import javax.validation.constraints.NotNull;
+import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotNull;
 
 /**
 * ${comment}服务

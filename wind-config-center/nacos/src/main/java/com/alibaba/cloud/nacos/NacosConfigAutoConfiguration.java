@@ -16,6 +16,7 @@ import org.springframework.cloud.context.properties.ConfigurationPropertiesRebin
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+import static com.alibaba.cloud.nacos.WindNacosBootstrapListener.NACOS_CONFIG_PREFIX;
 import static com.wind.common.WindConstants.ENABLED_NAME;
 import static com.wind.common.WindConstants.TRUE;
 
@@ -25,7 +26,7 @@ import static com.wind.common.WindConstants.TRUE;
  */
 @Configuration(proxyBeanMethods = false)
 @AllArgsConstructor
-@ConditionalOnProperty(prefix = NacosConfigProperties.PREFIX, name = ENABLED_NAME, havingValue = TRUE, matchIfMissing = true)
+@ConditionalOnProperty(prefix = NACOS_CONFIG_PREFIX, name = ENABLED_NAME, havingValue = TRUE, matchIfMissing = true)
 public class NacosConfigAutoConfiguration {
 
     @Bean

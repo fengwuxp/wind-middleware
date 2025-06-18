@@ -2,7 +2,7 @@ package com.wind.elasticjob.job;
 
 import com.wind.common.WindConstants;
 
-import javax.validation.constraints.NotNull;
+import jakarta.validation.constraints.NotNull;
 import java.util.Collections;
 import java.util.List;
 

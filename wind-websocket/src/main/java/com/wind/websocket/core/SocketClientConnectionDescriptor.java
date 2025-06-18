@@ -3,9 +3,9 @@ package com.wind.websocket.core;
 import com.wind.core.ObjectReadonlyMetadata;
 import com.wind.websocket.WindWebSocketMetadataNames;
 
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Null;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Null;
 import java.time.LocalDateTime;
 
 /**

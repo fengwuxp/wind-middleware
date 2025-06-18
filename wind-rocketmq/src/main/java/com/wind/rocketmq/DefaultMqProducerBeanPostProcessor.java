@@ -6,7 +6,7 @@ import org.apache.rocketmq.client.producer.DefaultMQProducer;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.config.BeanPostProcessor;
 
-import javax.validation.constraints.NotNull;
+import jakarta.validation.constraints.NotNull;
 import java.util.concurrent.atomic.AtomicReference;
 
 /**

@@ -4,12 +4,13 @@ import com.wind.security.authentication.WindAuthenticationToken;
 import com.wind.security.authentication.WindAuthenticationUser;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-import org.springframework.util.Base64Utils;
+
 
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
 import java.security.NoSuchAlgorithmException;
 import java.time.Duration;
+import java.util.Base64;
 
 class JwtTokenCodecTests {
 
@@ -95,8 +96,8 @@ class JwtTokenCodecTests {
 
     static JwtProperties jwtProperties(Duration duration) {
         KeyPair keyPair = genKeyPir();
-        String publicKey = Base64Utils.encodeToString(keyPair.getPublic().getEncoded());
-        String privateKey = Base64Utils.encodeToString(keyPair.getPrivate().getEncoded());
+        String publicKey = Base64.getEncoder().encodeToString(keyPair.getPublic().getEncoded());
+        String privateKey = Base64.getEncoder().encodeToString(keyPair.getPrivate().getEncoded());
         JwtProperties result = new JwtProperties();
         if (duration != null) {
             result.setEffectiveTime(duration);

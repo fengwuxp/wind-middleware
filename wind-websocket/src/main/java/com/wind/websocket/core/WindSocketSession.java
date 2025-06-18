@@ -2,8 +2,8 @@ package com.wind.websocket.core;
 
 import com.wind.common.exception.AssertUtils;
 
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Null;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Null;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;

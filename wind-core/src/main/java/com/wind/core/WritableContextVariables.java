@@ -3,7 +3,7 @@ package com.wind.core;
 
 import org.springframework.lang.Nullable;
 
-import javax.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotBlank;
 
 /**
  * 可写的上下文变量

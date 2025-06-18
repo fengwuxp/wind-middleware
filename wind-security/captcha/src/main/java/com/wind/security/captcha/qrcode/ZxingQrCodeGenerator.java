@@ -10,7 +10,6 @@ import com.google.zxing.qrcode.decoder.ErrorCorrectionLevel;
 import com.wind.common.exception.BaseException;
 import com.wind.common.exception.DefaultExceptionCode;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.util.Base64Utils;
 import org.springframework.util.StringUtils;
 
 import javax.imageio.ImageIO;
@@ -19,6 +18,7 @@ import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+import java.util.Base64;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -80,7 +80,7 @@ public class ZxingQrCodeGenerator implements QrCodeGenerator {
     private BufferedImage addLogo(BufferedImage qrCodeImage, QrCodeConfig qrCodeConfig) throws IOException {
         BufferedImage bufferedImage = new BufferedImage(qrCodeConfig.getSize(), qrCodeConfig.getSize(), BufferedImage.TYPE_INT_RGB);
 
-        BufferedImage logoImage = ImageIO.read(new ByteArrayInputStream(Base64Utils.decodeFromString(qrCodeConfig.getLogo())));
+        BufferedImage logoImage = ImageIO.read(new ByteArrayInputStream(Base64.getDecoder().decode(qrCodeConfig.getLogo())));
         Graphics2D qrCodeImageGraphics = bufferedImage.createGraphics();
 
         // logo起始位置，此目的是为logo居中显示

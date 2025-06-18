@@ -2,7 +2,7 @@ package com.wind.trace;
 
 import com.wind.core.ReadonlyContextVariables;
 
-import javax.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotBlank;
 
 /**
  * trace context

@@ -2,8 +2,8 @@ package com.wind.api.core.signature;
 
 import org.springframework.lang.Nullable;
 
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import java.util.Objects;
 
 /**

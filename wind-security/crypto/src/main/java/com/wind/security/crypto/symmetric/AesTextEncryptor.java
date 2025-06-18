@@ -5,9 +5,9 @@ import org.springframework.security.crypto.codec.Hex;
 import org.springframework.security.crypto.encrypt.AesBytesEncryptor;
 import org.springframework.security.crypto.encrypt.TextEncryptor;
 import org.springframework.security.crypto.keygen.BytesKeyGenerator;
-import org.springframework.util.Base64Utils;
 
 import java.nio.charset.StandardCharsets;
+import java.util.Base64;
 
 /**
  * 对称加密：AES
@@ -50,12 +50,12 @@ public class AesTextEncryptor implements TextEncryptor {
      */
     @Override
     public String encrypt(String text) {
-        return Base64Utils.encodeToString(bytesEncryptor.encrypt(text.getBytes(StandardCharsets.UTF_8)));
+        return Base64.getEncoder().encodeToString(bytesEncryptor.encrypt(text.getBytes(StandardCharsets.UTF_8)));
     }
 
     @Override
     public String decrypt(String encryptedText) {
-        byte[] bytes = Base64Utils.decodeFromString(encryptedText);
+        byte[] bytes = Base64.getDecoder().decode(encryptedText);
         return new String(bytesEncryptor.decrypt(bytes), StandardCharsets.UTF_8);
     }
 }

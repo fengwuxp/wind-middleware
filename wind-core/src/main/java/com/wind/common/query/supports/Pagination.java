@@ -4,7 +4,7 @@ package com.wind.common.query.supports;
 import org.springframework.lang.Nullable;
 import org.springframework.util.CollectionUtils;
 
-import javax.validation.constraints.NotNull;
+import jakarta.validation.constraints.NotNull;
 import java.beans.Transient;
 import java.io.Serializable;
 import java.util.Collections;

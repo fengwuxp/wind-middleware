@@ -13,10 +13,10 @@ import com.warrenstrange.googleauth.ICredentialRepository;
 import com.warrenstrange.googleauth.KeyRepresentation;
 import com.wind.common.exception.BaseException;
 import com.wind.common.exception.DefaultExceptionCode;
-import org.springframework.util.Base64Utils;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.util.Base64;
 
 /**
  * @author wuxp
@@ -56,7 +56,7 @@ public class GoogleTotpAuthenticator implements TotpAuthenticator {
             BitMatrix bitMatrix = writer.encode(url, BarcodeFormat.QR_CODE, DEFAULT_QR_CODE_SIZE, DEFAULT_QR_CODE_SIZE);
             ByteArrayOutputStream stream = new ByteArrayOutputStream();
             MatrixToImageWriter.writeToStream(bitMatrix, "PNG", stream);
-            return Base64Utils.encodeToString(stream.toByteArray());
+            return Base64.getEncoder().encodeToString(stream.toByteArray());
         } catch (WriterException | IOException exception) {
             throw new BaseException(DefaultExceptionCode.COMMON_ERROR, "生成绑定MFA认证二维码失败", exception);
         }

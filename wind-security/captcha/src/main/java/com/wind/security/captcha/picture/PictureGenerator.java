@@ -2,12 +2,12 @@ package com.wind.security.captcha.picture;
 
 import com.wind.common.exception.BaseException;
 import com.wind.common.exception.DefaultExceptionCode;
-import org.springframework.util.Base64Utils;
 
 import javax.imageio.ImageIO;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
+import java.util.Base64;
 
 /**
  * 图片生成器
@@ -65,7 +65,7 @@ public interface PictureGenerator {
             ByteArrayOutputStream output = new ByteArrayOutputStream();
             ImageIO.write((BufferedImage) image, format, output);
             // convert base64
-            return Base64Utils.encodeToString(output.toByteArray());
+            return Base64.getEncoder().encodeToString(output.toByteArray());
         } catch (Exception exception) {
             throw new BaseException(DefaultExceptionCode.COMMON_ERROR, "图片转 base64 编码失败", exception);
         }

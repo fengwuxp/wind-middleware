@@ -6,7 +6,7 @@ import com.wind.mask.masker.MaskerFactory;
 import lombok.Data;
 import org.springframework.lang.Nullable;
 
-import javax.validation.constraints.NotNull;
+import jakarta.validation.constraints.NotNull;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Arrays;

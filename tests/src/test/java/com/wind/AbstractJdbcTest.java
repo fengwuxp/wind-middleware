@@ -15,6 +15,7 @@ import org.springframework.boot.autoconfigure.jdbc.DataSourceProperties;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceTransactionManagerAutoConfiguration;
 import org.springframework.boot.autoconfigure.jdbc.JdbcTemplateAutoConfiguration;
 import org.springframework.boot.autoconfigure.sql.init.SqlInitializationAutoConfiguration;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.EnableAspectJAutoProxy;
@@ -56,6 +57,7 @@ public abstract class AbstractJdbcTest {
     @AllArgsConstructor
     @AutoConfiguration
     @AutoConfigureBefore(SqlInitializationAutoConfiguration.class)
+    @EnableConfigurationProperties(DataSourceProperties.class)
     public static class H2InitializationAutoConfiguration {
 
         @Bean

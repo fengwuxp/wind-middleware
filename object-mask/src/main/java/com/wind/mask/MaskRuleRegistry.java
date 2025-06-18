@@ -5,7 +5,7 @@ import com.wind.common.util.WindReflectUtils;
 import com.wind.mask.annotation.Sensitive;
 import org.springframework.util.ObjectUtils;
 
-import javax.validation.constraints.NotNull;
+import jakarta.validation.constraints.NotNull;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Map;

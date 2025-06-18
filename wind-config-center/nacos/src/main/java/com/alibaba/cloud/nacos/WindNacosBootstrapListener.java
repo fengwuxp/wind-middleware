@@ -4,8 +4,6 @@ package com.alibaba.cloud.nacos;
 import com.alibaba.nacos.api.NacosFactory;
 import com.alibaba.nacos.api.config.ConfigService;
 import com.alibaba.nacos.api.exception.NacosException;
-import com.alibaba.spring.context.config.ConfigurationBeanBinder;
-import com.alibaba.spring.context.config.DefaultConfigurationBeanBinder;
 import com.google.common.base.CaseFormat;
 import com.wind.common.WindConstants;
 import com.wind.common.exception.AssertUtils;
@@ -15,6 +13,9 @@ import com.wind.nacos.NacosConfigRepository;
 import org.springframework.beans.factory.BeanCreationException;
 import org.springframework.boot.ConfigurableBootstrapContext;
 import org.springframework.boot.context.event.ApplicationEnvironmentPreparedEvent;
+import org.springframework.boot.context.properties.bind.Binder;
+import org.springframework.boot.context.properties.source.ConfigurationPropertySource;
+import org.springframework.boot.context.properties.source.MapConfigurationPropertySource;
 import org.springframework.cloud.bootstrap.BootstrapApplicationListener;
 import org.springframework.context.ApplicationListener;
 import org.springframework.core.Ordered;
@@ -44,6 +45,8 @@ import static org.springframework.core.env.StandardEnvironment.SYSTEM_PROPERTIES
  **/
 public class WindNacosBootstrapListener implements ApplicationListener<ApplicationEnvironmentPreparedEvent>, Ordered {
 
+    public static final String NACOS_CONFIG_PREFIX = "spring.cloud.nacos.config";
+
     private static final Logger LOGGER = Logger.getLogger(WindNacosBootstrapListener.class.getName());
 
     static final AtomicReference<ConfigService> CONFIG_SERVICE = new AtomicReference<>();
@@ -52,7 +55,7 @@ public class WindNacosBootstrapListener implements ApplicationListener<Applicati
 
     @Override
     public void onApplicationEvent(@Nonnull ApplicationEnvironmentPreparedEvent event) {
-        String enable = event.getEnvironment().getProperty(NacosConfigProperties.PREFIX + ".enabled");
+        String enable = event.getEnvironment().getProperty(NACOS_CONFIG_PREFIX + ".enabled");
         if (Boolean.FALSE.toString().equals(enable)) {
             LOGGER.info("un enable nacos");
             return;
@@ -60,7 +63,7 @@ public class WindNacosBootstrapListener implements ApplicationListener<Applicati
         if (CONFIG_SERVICE.get() == null) {
             LOGGER.info("init nacos bean on bootstrap");
             NacosConfigProperties properties = createNacosProperties(event.getEnvironment());
-            AssertUtils.notNull(properties, String.format("please check %s config", NacosConfigProperties.PREFIX));
+            AssertUtils.notNull(properties, String.format("please check %s config", NACOS_CONFIG_PREFIX));
             CONFIG_SERVICE.set(buildConfigService(properties));
             CONFIG_REPOSITORY.set(new NacosConfigRepository(CONFIG_SERVICE.get(), properties));
         }
@@ -87,15 +90,16 @@ public class WindNacosBootstrapListener implements ApplicationListener<Applicati
         PropertySource<?> systemProperties = environment.getPropertySources().remove(SYSTEM_PROPERTIES_PROPERTY_SOURCE_NAME);
         environment.getPropertySources().addAfter(BOOTSTRAP_PROPERTY_SOURCE_NAME, ConfigFunctionEvaluator.getInstance().eval(systemProperties));
 
-        ConfigurationBeanBinder binder = new DefaultConfigurationBeanBinder();
-        NacosConfigProperties result = new NacosConfigProperties();
-        binder.bind(getNacosConfigs(environment), true, true, result);
+
+        NacosConfigProperties result = new Binder(getNacosPropertySources(environment))
+                .bind(NACOS_CONFIG_PREFIX, NacosConfigProperties.class)
+                .orElseThrow(() -> new IllegalStateException("Cannot bind " + NACOS_CONFIG_PREFIX));
         result.setEnvironment(environment);
         return result;
     }
 
     @Nonnull
-    private Map<String, Object> getNacosConfigs(ConfigurableEnvironment environment) {
+    private ConfigurationPropertySource getNacosPropertySources(ConfigurableEnvironment environment) {
         // 复制一份
         MutablePropertySources sources = new MutablePropertySources(environment.getPropertySources());
         if (!sources.contains(SYSTEM_PROPERTIES_PROPERTY_SOURCE_NAME)) {
@@ -104,18 +108,18 @@ public class WindNacosBootstrapListener implements ApplicationListener<Applicati
             sources.addLast(new SystemEnvironmentPropertySource(SYSTEM_ENVIRONMENT_PROPERTY_SOURCE_NAME, environment.getSystemEnvironment()));
         }
         Map<String, Object> properties = new HashMap<>(environment.getSystemProperties());
-        Map<String, Object> result = new HashMap<>();
         properties.putAll(environment.getSystemEnvironment());
+        Map<String, Object> nacosProperties = new HashMap<>();
         PropertyResolver resolver = new PropertySourcesPropertyResolver(sources);
         properties.forEach((key, val) -> {
-            if (key != null && key.startsWith(NacosConfigProperties.PREFIX)) {
-                String name = key.substring(NacosConfigProperties.PREFIX.length() + 1);
+            if (key != null && key.startsWith(NACOS_CONFIG_PREFIX)) {
+                String name = key.substring(NACOS_CONFIG_PREFIX.length() + 1);
                 // 中划线转驼峰
                 name = CaseFormat.LOWER_UNDERSCORE.to(CaseFormat.LOWER_CAMEL, name.replace(WindConstants.DASHED, WindConstants.UNDERLINE));
-                result.put(name, resolver.getProperty(key, String.class));
+                nacosProperties.put(name, resolver.getProperty(key, String.class));
             }
         });
-        return result;
+        return new MapConfigurationPropertySource(nacosProperties);
     }
 
 }

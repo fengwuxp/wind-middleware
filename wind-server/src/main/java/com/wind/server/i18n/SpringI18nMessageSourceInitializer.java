@@ -12,7 +12,7 @@ import org.springframework.context.MessageSource;
 import org.springframework.web.servlet.LocaleResolver;
 
 import javax.annotation.Nonnull;
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
 import java.util.Arrays;
 import java.util.Locale;
 import java.util.concurrent.atomic.AtomicReference;

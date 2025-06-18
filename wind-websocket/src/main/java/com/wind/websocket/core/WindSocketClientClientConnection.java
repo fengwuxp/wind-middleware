@@ -1,6 +1,6 @@
 package com.wind.websocket.core;
 
-import javax.validation.constraints.NotNull;
+import jakarta.validation.constraints.NotNull;
 import java.util.concurrent.CompletableFuture;
 
 /**

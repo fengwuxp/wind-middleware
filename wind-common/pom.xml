@@ -50,15 +50,11 @@
         </dependency>
         <dependency>
             <groupId>com.bucket4j</groupId>
-            <artifactId>bucket4j_jdk8-core</artifactId>
+            <artifactId>bucket4j-core</artifactId>
         </dependency>
         <dependency>
             <groupId>org.awaitility</groupId>
             <artifactId>awaitility</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>com.wind.middleware</groupId>
-            <artifactId>wind-core</artifactId>
         </dependency>
     </dependencies>
 

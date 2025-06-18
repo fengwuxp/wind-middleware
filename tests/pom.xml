@@ -18,14 +18,10 @@
     </properties>
 
     <dependencies>
-        <dependency>
-            <groupId>com.wind.tools</groupId>
-            <artifactId>mybatis-plus-annotation-processor</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>com.wind.tools</groupId>
-            <artifactId>wind-mybatis-flex-processor</artifactId>
-        </dependency>
+<!--        <dependency>-->
+<!--            <groupId>com.wind.tools</groupId>-->
+<!--            <artifactId>wind-mybatis-flex-processor</artifactId>-->
+<!--        </dependency>-->
         <dependency>
             <groupId>com.wind.middleware</groupId>
             <artifactId>logback-kafka-appender</artifactId>

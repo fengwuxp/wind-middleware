@@ -6,7 +6,7 @@ import com.wind.common.exception.AssertUtils;
 import org.apache.shardingsphere.elasticjob.api.ShardingContext;
 import org.springframework.util.StringUtils;
 
-import javax.validation.constraints.Null;
+import jakarta.validation.constraints.Null;
 import java.util.Map;
 
 /**

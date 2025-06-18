@@ -4,12 +4,12 @@ import lombok.AllArgsConstructor;
 import org.springframework.lang.Nullable;
 import org.springframework.security.crypto.encrypt.BytesEncryptor;
 import org.springframework.security.crypto.encrypt.TextEncryptor;
-import org.springframework.util.Base64Utils;
 
 import javax.crypto.Cipher;
 import java.nio.charset.StandardCharsets;
 import java.security.PrivateKey;
 import java.security.PublicKey;
+import java.util.Base64;
 
 /**
  * ras TextEncryptor
@@ -49,27 +49,18 @@ public final class RasTextEncryptor implements TextEncryptor {
 
     @Override
     public String encrypt(String text) {
-        return Base64Utils.encodeToString(delegate.encrypt(text.getBytes(StandardCharsets.UTF_8)));
+        return Base64.getEncoder().encodeToString(delegate.encrypt(text.getBytes(StandardCharsets.UTF_8)));
     }
 
     @Override
     public String decrypt(String encryptedText) {
-        return new String(delegate.decrypt(Base64Utils.decodeFromString(encryptedText)));
+        return new String(delegate.decrypt(Base64.getDecoder().decode(encryptedText)));
     }
 
     /**
      * 公钥加密，私钥解密
      */
-    private static class RsaPublicEncryptor implements BytesEncryptor {
-
-        private final PublicKey publicKey;
-
-        private final PrivateKey privateKey;
-
-        public RsaPublicEncryptor(PublicKey publicKey, PrivateKey privateKey) {
-            this.publicKey = publicKey;
-            this.privateKey = privateKey;
-        }
+    private record RsaPublicEncryptor(PublicKey publicKey, PrivateKey privateKey) implements BytesEncryptor {
 
         @Override
         public byte[] encrypt(byte[] byteArray) {
@@ -98,16 +89,7 @@ public final class RasTextEncryptor implements TextEncryptor {
     /**
      * 私钥加密，公钥解密
      */
-    private static class RsaPrivateEncryptor implements BytesEncryptor {
-
-        private final PrivateKey privateKey;
-
-        private final PublicKey publicKey;
-
-        public RsaPrivateEncryptor(PrivateKey privateKey, PublicKey publicKey) {
-            this.privateKey = privateKey;
-            this.publicKey = publicKey;
-        }
+    private record RsaPrivateEncryptor(PrivateKey privateKey, PublicKey publicKey) implements BytesEncryptor {
 
         @Override
         public byte[] encrypt(byte[] bytes) {

@@ -41,7 +41,7 @@
         <dependency>
             <groupId>com.wuxp.codegen</groupId>
             <artifactId>wuxp-codegen-source-code-support</artifactId>
-            <version>${wuxp-codegen.version}</version>
+            <version>${revision}</version>
             <exclusions>
                 <exclusion>
                     <groupId>ch.qos.reload4j</groupId>

@@ -4,7 +4,7 @@ import com.wind.common.WindConstants;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import org.springframework.security.web.util.matcher.RequestMatcher;
 
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
 import java.util.Set;
 import java.util.stream.Collectors;
 

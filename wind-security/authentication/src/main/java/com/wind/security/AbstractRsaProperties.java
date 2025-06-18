@@ -4,7 +4,6 @@ import com.wind.common.exception.BaseException;
 import com.wind.common.exception.DefaultExceptionCode;
 import lombok.Getter;
 import lombok.Setter;
-import org.springframework.util.Base64Utils;
 
 import java.beans.Transient;
 import java.security.KeyFactory;
@@ -14,6 +13,7 @@ import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.security.spec.PKCS8EncodedKeySpec;
 import java.security.spec.X509EncodedKeySpec;
+import java.util.Base64;
 
 /**
  * @author wuxp
@@ -44,12 +44,12 @@ public abstract class AbstractRsaProperties {
     }
 
     private PublicKey getPublicKey() throws Exception {
-        byte[] bytes = Base64Utils.decodeFromString(getRsaPublicKey());
+        byte[] bytes = Base64.getDecoder().decode(getRsaPublicKey());
         return getRsaFactory().generatePublic(new X509EncodedKeySpec(bytes));
     }
 
     private PrivateKey getPrivateKey() throws Exception {
-        byte[] bytes = Base64Utils.decodeFromString(getRsaPrivateKey());
+        byte[] bytes = Base64.getDecoder().decode(getRsaPrivateKey());
         return getRsaFactory().generatePrivate(new PKCS8EncodedKeySpec(bytes));
     }
 

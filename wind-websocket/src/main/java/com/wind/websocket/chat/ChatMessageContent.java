@@ -7,7 +7,7 @@ import com.wind.core.WritableContextVariables;
 import lombok.Getter;
 import lombok.experimental.FieldNameConstants;
 
-import javax.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotBlank;
 import java.io.Serializable;
 import java.util.Collections;
 import java.util.HashMap;

@@ -2,7 +2,6 @@ package com.wind.signature.algorithm;
 
 import com.wind.common.exception.BaseException;
 import com.wind.common.exception.DefaultExceptionCode;
-import org.springframework.util.Base64Utils;
 
 import java.security.InvalidKeyException;
 import java.security.KeyFactory;
@@ -12,6 +11,7 @@ import java.security.SignatureException;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.PKCS8EncodedKeySpec;
 import java.security.spec.X509EncodedKeySpec;
+import java.util.Base64;
 
 
 /**
@@ -39,7 +39,7 @@ public final class Sha256WithRsaSigner {
      */
     public static String sign(String signText, String privateKey) {
         // 构造PKCS8EncodedKeySpec对象
-        PKCS8EncodedKeySpec keySpec = new PKCS8EncodedKeySpec(Base64Utils.decodeFromString(privateKey));
+        PKCS8EncodedKeySpec keySpec = new PKCS8EncodedKeySpec(Base64.getDecoder().decode(privateKey));
         try {
             // 指定加密算法
             KeyFactory keyFactory = KeyFactory.getInstance(KEY_ALGORITHM);
@@ -47,7 +47,7 @@ public final class Sha256WithRsaSigner {
             Signature signature = Signature.getInstance(SIGNATURE_ALGORITHM);
             signature.initSign(keyFactory.generatePrivate(keySpec));
             signature.update(signText.getBytes());
-            return Base64Utils.encodeToString(signature.sign());
+            return Base64.getEncoder().encodeToString(signature.sign());
         } catch (NoSuchAlgorithmException | InvalidKeyException | InvalidKeySpecException |
                  SignatureException exception) {
             throw new BaseException(DefaultExceptionCode.COMMON_ERROR, "sign error", exception);
@@ -64,7 +64,7 @@ public final class Sha256WithRsaSigner {
      */
     public static boolean verify(String signText, String publicKey, String sign) {
         // 构造X509EncodedKeySpec对象
-        X509EncodedKeySpec keySpec = new X509EncodedKeySpec(Base64Utils.decodeFromString(publicKey));
+        X509EncodedKeySpec keySpec = new X509EncodedKeySpec(Base64.getDecoder().decode(publicKey));
         try {
             // 指定加密算法
             KeyFactory keyFactory = KeyFactory.getInstance(KEY_ALGORITHM);
@@ -72,7 +72,7 @@ public final class Sha256WithRsaSigner {
             signature.initVerify(keyFactory.generatePublic(keySpec));
             signature.update(signText.getBytes());
             // 验证签名是否正常
-            return signature.verify(Base64Utils.decodeFromString(sign));
+            return signature.verify(Base64.getDecoder().decode(sign));
         } catch (NoSuchAlgorithmException | InvalidKeyException | InvalidKeySpecException |
                  SignatureException exception) {
             throw new BaseException(DefaultExceptionCode.COMMON_ERROR, "verify sign error", exception);

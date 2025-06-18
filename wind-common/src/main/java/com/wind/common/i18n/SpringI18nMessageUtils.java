@@ -1,12 +1,13 @@
 package com.wind.common.i18n;
 
 import com.wind.common.WindConstants;
+import jakarta.validation.constraints.NotNull;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.MessageSource;
 import org.springframework.lang.Nullable;
 import org.springframework.util.StringUtils;
 
-import javax.validation.constraints.NotNull;
+
 import java.util.Locale;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Predicate;

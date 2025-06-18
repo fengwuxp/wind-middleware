@@ -79,22 +79,18 @@
         <google-zxing.version>3.5.2</google-zxing.version>
         <freemarker.version>2.3.32</freemarker.version>
         <logback-encoder.version>8.1</logback-encoder.version>
-        <retrofit.version>2.9.0</retrofit.version>
-        <kafka.version>3.5.0</kafka.version>
+        <okhttp.version>5.0.0-alpha.16</okhttp.version>
+        <retrofit.version>3.0.0</retrofit.version>
+        <kafka.version>3.8.0</kafka.version>
 
-        <!-- fix -->
-<!--        <kafka.version>3.8.0</kafka.version>-->
-<!--        <jackson-bom.version>2.18.2</jackson-bom.version>-->
-<!--        <snakeyaml.version>2.3</snakeyaml.version>-->
         <zookeeper.version>3.9.3</zookeeper.version>
 
         <swagger-openapiv3.version>2.2.31</swagger-openapiv3.version>
-        <springdoc-openapi.version>1.8.0</springdoc-openapi.version>
+        <springdoc-openapi.version>2.8.9</springdoc-openapi.version>
         <googleauth.version>1.5.0</googleauth.version>
-        <bcprov.version>1.80</bcprov.version>
         <bucket4j.version>8.10.1</bucket4j.version>
         <json-path.version>2.9.0</json-path.version>
-        <jetbrains-annotations.version>24.1.0</jetbrains-annotations.version>
+        <jetbrains-annotations.version>26.0.2</jetbrains-annotations.version>
         <podam.version>8.0.2.RELEASE</podam.version>
         <junit-platform-surefire-provider.version>1.3.2</junit-platform-surefire-provider.version>
     </properties>
@@ -155,6 +151,24 @@
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
+            <dependency>
+                <groupId>com.squareup.okhttp3</groupId>
+                <artifactId>okhttp-bom</artifactId>
+                <version>${okhttp.version}</version>
+                <type>pom</type>
+            </dependency>
+            <dependency>
+                <groupId>org.springdoc</groupId>
+                <artifactId>springdoc-openapi</artifactId>
+                <version>${springdoc-openapi.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.springdoc</groupId>
+                <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
+                <version>${springdoc-openapi.version}</version>
+            </dependency>
             <!-- https://mvnrepository.com/artifact/org.apache.rocketmq/rocketmq-spring-boot-starter -->
             <dependency>
                 <groupId>org.apache.rocketmq</groupId>
@@ -176,11 +190,11 @@
                 <artifactId>wind-mybatis-flex-processor</artifactId>
                 <version>${revision}</version>
             </dependency>
-<!--            <dependency>-->
-<!--                <groupId>com.wind.tools</groupId>-->
-<!--                <artifactId>mybatis-flex-codegen</artifactId>-->
-<!--                <version>${revision}</version>-->
-<!--            </dependency>-->
+            <dependency>
+                <groupId>com.wind.tools</groupId>
+                <artifactId>mybatis-flex-codegen</artifactId>
+                <version>${revision}</version>
+            </dependency>
             <dependency>
                 <groupId>com.wind.tools</groupId>
                 <artifactId>h2-functions-for-mysql</artifactId>
@@ -503,13 +517,8 @@
             </dependency>
             <dependency>
                 <groupId>io.swagger.core.v3</groupId>
-                <artifactId>swagger-annotations</artifactId>
+                <artifactId>swagger-annotations-jakarta</artifactId>
                 <version>${swagger-openapiv3.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.springdoc</groupId>
-                <artifactId>springdoc-openapi-ui</artifactId>
-                <version>${springdoc-openapi.version}</version>
             </dependency>
             <dependency>
                 <groupId>com.jayway.jsonpath</groupId>

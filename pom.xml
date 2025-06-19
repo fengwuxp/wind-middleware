@@ -47,7 +47,6 @@
         <tests.fork.count/>
         <tests.reuse.forks/>
 
-        <!--编译参数 保留方法名称-->
         <java.version>21</java.version>
         <maven.compiler.source>21</maven.compiler.source>
         <maven.compiler.target>21</maven.compiler.target>
@@ -700,16 +699,6 @@
 
     <profiles>
         <profile>
-            <id>编译时保留方法参数名称</id>
-            <activation>
-                <jdk>1.8</jdk>
-            </activation>
-            <properties>
-                <!--1.8编译参数-保留方法名称-->
-                <compilerArgument>-parameters</compilerArgument>
-            </properties>
-        </profile>
-        <profile>
             <id>测试覆盖率采集</id>
             <activation>
                 <activeByDefault>true</activeByDefault>
@@ -819,7 +808,10 @@
                         <artifactId>maven-compiler-plugin</artifactId>
                         <configuration>
                             <debug>true</debug>
-                            <compilerArgument>${compilerArgument}</compilerArgument>
+                            <compilerArgs>
+                                <!--  编译时保留方法名称  -->
+                                <arg>-parameters</arg>
+                            </compilerArgs>
                             <source>${java.version}</source>
                             <target>${java.version}</target>
                             <encoding>UTF-8</encoding>

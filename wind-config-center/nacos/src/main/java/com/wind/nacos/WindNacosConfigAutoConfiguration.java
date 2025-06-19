@@ -5,9 +5,11 @@ import com.alibaba.nacos.api.config.ConfigService;
 import com.wind.configcenter.core.ConfigRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 
 
 @AllArgsConstructor
+@Configuration(proxyBeanMethods = false)
 public class WindNacosConfigAutoConfiguration {
 
     @Bean

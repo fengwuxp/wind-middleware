@@ -133,6 +133,18 @@ public final class WindReflectUtils {
                 .collect(Collectors.toList());
     }
 
+    public static boolean makeAccessible(Field field) {
+        try {
+            if (isAccessibleClass(field.getDeclaringClass())) {
+                field.setAccessible(true);
+                return true;
+            }
+        } catch (Throwable ignored) {
+            // JDK 17/21 模块安全限制导致不能 setAccessible；忽略
+        }
+        return false;
+    }
+
     /**
      * 获取类的 方法列表
      *
@@ -143,6 +155,35 @@ public final class WindReflectUtils {
         AssertUtils.notNull(clazz, "argument clazz must not null");
         return clazz.getMethods();
     }
+
+    /**
+     * 获取字段的 getter 方法
+     *
+     * @param field 字段
+     * @return get 方法
+     */
+    public static Method findFieldGetMethod(Field field) {
+        Class<?> clazz = field.getDeclaringClass();
+        String fieldName = field.getName();
+        Class<?> fieldType = field.getType();
+        // 构建 getter 方法名
+        String capitalized = Character.toUpperCase(fieldName.charAt(0)) + fieldName.substring(1);
+        String getterName = "get" + capitalized;
+        try {
+            return clazz.getMethod(getterName); // 只找 public 方法
+        } catch (NoSuchMethodException e) {
+            // fallback：尝试找 getXxx 形式（boolean 时 isXxx 可能找不到）
+            if (fieldType == boolean.class || fieldType == Boolean.class) {
+                try {
+                    return clazz.getMethod("is" + capitalized);
+                } catch (NoSuchMethodException ex) {
+                    return null;
+                }
+            }
+            return null;
+        }
+    }
+
 
     /**
      * 获取类的公有 getter 方法列表
@@ -231,13 +272,7 @@ public final class WindReflectUtils {
 
     private static void trySetAccessible(Field[] fields) {
         for (Field field : fields) {
-            try {
-                if (isAccessibleClass(field.getDeclaringClass())) {
-                    field.setAccessible(true);
-                }
-            } catch (Throwable ignored) {
-                // JDK 17/21 模块安全限制导致不能 setAccessible；忽略
-            }
+            makeAccessible(field);
         }
     }
 

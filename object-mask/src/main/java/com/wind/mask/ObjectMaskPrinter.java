@@ -12,6 +12,7 @@ import org.springframework.util.ClassUtils;
 import org.springframework.util.ReflectionUtils;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 import java.time.temporal.Temporal;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -322,8 +323,14 @@ public final class ObjectMaskPrinter implements ObjectMasker<Object, String> {
             Class<?> clazz = obj.getClass();
             StringBuilder result = new StringBuilder(obj.getClass().getSimpleName()).append("(");
             for (Field field : WindReflectUtils.getFields(clazz)) {
-                ReflectionUtils.makeAccessible(field);
-                Object value = ReflectionUtils.getField(field, obj);
+                Object value = null;
+                if (WindReflectUtils.makeAccessible(field)) {
+                    value = ReflectionUtils.getField(field, obj);
+                } else {
+                    // 改用 getter 方法获取
+                    Method method = WindReflectUtils.findFieldGetMethod(field);
+                    value = method == null ? null : ReflectionUtils.invokeMethod(method, obj);
+                }
                 MaskRule rule = getFieldMaskRule(field);
                 result.append(field.getName()).append("=").append(printWithMaskRule(value, rule)).append(", ");
             }

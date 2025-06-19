@@ -1,8 +1,11 @@
 package com.wind.common.util;
 
+import lombok.Data;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 import java.lang.reflect.Type;
 import java.util.Collections;
 import java.util.List;
@@ -27,6 +30,14 @@ class WindReflectUtilsTests {
         Assertions.assertEquals(2, types.length);
     }
 
+    @Test
+    void testFindFieldGetMethod() {
+        Field field = WindReflectUtils.findField(Example2.class, "name");
+        Assertions.assertNotNull(field);
+        Method method = WindReflectUtils.findFieldGetMethod(field);
+        Assertions.assertNotNull(method);
+    }
+
     static class Example implements Function<String, List<String>> {
 
         @Override
@@ -38,11 +49,15 @@ class WindReflectUtilsTests {
     static abstract class AbstractDemo<T, R> implements Function<T, R> {
     }
 
+    @Data
     static class Example2 extends AbstractDemo<String, List<String>> {
+
+        private String name;
 
         @Override
         public List<String> apply(String s) {
             return Collections.emptyList();
         }
     }
+
 }

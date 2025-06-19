@@ -1,13 +1,13 @@
 package com.wind.common.util;
 
 import com.wind.common.exception.AssertUtils;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Null;
 import org.springframework.aop.support.AopUtils;
 import org.springframework.core.ResolvableType;
 import org.springframework.util.ConcurrentReferenceHashMap;
 import org.springframework.util.ObjectUtils;
 
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Null;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
@@ -22,6 +22,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
+import java.util.concurrent.CopyOnWriteArraySet;
 import java.util.stream.Collectors;
 
 /**
@@ -35,6 +36,11 @@ public final class WindReflectUtils {
     private static final Field[] EMPTY = new Field[0];
 
     private static final Map<Class<?>, List<Field>> FIELDS = new ConcurrentReferenceHashMap<>();
+
+    private static final Set<String> UNABLE_ACCESS_PACKAGES = new CopyOnWriteArraySet<>(
+            Arrays.asList("java.", "jdk.", "com.sun.", "sun.")
+    );
+
 
     /**
      * 根据注解查找 {@link Field}，会递归查找超类
@@ -51,7 +57,7 @@ public final class WindReflectUtils {
                 .stream()
                 .filter(field -> field.isAnnotationPresent(annotationClass))
                 .toArray(Field[]::new);
-        Field.setAccessible(result, true);
+        trySetAccessible(result);
         return result;
     }
 
@@ -74,7 +80,7 @@ public final class WindReflectUtils {
                 .filter(field -> names.contains(field.getName()))
                 .distinct()
                 .toArray(Field[]::new);
-        Field.setAccessible(result, true);
+        trySetAccessible(result);
         return result;
     }
 
@@ -221,5 +227,21 @@ public final class WindReflectUtils {
         return Arrays.stream(generics)
                 .map(ResolvableType::getType)
                 .toArray(Type[]::new);
+    }
+
+    private static void trySetAccessible(Field[] fields) {
+        for (Field field : fields) {
+            try {
+                if (isAccessibleClass(field.getDeclaringClass())) {
+                    field.setAccessible(true);
+                }
+            } catch (Throwable ignored) {
+                // JDK 17/21 模块安全限制导致不能 setAccessible；忽略
+            }
+        }
+    }
+
+    private static boolean isAccessibleClass(Class<?> clazz) {
+        return UNABLE_ACCESS_PACKAGES.stream().noneMatch(p -> clazz.getName().startsWith(p));
     }
 }

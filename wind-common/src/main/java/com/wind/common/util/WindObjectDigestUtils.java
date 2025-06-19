@@ -106,12 +106,12 @@ public final class WindObjectDigestUtils {
         if (StringUtils.hasText(prefix)) {
             result.append(WindConstants.COLON).append(prefix);
         }
-        List<String> sortedNames = fieldNames.stream().sorted().collect(Collectors.toList());
+        List<String> sortedNames = fieldNames.stream().sorted().toList();
         for (String name : sortedNames) {
             Field field = fieldMaps.get(name);
             AssertUtils.notNull(field, String.format("field name = %s not found", name));
             try {
-                Object val = null;
+                Object val;
                 if (WindReflectUtils.makeAccessible(field)) {
                     val = field.get(target);
                 } else {
@@ -135,9 +135,7 @@ public final class WindObjectDigestUtils {
         if (val == null) {
             return WindConstants.EMPTY;
         }
-        if (ClassUtils.isPrimitiveOrWrapper(val.getClass())
-                || val.getClass().isEnum()
-                || val instanceof CharSequence) {
+        if (ClassUtils.isPrimitiveOrWrapper(val.getClass()) || val.getClass().isEnum() || val instanceof CharSequence) {
             // 基础数据类型，枚举，字符串
             return String.valueOf(val);
         } else if (val instanceof Date) {

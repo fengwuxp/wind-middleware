@@ -5,15 +5,17 @@ import com.wind.common.annotations.VisibleForTesting;
 import com.wind.common.exception.AssertUtils;
 import com.wind.common.exception.BaseException;
 import com.wind.common.exception.DefaultExceptionCode;
+import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotNull;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.springframework.lang.Nullable;
 import org.springframework.util.ClassUtils;
 import org.springframework.util.ConcurrentReferenceHashMap;
 import org.springframework.util.StringUtils;
 
-import jakarta.validation.constraints.NotEmpty;
-import jakarta.validation.constraints.NotNull;
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -99,7 +101,6 @@ public final class WindObjectDigestUtils {
     static String genSha256Text(Object target, Collection<String> fieldNames, String prefix, String joiner) {
         // TODO 性能优化
         Field[] fields = WindReflectUtils.findFields(target.getClass(), fieldNames);
-        Field.setAccessible(fields, true);
         Map<String, Field> fieldMaps = Arrays.stream(fields).collect(Collectors.toMap(Field::getName, Function.identity()));
         StringBuilder result = new StringBuilder();
         if (StringUtils.hasText(prefix)) {
@@ -110,10 +111,19 @@ public final class WindObjectDigestUtils {
             Field field = fieldMaps.get(name);
             AssertUtils.notNull(field, String.format("field name = %s not found", name));
             try {
+                Object val = null;
+                if (WindReflectUtils.makeAccessible(field)) {
+                    val = field.get(target);
+                } else {
+                    Method method = WindReflectUtils.findFieldGetMethod(field);
+                    AssertUtils.notNull(method,
+                            () -> String.format("not find get method, field = %s#%s", field.getDeclaringClass().getName(), field.getName()));
+                    val = method.invoke(target);
+                }
                 result.append(name).append(WindConstants.EQ)
-                        .append(getValueText(field.get(target)))
+                        .append(getValueText(val))
                         .append(joiner);
-            } catch (IllegalAccessException exception) {
+            } catch (IllegalAccessException | InvocationTargetException exception) {
                 throw new BaseException(DefaultExceptionCode.COMMON_ERROR, String.format("get object value error, name = %s", name), exception);
             }
         }
@@ -170,6 +180,9 @@ public final class WindObjectDigestUtils {
         } else if (val instanceof Map) {
             // Map 使用 {}
             return String.format("%s%s%s", WindConstants.DELIM_START, getMapText(((Map<?, ?>) val)), WindConstants.DELIM_END);
+        } else if (val instanceof Number) {
+            // 数值类型
+            return String.valueOf(val);
         } else {
             // 对象使用 {}
             return String.format("%s%s%s", WindConstants.DELIM_START, genSha256Text(val, getObjectFieldNames(val), null, WindConstants.AND),
@@ -188,17 +201,23 @@ public final class WindObjectDigestUtils {
     }
 
     private static long getTemporalAccessorTimestamp(TemporalAccessor accessor) {
-        if (accessor instanceof LocalDateTime) {
-            Instant instant = ((LocalDateTime) accessor).toInstant(ZoneOffset.UTC);
-            return instant.toEpochMilli();
-        } else if (accessor instanceof LocalDate) {
-            Instant instant = ((LocalDate) accessor).atStartOfDay().toInstant(ZoneOffset.UTC);
-            return instant.toEpochMilli();
-        } else if (accessor instanceof LocalTime) {
-            // 计算从当天零点（午夜）开始到该时间点的 纳秒数
-            return ((LocalTime) accessor).toNanoOfDay();
-        } else {
-            return accessor.getLong(ChronoField.MILLI_OF_DAY);
+        switch (accessor) {
+            case LocalDateTime localDateTime -> {
+                Instant instant = localDateTime.toInstant(ZoneOffset.UTC);
+                return instant.toEpochMilli();
+            }
+            case LocalDate localDate -> {
+                Instant instant = localDate.atStartOfDay().toInstant(ZoneOffset.UTC);
+                return instant.toEpochMilli();
+            }
+            case LocalTime localTime -> {
+                // 计算从当天零点（午夜）开始到该时间点的 纳秒数
+                return localTime.toNanoOfDay();
+                // 计算从当天零点（午夜）开始到该时间点的 纳秒数
+            }
+            default -> {
+                return accessor.getLong(ChronoField.MILLI_OF_DAY);
+            }
         }
     }
 }

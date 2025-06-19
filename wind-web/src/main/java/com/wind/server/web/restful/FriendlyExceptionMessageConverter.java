@@ -43,8 +43,8 @@ public interface FriendlyExceptionMessageConverter {
      */
     static FriendlyExceptionMessageConverter defaults() {
         return throwable -> {
-            if (throwable instanceof BaseException) {
-                ExceptionCode code = ((BaseException) throwable).getCode();
+            if (throwable instanceof BaseException baseException) {
+                ExceptionCode code = baseException.getCode();
                 if (Objects.equals(code, DefaultExceptionCode.COMMON_FRIENDLY_ERROR)) {
                     return code.getDesc();
                 }
@@ -60,8 +60,7 @@ public interface FriendlyExceptionMessageConverter {
      */
     static FriendlyExceptionMessageConverter i18n() {
         return throwable -> {
-            if (throwable instanceof BaseException) {
-                BaseException baseException = (BaseException) throwable;
+            if (throwable instanceof BaseException baseException) {
                 if (Objects.equals(baseException.getCode(), DefaultExceptionCode.COMMON_FRIENDLY_ERROR)) {
                     return SpringI18nMessageUtils.getMessage(baseException.getCode().getDesc());
                 }

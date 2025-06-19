@@ -6,10 +6,6 @@ com.wind.server.i18n.SpringI18nMessageSourceInitializer
 #ApplicationContextInitializer
 org.springframework.context.ApplicationContextInitializer=\
 com.wind.common.spring.WindBeanDefinitionRegistryPostProcessor
-# Auto Configure
-org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
-com.wind.server.configuration.WindServerAutoConfiguration,\
-com.wind.server.configuration.I18nMessageSourceAutoConfiguration
 # Environment PostProcessor
 org.springframework.boot.env.EnvironmentPostProcessor=\
 com.wind.server.env.ReorderSystemEnvironmentPostProcessor

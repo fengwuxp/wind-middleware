@@ -5,6 +5,8 @@ import com.wind.common.message.MessageFormatter;
 import com.wind.common.message.MessagePlaceholder;
 import lombok.Getter;
 
+import java.io.Serial;
+
 /**
  * 通用基础业务异常，不同的业务场景可以继承该类做扩展
  *
@@ -13,6 +15,7 @@ import lombok.Getter;
 @Getter
 public class BaseException extends RuntimeException {
 
+    @Serial
     private static final long serialVersionUID = 319556802147084526L;
 
     private static final MessageFormatter MESSAGE_FORMATTER = MessageFormatter.java();

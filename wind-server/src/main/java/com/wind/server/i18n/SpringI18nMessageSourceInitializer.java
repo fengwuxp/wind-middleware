@@ -4,6 +4,7 @@ import com.wind.common.i18n.SpringI18nMessageUtils;
 import com.wind.server.web.restful.FriendlyExceptionMessageConverter;
 import com.wind.server.web.restful.RestfulApiRespFactory;
 import com.wind.web.util.HttpServletRequestUtils;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.context.event.ApplicationStartedEvent;
 import org.springframework.boot.web.context.ConfigurableWebServerApplicationContext;
@@ -12,7 +13,6 @@ import org.springframework.context.MessageSource;
 import org.springframework.web.servlet.LocaleResolver;
 
 import javax.annotation.Nonnull;
-import jakarta.servlet.http.HttpServletRequest;
 import java.util.Arrays;
 import java.util.Locale;
 import java.util.concurrent.atomic.AtomicReference;

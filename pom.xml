@@ -595,10 +595,18 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
                 <configuration>
+                    <debug>true</debug>
+                    <!--  编译时保留方法名称  -->
+                    <parameters>true</parameters>
+                    <compilerArgs>
+                        <arg>-parameters</arg>
+                    </compilerArgs>
+                    <release>${java.version}</release>
                     <source>${java.version}</source>
                     <target>${java.version}</target>
                     <encoding>UTF-8</encoding>
                 </configuration>
+                <inherited>true</inherited>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -805,21 +813,6 @@
                     </plugin>
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-compiler-plugin</artifactId>
-                        <configuration>
-                            <debug>true</debug>
-                            <compilerArgs>
-                                <!--  编译时保留方法名称  -->
-                                <arg>-parameters</arg>
-                            </compilerArgs>
-                            <source>${java.version}</source>
-                            <target>${java.version}</target>
-                            <encoding>UTF-8</encoding>
-                        </configuration>
-                        <inherited>true</inherited>
-                    </plugin>
-                    <plugin>
-                        <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-deploy-plugin</artifactId>
                         <inherited>true</inherited>
                     </plugin>
@@ -890,6 +883,7 @@
             </build>
         </profile>
     </profiles>
+
 
     <organization>
         <name>Wuxp</name>

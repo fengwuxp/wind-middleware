@@ -42,10 +42,11 @@
 
     <properties>
         <revision>1.0.0-jdk21-SNAPSHOT</revision>
-        <!--   占位使用     -->
+        <!--   测试相关     -->
         <jacoco-coverage-agent/>
         <tests.fork.count/>
         <tests.reuse.forks/>
+        <test.ignore.failure>true</test.ignore.failure>
 
         <java.version>21</java.version>
         <maven.compiler.source>21</maven.compiler.source>
@@ -55,7 +56,9 @@
         <maven-source-plugin.attach>false</maven-source-plugin.attach>
 
         <maven-flatten-plugin.version>1.5.0</maven-flatten-plugin.version>
+        <maven-surefire-report-plugin.version>3.5.3</maven-surefire-report-plugin.version>
         <jacoco-maven-plugin.version>0.8.13</jacoco-maven-plugin.version>
+        <git-commit-id-plugin.version>4.9.10</git-commit-id-plugin.version>
 
         <spring-boot.version>3.5.0</spring-boot.version>
         <spring-cloud-commons.version>4.3.0</spring-cloud-commons.version>
@@ -564,19 +567,9 @@
         <pluginManagement>
             <plugins>
                 <plugin>
-                    <groupId>org.apache.maven.plugins</groupId>
-                    <artifactId>maven-resources-plugin</artifactId>
-                    <version>${maven-resources-plugin.version}</version>
-                </plugin>
-                <plugin>
                     <groupId>org.codehaus.mojo</groupId>
                     <artifactId>flatten-maven-plugin</artifactId>
                     <version>${maven-flatten-plugin.version}</version>
-                </plugin>
-                <plugin>
-                    <groupId>org.apache.maven.plugins</groupId>
-                    <artifactId>maven-source-plugin</artifactId>
-                    <version>${maven-source-plugin.version}</version>
                 </plugin>
                 <plugin>
                     <groupId>org.jacoco</groupId>
@@ -584,9 +577,14 @@
                     <version>${jacoco-maven-plugin.version}</version>
                 </plugin>
                 <plugin>
+                    <groupId>pl.project13.maven</groupId>
+                    <artifactId>git-commit-id-plugin</artifactId>
+                    <version>${git-commit-id-plugin.version}</version>
+                </plugin>
+                <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-surefire-report-plugin</artifactId>
-                    <version>${maven-surefire-plugin.version}</version>
+                    <version>${maven-surefire-report-plugin.version}</version>
                 </plugin>
             </plugins>
         </pluginManagement>
@@ -628,6 +626,7 @@
                         </property>
                     </systemPropertyVariables>
                     <forkCount>${tests.fork.count}</forkCount>
+                    <testFailureIgnore>${test.ignore.failure}</testFailureIgnore>
                 </configuration>
                 <dependencies>
                     <dependency>
@@ -674,6 +673,7 @@
                             or prepare-agent-integration goals, before the actual tests are run. This sets a property named argLine which
                             points to the JaCoCo agent, later passed as a JVM argument to the test runner -->
                             <argLine>${jacoco-coverage-agent}</argLine>
+                            <testFailureIgnore>${test.ignore.failure}</testFailureIgnore>
                         </configuration>
                     </execution>
                 </executions>

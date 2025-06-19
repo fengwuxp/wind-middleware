@@ -77,12 +77,11 @@
         <fastjson2.version>2.0.53</fastjson2.version>
         <javet.version>3.1.2</javet.version>
         <google-zxing.version>3.5.2</google-zxing.version>
-        <freemarker.version>2.3.32</freemarker.version>
         <logback-encoder.version>8.1</logback-encoder.version>
-        <okhttp.version>5.0.0-alpha.16</okhttp.version>
+        <okhttp.version>4.12.0</okhttp.version>
         <retrofit.version>3.0.0</retrofit.version>
         <kafka.version>3.8.0</kafka.version>
-
+        <datafaker.version>2.4.3</datafaker.version>
         <zookeeper.version>3.9.3</zookeeper.version>
 
         <swagger-openapiv3.version>2.2.31</swagger-openapiv3.version>
@@ -368,11 +367,6 @@
             </dependency>
             <dependency>
                 <groupId>org.mapstruct</groupId>
-                <artifactId>mapstruct-jdk8</artifactId>
-                <version>${mapstruct.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.mapstruct</groupId>
                 <artifactId>mapstruct-processor</artifactId>
                 <version>${mapstruct.version}</version>
             </dependency>
@@ -426,12 +420,6 @@
                 <artifactId>javet-macos</artifactId>
                 <version>${javet.version}</version>
                 <optional>true</optional>
-            </dependency>
-            <!-- https://mvnrepository.com/artifact/org.freemarker/freemarker -->
-            <dependency>
-                <groupId>org.freemarker</groupId>
-                <artifactId>freemarker</artifactId>
-                <version>${freemarker.version}</version>
             </dependency>
             <dependency>
                 <groupId>net.logstash.logback</groupId>
@@ -540,6 +528,12 @@
                 <groupId>org.yaml</groupId>
                 <artifactId>snakeyaml</artifactId>
                 <version>${snakeyaml.version}</version>
+            </dependency>
+            <!-- https://mvnrepository.com/artifact/net.datafaker/datafaker -->
+            <dependency>
+                <groupId>net.datafaker</groupId>
+                <artifactId>datafaker</artifactId>
+                <version>${datafaker.version}</version>
             </dependency>
             <!-- https://mvnrepository.com/artifact/com.bucket4j/bucket4j-core -->
             <dependency>

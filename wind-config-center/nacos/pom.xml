@@ -50,36 +50,41 @@
             <groupId>com.alibaba.cloud</groupId>
             <artifactId>spring-cloud-starter-alibaba-nacos-config</artifactId>
         </dependency>
+        <dependency>
+            <groupId>com.alibaba.cloud</groupId>
+            <artifactId>spring-alibaba-nacos-config</artifactId>
+        </dependency>
     </dependencies>
 
-    <build>
-        <plugins>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-shade-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <phase>package</phase>
-                        <goals>
-                            <goal>shade</goal>
-                        </goals>
-                        <configuration>
-                            <createDependencyReducedPom>true</createDependencyReducedPom>
-                            <artifactSet>
-                                <includes>
-                                    <include>com.alibaba.cloud:spring-cloud-starter-alibaba-nacos-config</include>
-                                </includes>
-                                <excludes>
-                                    <exclude>org.slf4j:*</exclude>
-                                    <exclude>org.springframework.boot:*</exclude>
-                                    <exclude>org.springframework:*</exclude>
-                                </excludes>
-                            </artifactSet>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
-        </plugins>
-    </build>
+<!--    <build>-->
+<!--        <plugins>-->
+<!--            <plugin>-->
+<!--                <groupId>org.apache.maven.plugins</groupId>-->
+<!--                <artifactId>maven-shade-plugin</artifactId>-->
+<!--                <executions>-->
+<!--                    <execution>-->
+<!--                        <phase>package</phase>-->
+<!--                        <goals>-->
+<!--                            <goal>shade</goal>-->
+<!--                        </goals>-->
+<!--                        <configuration>-->
+<!--                            <createDependencyReducedPom>true</createDependencyReducedPom>-->
+<!--                            <artifactSet>-->
+<!--                                <includes>-->
+<!--                                    <include>com.alibaba.cloud:spring-cloud-starter-alibaba-nacos-config</include>-->
+<!--                                    <include>com.alibaba.cloud:spring-alibaba-nacos-config</include>-->
+<!--                                </includes>-->
+<!--                                <excludes>-->
+<!--                                    <exclude>org.slf4j:*</exclude>-->
+<!--                                    <exclude>org.springframework.boot:*</exclude>-->
+<!--                                    <exclude>org.springframework:*</exclude>-->
+<!--                                </excludes>-->
+<!--                            </artifactSet>-->
+<!--                        </configuration>-->
+<!--                    </execution>-->
+<!--                </executions>-->
+<!--            </plugin>-->
+<!--        </plugins>-->
+<!--    </build>-->
 
 </project>

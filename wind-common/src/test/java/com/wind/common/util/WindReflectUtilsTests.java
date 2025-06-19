@@ -12,7 +12,7 @@ import java.util.function.Function;
  * @author wuxp
  * @date 2024-09-14 13:50
  **/
-public class WindReflectUtilsTests {
+class WindReflectUtilsTests {
 
 
     @Test

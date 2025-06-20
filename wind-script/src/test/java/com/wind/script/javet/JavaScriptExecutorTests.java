@@ -24,7 +24,7 @@ import java.util.concurrent.Future;
 class JavaScriptExecutorTests {
 
     @BeforeEach
-    public void setup() {
+    void setup() {
         JavaScriptExecutor.configure("Array.prototype.includes = function (searchElement, fromIndex) {\n"
                 + "  return this.indexOf(searchElement, fromIndex) >= 0\n"
                 + "}");

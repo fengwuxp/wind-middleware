@@ -1,9 +1,8 @@
 package com.wind.server.web.download;
 
-import com.wind.common.exception.BaseException;
-import com.wind.common.exception.DefaultExceptionCode;
 import com.wind.web.download.WindDownload;
 import com.wind.web.download.WindFileMediaType;
+import jakarta.servlet.http.HttpServletResponse;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.core.MethodParameter;
 import org.springframework.core.annotation.AnnotationUtils;
@@ -12,10 +11,9 @@ import org.springframework.http.MediaType;
 import org.springframework.http.server.ServerHttpRequest;
 import org.springframework.http.server.ServerHttpResponse;
 import org.springframework.http.server.ServletServerHttpResponse;
+import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseBodyAdvice;
 
-import javax.servlet.http.HttpServletResponse;
-import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.Objects;
@@ -26,6 +24,7 @@ import java.util.Objects;
  * @author wuxp
  * @date 2025-06-20 17:01
  **/
+@ControllerAdvice
 public class DownloadFileResponseHeaderAdvice implements ResponseBodyAdvice<Object> {
 
     @Override
@@ -40,7 +39,7 @@ public class DownloadFileResponseHeaderAdvice implements ResponseBodyAdvice<Obje
         if (annotation == null) {
             return body;
         }
-        if (response instanceof ServletServerHttpResponse) {
+        if (response instanceof ServletServerHttpResponse serverResponse) {
             String mediaType = annotation.mediaType();
             String filename = annotation.value();
             if (mediaType.isEmpty()) {
@@ -48,14 +47,10 @@ public class DownloadFileResponseHeaderAdvice implements ResponseBodyAdvice<Obje
                 // 默认 octet-stream
                 mediaType = fileMediaType == null ? MediaType.APPLICATION_OCTET_STREAM_VALUE : fileMediaType.getMediaType();
             }
-            HttpServletResponse servletResponse = ((ServletServerHttpResponse) response).getServletResponse();
+            HttpServletResponse servletResponse = serverResponse.getServletResponse();
             servletResponse.addHeader(HttpHeaders.CONTENT_TYPE, mediaType);
-            try {
-                String encodedFilename = URLEncoder.encode(filename, StandardCharsets.UTF_8.name());
-                servletResponse.addHeader(HttpHeaders.CONTENT_DISPOSITION, String.format("attachment;filename=%s", encodedFilename));
-            } catch (UnsupportedEncodingException e) {
-                throw new BaseException(DefaultExceptionCode.COMMON_ERROR, "download file exception", e);
-            }
+            String encodedFilename = URLEncoder.encode(filename, StandardCharsets.UTF_8);
+            servletResponse.addHeader(HttpHeaders.CONTENT_DISPOSITION, String.format("attachment;filename=%s", encodedFilename));
         }
         return body;
     }

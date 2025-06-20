@@ -77,7 +77,7 @@
         <dynamic-tp.version>1.2.2</dynamic-tp.version>
         <guava.version>32.0.1-jre</guava.version>
         <fastjson2.version>2.0.53</fastjson2.version>
-        <javet.version>3.1.2</javet.version>
+        <javet.version>4.0.0</javet.version>
         <google-zxing.version>3.5.2</google-zxing.version>
         <logback-encoder.version>8.1</logback-encoder.version>
         <okhttp.version>4.12.0</okhttp.version>

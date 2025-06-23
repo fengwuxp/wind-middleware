@@ -11,7 +11,6 @@ import org.springframework.http.MediaType;
 import org.springframework.http.server.ServerHttpRequest;
 import org.springframework.http.server.ServerHttpResponse;
 import org.springframework.http.server.ServletServerHttpResponse;
-import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseBodyAdvice;
 
 import java.net.URLEncoder;
@@ -24,7 +23,6 @@ import java.util.Objects;
  * @author wuxp
  * @date 2025-06-20 17:01
  **/
-@ControllerAdvice
 public class DownloadFileResponseHeaderAdvice implements ResponseBodyAdvice<Object> {
 
     @Override

@@ -7,7 +7,9 @@ import lombok.Getter;
 import org.springframework.util.StringUtils;
 
 import javax.annotation.Nullable;
-import javax.validation.constraints.NotNull;
+import jakarta.validation.constraints.NotNull;
+
+import java.io.Serial;
 import java.io.Serializable;
 import java.util.Collections;
 import java.util.Set;
@@ -140,6 +142,7 @@ public interface RbacResource extends Serializable {
     @EqualsAndHashCode(of = "id")
     class ImmutablePermission implements RbacResource.Permission {
 
+        @Serial
         private static final long serialVersionUID = 6255678473411919964L;
 
         /**
@@ -171,6 +174,7 @@ public interface RbacResource extends Serializable {
     @EqualsAndHashCode(of = "id")
     class ImmutableRole implements RbacResource.Role {
 
+        @Serial
         private static final long serialVersionUID = -6791142921724321619L;
 
         /**

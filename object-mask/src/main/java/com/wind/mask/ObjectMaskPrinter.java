@@ -47,9 +47,9 @@ public final class ObjectMaskPrinter implements ObjectMasker<Object, String> {
                     Temporal.class
             ));
 
-    public static final Set<Class<?>> IGNORE_CLASSES = new LinkedHashSet<>(ImmutableSet.of(Date.class));
+    private static final Set<Class<?>> IGNORE_CLASSES = new LinkedHashSet<>(ImmutableSet.of(Date.class));
 
-    public static final Set<String> IGNORE_PACKAGES = new LinkedHashSet<>();
+    private static final Set<String> IGNORE_PACKAGES = new LinkedHashSet<>();
 
     static {
         IGNORE_PACKAGES.add("org.springframework.");
@@ -178,9 +178,9 @@ public final class ObjectMaskPrinter implements ObjectMasker<Object, String> {
             if (isCycleRef(value)) {
                 return printCycleRefClassHashCode(value);
             }
-            if (value instanceof String) {
+            if (value instanceof String str) {
                 // TODO 单纯的字符串先不支持脱敏
-                return (String) value;
+                return str;
             }
             if (value instanceof Throwable) {
                 return value.toString();
@@ -219,7 +219,7 @@ public final class ObjectMaskPrinter implements ObjectMasker<Object, String> {
             if (isCycleRef(value)) {
                 return printCycleRefClassHashCode(value);
             }
-            Object result = masker instanceof ObjectMasker ? ((ObjectMasker) masker).mask(value, fieldRule.getKeys()) : masker.mask(value);
+            Object result = (masker instanceof ObjectMasker om) ? om.mask(value, fieldRule.getKeys()) : masker.mask(value);
             return String.valueOf(result);
         }
 
@@ -306,8 +306,8 @@ public final class ObjectMaskPrinter implements ObjectMasker<Object, String> {
             for (Map.Entry<?, ?> entry : map.entrySet()) {
                 Object key = entry.getKey();
                 result.append(key).append("=");
-                if (key instanceof String) {
-                    MaskRule rule = group.matchesWithKey((String) key);
+                if (key instanceof String k) {
+                    MaskRule rule = group.matchesWithKey(k);
                     result.append(printWithMaskRule(entry.getValue(), rule == null ? maskRule : rule));
                 } else {
                     result.append(mask(entry.getValue()));
@@ -323,8 +323,8 @@ public final class ObjectMaskPrinter implements ObjectMasker<Object, String> {
             Class<?> clazz = obj.getClass();
             StringBuilder result = new StringBuilder(obj.getClass().getSimpleName()).append("(");
             for (Field field : WindReflectUtils.getFields(clazz)) {
-                Object value = null;
-                if (WindReflectUtils.makeAccessible(field)) {
+                Object value;
+                if (field.trySetAccessible()) {
                     value = ReflectionUtils.getField(field, obj);
                 } else {
                     // 改用 getter 方法获取
@@ -345,7 +345,7 @@ public final class ObjectMaskPrinter implements ObjectMasker<Object, String> {
             String name = field.getName();
             if (annotation == null) {
                 MaskRuleGroup ruleGroup = rueRegistry.getRuleGroup(field.getDeclaringClass());
-                return ruleGroup == null ? null : ruleGroup.matchesWithName(name);
+                return ruleGroup.matchesWithName(name);
             }
             return new MaskRule(name, Arrays.asList(annotation.names()), MaskerFactory.getMasker(annotation.masker()));
         }
@@ -383,7 +383,7 @@ public final class ObjectMaskPrinter implements ObjectMasker<Object, String> {
             if (rule == null) {
                 return null;
             }
-            return (WindMasker<Object, Object>) rule.getMasker();
+            return rule.getMasker();
         }
 
         private void deleteLastBlank(StringBuilder builder) {

@@ -112,7 +112,7 @@ public final class WindObjectDigestUtils {
             AssertUtils.notNull(field, String.format("field name = %s not found", name));
             try {
                 Object val;
-                if (WindReflectUtils.makeAccessible(field)) {
+                if (field.trySetAccessible()) {
                     val = field.get(target);
                 } else {
                     Method method = WindReflectUtils.findFieldGetMethod(field);

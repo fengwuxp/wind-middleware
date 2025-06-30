@@ -6,6 +6,7 @@ import java.time.Duration;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.concurrent.RejectedExecutionHandler;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
@@ -20,6 +21,19 @@ public final class ExecutorServiceUtils {
 
     private ExecutorServiceUtils() {
         throw new AssertionError();
+    }
+
+    /**
+     * 创建虚拟线程的线程池（每个任务一个线程，适用于高并发阻塞型任务）
+     *
+     * @param threadNamePrefix 线程名前缀（JDK 21 无法自定义虚拟线程名，但可以手动 wrap）
+     * @return ExecutorService 实例
+     * @since JDK 21+
+     */
+    public static ExecutorService virtual(String threadNamePrefix) {
+        return ExecutorBuilder.withThreadName(threadNamePrefix)
+                .useVirtualThreads()
+                .build();
     }
 
     /**
@@ -81,6 +95,8 @@ public final class ExecutorServiceUtils {
 
         private RejectedExecutionHandler rejectedExecutionHandler = new ThreadPoolExecutor.AbortPolicy();
 
+        private boolean useVirtualThreads = false;
+
         private ExecutorBuilder() {
         }
 
@@ -115,7 +131,16 @@ public final class ExecutorServiceUtils {
             return this;
         }
 
+        public ExecutorBuilder useVirtualThreads() {
+            this.useVirtualThreads = true;
+            return this;
+        }
+
         public ExecutorService build() {
+            if (useVirtualThreads) {
+                return Executors.newThreadPerTaskExecutor(Thread.ofVirtual().name(threadNamePrefix, 0).factory());
+            }
+
             return new ThreadPoolExecutor(corePoolSize, maximumPoolSize, keepAlive.getSeconds(), TimeUnit.SECONDS, workQueue,
                     new CustomizableThreadFactory(threadNamePrefix), rejectedExecutionHandler);
         }

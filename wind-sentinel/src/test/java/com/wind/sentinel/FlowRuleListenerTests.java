@@ -43,6 +43,13 @@ class FlowRuleListenerTests {
 
 
     @Test
+    void testReadSource() throws Exception {
+        String text = dataSource.readSource();
+        Assertions.assertEquals("[{\"clusterMode\":false,\"controlBehavior\":0,\"count\":100.0,\"grade\":1,\"limitApp\":\"default\"," +
+                "\"maxQueueingTimeMs\":500,\"regex\":false,\"resource\":\"/a/b/c\",\"strategy\":0,\"warmUpPeriodSec\":10}]", text);
+    }
+
+    @Test
     void testLoadAndGetRules() {
         Assertions.assertEquals(1, FlowRuleManager.getRules().size());
         ready.set(true);

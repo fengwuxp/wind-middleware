@@ -1,12 +1,17 @@
 package com.wind.common.util;
 
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
+import java.lang.reflect.AccessFlag;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Type;
+import java.math.BigDecimal;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.function.Function;
@@ -16,7 +21,6 @@ import java.util.function.Function;
  * @date 2024-09-14 13:50
  **/
 class WindReflectUtilsTests {
-
 
     @Test
     void testResolveSuperGenericTypeV1() {
@@ -38,6 +42,17 @@ class WindReflectUtilsTests {
         Assertions.assertNotNull(method);
     }
 
+    @Test
+    void testReflectIgnoreJavaModel() {
+        List<String> fieldNames = WindReflectUtils.getFieldNames(BigDecimal.class);
+        Field[] fields = WindReflectUtils.findFields(BigDecimal.class, fieldNames);
+        boolean match = Arrays.stream(fields).map(Field::accessFlags)
+                .flatMap(Collection::stream)
+                .anyMatch(accessFlag -> accessFlag == AccessFlag.PRIVATE);
+        Assertions.assertTrue(match);
+    }
+
+
     static class Example implements Function<String, List<String>> {
 
         @Override
@@ -46,9 +61,10 @@ class WindReflectUtilsTests {
         }
     }
 
-    static abstract class AbstractDemo<T, R> implements Function<T, R> {
+    abstract static class AbstractDemo<T, R> implements Function<T, R> {
     }
 
+    @EqualsAndHashCode(callSuper = true)
     @Data
     static class Example2 extends AbstractDemo<String, List<String>> {
 

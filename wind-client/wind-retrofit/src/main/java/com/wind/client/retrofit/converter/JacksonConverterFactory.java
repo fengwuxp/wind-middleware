@@ -55,8 +55,8 @@ public class JacksonConverterFactory extends Converter.Factory {
     public @Nullable Converter<?, String> stringConverter(
             @NotNull Type type, Annotation @NotNull [] annotations, @NotNull Retrofit retrofit) {
         return (Converter<Object, String>) value -> {
-            if (value instanceof Collection) {
-                return joinAsQueryString((Collection) value);
+            if (value instanceof Collection val) {
+                return joinAsQueryString(val);
             }
             if (value.getClass().isArray()) {
                 List args = Arrays.asList((Object[]) value);

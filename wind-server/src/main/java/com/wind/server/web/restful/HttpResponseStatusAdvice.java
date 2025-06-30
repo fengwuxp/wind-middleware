@@ -39,8 +39,7 @@ public class HttpResponseStatusAdvice implements ResponseBodyAdvice<Object> {
     public Object beforeBodyWrite(Object body, @Nonnull MethodParameter returnType, @Nonnull MediaType selectedContentType,
                                   @Nonnull Class selectedConverterType, @Nonnull ServerHttpRequest request,
                                   @Nonnull ServerHttpResponse response) {
-        if (body instanceof ApiResp) {
-            ApiResp<?> resp = (ApiResp<?>) body;
+        if (body instanceof ApiResp<?> resp) {
             response.setStatusCode(resp.getHttpStatus());
         }
         return body;

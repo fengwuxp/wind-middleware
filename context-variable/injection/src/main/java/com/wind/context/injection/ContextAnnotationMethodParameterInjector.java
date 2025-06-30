@@ -102,8 +102,8 @@ public class ContextAnnotationMethodParameterInjector implements MethodParameter
             } else if (isCollection(parameterType)) {
                 // 集合对象
                 Type genericType = parameter.getParameterizedType();
-                if (genericType instanceof ParameterizedType) {
-                    Type[] actualTypeArguments = ((ParameterizedType) genericType).getActualTypeArguments();
+                if (genericType instanceof ParameterizedType parameterizedType) {
+                    Type[] actualTypeArguments = parameterizedType.getActualTypeArguments();
                     AssertUtils.isTrue(actualTypeArguments.length >= 1, String.format("method = %s, parameter = %s actualTypeArguments size le 1",
                             method.getName(), parameter.getName()));
                     Class<?> actualTypeArgument = (Class<?>) actualTypeArguments[0];

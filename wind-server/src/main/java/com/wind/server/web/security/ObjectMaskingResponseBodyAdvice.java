@@ -44,10 +44,10 @@ public class ObjectMaskingResponseBodyAdvice implements ResponseBodyAdvice<Objec
 
     @Override
     public Object beforeBodyWrite(Object body, @NotNull MethodParameter returnType, @NotNull MediaType selectedContentType, @NotNull Class<?
-            extends HttpMessageConverter<?>> selectedConverterType, ServerHttpRequest request, ServerHttpResponse response) {
+            extends HttpMessageConverter<?>> selectedConverterType, @NotNull ServerHttpRequest request, @NotNull ServerHttpResponse response) {
         // TODO 待优化
-        if (body instanceof ApiResp) {
-            sanitizeReturnValue(((ApiResp<?>) body).getData());
+        if (body instanceof ApiResp<?> resp) {
+            sanitizeReturnValue(resp.getData());
         } else {
             sanitizeReturnValue(body);
         }
@@ -55,9 +55,9 @@ public class ObjectMaskingResponseBodyAdvice implements ResponseBodyAdvice<Objec
     }
 
     private void sanitizeReturnValue(Object result) {
-        if (result instanceof Pagination) {
+        if (result instanceof Pagination<?> pagination) {
             // 分页对象
-            MASKER.mask(((Pagination<?>) result).getRecords());
+            MASKER.mask(pagination.getRecords());
         } else {
             MASKER.mask(result);
         }

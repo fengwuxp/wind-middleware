@@ -36,12 +36,12 @@ public final class SpringExpressionOperators {
         AssertUtils.notNull(right, "argument right must no null");
         left = tryEval(left);
         right = tryEval(right);
-        if (left instanceof CharSequence && right instanceof CharSequence) {
+        if (left instanceof String lStr && right instanceof String rStr) {
             // 字符串类型
-            return ((String) left).contains((String) right);
-        } else if (left instanceof Collection) {
+            return lStr.contains(rStr);
+        } else if (left instanceof Collection<?> collection) {
             // 集合
-            return ((Collection<?>) left).contains(right);
+            return collection.contains(right);
         } else if (right instanceof Collection) {
             // 集合
             return ((Collection<?>) right).contains(left);
@@ -131,9 +131,8 @@ public final class SpringExpressionOperators {
     }
 
     private static Object tryEval(Object operand) {
-        if (operand instanceof String) {
+        if (operand instanceof String expression) {
             // 尝试对 new 表达式进行执行
-            String expression = (String) operand;
             return expression.startsWith("new ") ? SpringExpressionEvaluator.DEFAULT.eval(expression) : operand;
         }
         return operand;

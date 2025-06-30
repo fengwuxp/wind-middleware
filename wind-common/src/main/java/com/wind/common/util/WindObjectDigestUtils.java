@@ -138,12 +138,12 @@ public final class WindObjectDigestUtils {
         if (ClassUtils.isPrimitiveOrWrapper(val.getClass()) || val.getClass().isEnum() || val instanceof CharSequence) {
             // 基础数据类型，枚举，字符串
             return String.valueOf(val);
-        } else if (val instanceof Date) {
+        } else if (val instanceof Date date) {
             // 获取毫秒数
-            return String.valueOf(((Date) val).getTime());
-        } else if (val instanceof TemporalAccessor) {
+            return String.valueOf(date.getTime());
+        } else if (val instanceof TemporalAccessor temporal) {
             // 获取时间戳
-            return String.valueOf(getTemporalAccessorTimestamp((TemporalAccessor) val));
+            return String.valueOf(getTemporalAccessorTimestamp(temporal));
         } else if (val.getClass().isArray()) {
             if (ClassUtils.isPrimitiveArray(val.getClass())) {
                 // 基础数据类型数组
@@ -170,14 +170,14 @@ public final class WindObjectDigestUtils {
                         .map(WindObjectDigestUtils::getValueText)
                         .collect(Collectors.joining(WindConstants.COMMA));
             }
-        } else if (val instanceof Collection) {
+        } else if (val instanceof Collection<?> collection) {
             // 集合类型
-            return ((Collection<?>) val).stream()
+            return collection.stream()
                     .map(WindObjectDigestUtils::getValueText)
                     .collect(Collectors.joining(WindConstants.COMMA));
-        } else if (val instanceof Map) {
+        } else if (val instanceof Map<?,?> map) {
             // Map 使用 {}
-            return String.format("%s%s%s", WindConstants.DELIM_START, getMapText(((Map<?, ?>) val)), WindConstants.DELIM_END);
+            return String.format("%s%s%s", WindConstants.DELIM_START, getMapText(map), WindConstants.DELIM_END);
         } else if (val instanceof Number) {
             // 数值类型
             return String.valueOf(val);

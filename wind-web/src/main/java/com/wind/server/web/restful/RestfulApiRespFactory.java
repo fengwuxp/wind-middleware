@@ -139,8 +139,8 @@ public final class RestfulApiRespFactory {
             // 401
             return unAuthorized(errorMessage);
         }
-        if (throwable instanceof BaseException) {
-            ExceptionCode code = ((BaseException) throwable).getCode();
+        if (throwable instanceof BaseException baseException) {
+            ExceptionCode code = baseException.getCode();
             if (code instanceof DefaultExceptionCode) {
                 HttpStatus status = HttpStatus.resolve(Integer.parseInt(code.getCode()));
                 return of(status == null ? HttpStatus.INTERNAL_SERVER_ERROR : status, null, code, errorMessage);

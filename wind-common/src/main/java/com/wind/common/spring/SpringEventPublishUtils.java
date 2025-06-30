@@ -67,8 +67,8 @@ public final class SpringEventPublishUtils {
     public static void publishEventIfInTransaction(Object event) {
         if (TransactionSynchronizationManager.isSynchronizationActive()) {
             // 在事务中，通过注册回调的方式发送消息
-            if (event instanceof SpringTransactionEvent) {
-                String eventId = ((SpringTransactionEvent) event).getEventId();
+            if (event instanceof SpringTransactionEvent ev) {
+                String eventId = ev.getEventId();
                 Set<String> eventIds = TRANSACTION_EVENT_IDS.get();
                 if (eventIds == null) {
                     eventIds = new HashSet<>();

@@ -77,9 +77,9 @@ public final class WindThreadTracer implements WindTracer {
         if (name != null && val != null) {
             // TODO 待优化
             nullSecurityGetVariables().put(name, val);
-            if (val instanceof String) {
+            if (val instanceof String str) {
                 // 字符传类型变量同步到 MDC 中
-                MDC.put(name, (String) val);
+                MDC.put(name, str);
             }
         }
         return this;

@@ -9,6 +9,8 @@ import com.caoccao.javet.interop.callback.JavetCallbackContext;
 import com.caoccao.javet.values.reference.V8ValueObject;
 import com.wind.common.annotations.VisibleForTesting;
 import com.wind.common.exception.AssertUtils;
+import com.wind.common.exception.BaseException;
+import com.wind.common.exception.DefaultExceptionCode;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
@@ -78,14 +80,14 @@ public final class JavaScriptExecutor {
         try {
             return executJavaScript(functionCode, invoker, args);
         } catch (Exception e) {
-            if (e instanceof JavetException) {
+            if (e instanceof JavetException exception) {
                 // 转换 js 脚本执行异常的 message
                 String message = e.getMessage();
                 // 剪切掉错误消息的前缀
                 message = message != null && message.startsWith(JS_ERROR_PREFIX) ? message.substring(JS_ERROR_PREFIX.length()) : message;
-                throw new RuntimeException(message, e);
+                throw new BaseException(DefaultExceptionCode.COMMON_ERROR, message, exception);
             }
-            throw new RuntimeException(e);
+            throw new BaseException(DefaultExceptionCode.COMMON_ERROR, "execute js error", e);
         }
     }
 
@@ -167,7 +169,7 @@ public final class JavaScriptExecutor {
             }
             return result;
         } catch (IOException e) {
-            throw new RuntimeException("load js lib failure", e);
+            throw new BaseException(DefaultExceptionCode.COMMON_ERROR, "load js lib failure", e);
         }
     }
 
@@ -177,9 +179,10 @@ public final class JavaScriptExecutor {
                 Method method = ReflectionUtils.findMethod(invoker.getClass(), descriptor.getJavaMethodName(), descriptor.getParameterTypes());
                 AssertUtils.notNull(method, () -> "not found java invoker method: " + descriptor.getJavaMethodName());
                 JavetCallbackContext context = new JavetCallbackContext(descriptor.getJavaMethodName(), invoker, method);
-                V8ValueObject v8ValueObject = v8.createV8ValueObject();
-                v8ValueObject.bindFunction(context);
-                v8.getGlobalObject().set(invoker.getJsObjectName(), v8ValueObject);
+                try (V8ValueObject v8ValueObject = v8.createV8ValueObject()) {
+                    v8ValueObject.bindFunction(context);
+                    v8.getGlobalObject().set(invoker.getJsObjectName(), v8ValueObject);
+                }
             }
 
         }

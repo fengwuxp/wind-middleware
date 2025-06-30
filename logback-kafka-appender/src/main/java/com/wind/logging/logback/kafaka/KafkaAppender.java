@@ -49,7 +49,7 @@ public class KafkaAppender<E> extends KafkaAppenderConfig<E> {
             return;
         }
         ensureDeferredAppends();
-        if (e instanceof ILoggingEvent && ((ILoggingEvent) e).getLoggerName().startsWith(KAFKA_LOGGER_PREFIX)) {
+        if (e instanceof ILoggingEvent ev && ev.getLoggerName().startsWith(KAFKA_LOGGER_PREFIX)) {
             deferAppend(e);
         } else {
             super.doAppend(e);
@@ -149,8 +149,8 @@ public class KafkaAppender<E> extends KafkaAppenderConfig<E> {
     }
 
     protected Long getTimestamp(E e) {
-        if (e instanceof ILoggingEvent) {
-            return ((ILoggingEvent) e).getTimeStamp();
+        if (e instanceof ILoggingEvent ev) {
+            return ev.getTimeStamp();
         } else {
             return System.currentTimeMillis();
         }

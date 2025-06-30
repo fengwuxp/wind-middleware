@@ -25,9 +25,10 @@ public class WebAuditLogRecorder extends ScriptAuditLogRecorder {
     }
 
     @Override
+    @SuppressWarnings("rawtypes")
     protected Object resolveMethodReturnValue(Object methodReturnValue) {
-        if (methodReturnValue instanceof ApiResp) {
-            return ((ApiResp<?>) methodReturnValue).getData();
+        if (methodReturnValue instanceof ApiResp resp) {
+            return resp.getData();
         }
         return super.resolveMethodReturnValue(methodReturnValue);
     }

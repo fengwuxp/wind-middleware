@@ -5,8 +5,8 @@ import org.apache.rocketmq.client.hook.SendMessageHook;
 import org.apache.rocketmq.client.producer.DefaultMQProducer;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.config.BeanPostProcessor;
+import org.springframework.lang.NonNull;
 
-import jakarta.validation.constraints.NotNull;
 import java.util.concurrent.atomic.AtomicReference;
 
 /**
@@ -21,10 +21,10 @@ public class DefaultMqProducerBeanPostProcessor implements BeanPostProcessor {
     private final AtomicReference<Object> producerRef = new AtomicReference<>();
 
     @Override
-    public Object postProcessAfterInitialization(@NotNull Object bean, @NotNull String beanName) throws BeansException {
-        if (producerRef.get() != bean && bean instanceof DefaultMQProducer) {
+    public Object postProcessAfterInitialization(@NonNull Object bean, @NonNull String beanName) throws BeansException {
+        if (producerRef.get() != bean && bean instanceof DefaultMQProducer producer) {
             producerRef.set(bean);
-            ((DefaultMQProducer) bean).getDefaultMQProducerImpl().registerSendMessageHook(new SendMessageTraceHook());
+            producer.getDefaultMQProducerImpl().registerSendMessageHook(new SendMessageTraceHook());
             log.info("register send message hook：SendMessageTraceHook");
         }
         return bean;

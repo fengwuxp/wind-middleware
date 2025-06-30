@@ -59,8 +59,8 @@ public final class SentinelFlowLimitUtils {
             throwable = exception;
             if (exception instanceof BlockException) {
                 throw new BaseException(DefaultExceptionCode.TO_MANY_REQUESTS, "request to many", exception);
-            } else if (exception instanceof BaseException) {
-                throw (BaseException) exception;
+            } else if (exception instanceof BaseException baseException) {
+                throw baseException;
             } else {
                 throw new BaseException(DefaultExceptionCode.COMMON_ERROR, exception.getMessage(), exception);
             }

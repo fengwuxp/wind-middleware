@@ -269,9 +269,9 @@ public final class RetrofitClientFactory {
         }
 
         @NotNull
+        @SuppressWarnings({"rawtypes"})
         private static Object defaultResponseExtractor(Object data) {
-            if (data instanceof ApiResponse) {
-                ApiResponse<?> response = (ApiResponse<?>) data;
+            if (data instanceof ApiResponse response) {
                 AssertUtils.state(response.isSuccess(), () -> new ApiClientException(response, response.getErrorMessage()));
                 return response.getData();
             }

@@ -171,10 +171,9 @@ public class DefaultGlobalExceptionHandler {
         if (GlobalExceptionLogDecisionMaker.requiresPrintErrorLog(exception)) {
             log.error("捕获到异常: {}，errorMessage: {}", exception.getClass().getName(), exception.getMessage(), exception);
         }
-        if (throwable instanceof UndeclaredThrowableException) {
+        if (throwable instanceof UndeclaredThrowableException th) {
             // 获取真正的异常
-            InvocationTargetException invocationTargetException =
-                    (InvocationTargetException) ((UndeclaredThrowableException) throwable).getUndeclaredThrowable();
+            InvocationTargetException invocationTargetException = (InvocationTargetException) th.getUndeclaredThrowable();
             throwable = invocationTargetException.getTargetException();
         }
         return RestfulApiRespFactory.error(throwable.getMessage());

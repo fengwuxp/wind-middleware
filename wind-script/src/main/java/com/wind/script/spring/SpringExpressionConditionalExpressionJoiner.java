@@ -56,10 +56,7 @@ public class SpringExpressionConditionalExpressionJoiner implements ConditionalE
         JOINERS.put(Op.CONTAINS, (left, right, op) -> String.format(SPRING_CONTAINS_OP_EXPRESSION, left, right));
         JOINERS.put(Op.NOT_CONTAINS, (left, right, op) -> "!" + JOINERS.get(Op.CONTAINS).join(left, right, Op.CONTAINS));
 
-        JOINERS.put(Op.IN_RANG, (left, right, op) -> {
-            String[] rang = parseExpressionToArray(right);
-            return String.format(SPRING_IN_RANGE_OP_EXPRESSION, left, right);
-        });
+        JOINERS.put(Op.IN_RANG, (left, right, op) -> String.format(SPRING_IN_RANGE_OP_EXPRESSION, left, right));
         JOINERS.put(Op.NOT_IN_RANG, (left, right, op) -> "!" + JOINERS.get(Op.IN_RANG).join(left, right, Op.CONTAINS));
         JOINERS.put(Op.GLOBAL_METHOD, (left, right, op) -> {
             Map<String, String> configs = JSON.parseObject(right, new TypeReference<Map<String, String>>() {
@@ -135,9 +132,8 @@ public class SpringExpressionConditionalExpressionJoiner implements ConditionalE
 
     private String toExpression(Object o, OperandType type) {
         // TODO 其他类型判断
-        if (o instanceof String) {
+        if (o instanceof String text) {
             if (Objects.equals(type, OperandType.EXPRESSION)) {
-                String text = (String) o;
                 AssertUtils.isTrue(!text.startsWith(WindConstants.AT), "不允许使用 @ 开头，访问 spring context bean 对象");
                 return text;
             } else {

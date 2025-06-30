@@ -155,7 +155,7 @@ public final class IpAddressUtils {
      * @return 本机 host
      */
     public static String getLocalIpv4() {
-        InetAddress address = findFirstNonLoopbackAddress(i -> i instanceof Inet4Address);
+        InetAddress address = findFirstNonLoopbackAddress(Inet4Address.class::isInstance);
         return address == null ? WindConstants.UNKNOWN : address.getHostAddress();
     }
 
@@ -165,7 +165,7 @@ public final class IpAddressUtils {
      * @return 本机 host
      */
     public static String getLocalIpv6() {
-        InetAddress address = findFirstNonLoopbackAddress(i -> i instanceof Inet6Address);
+        InetAddress address = findFirstNonLoopbackAddress(Inet6Address.class::isInstance);
         return address == null ? WindConstants.UNKNOWN : address.getHostAddress();
     }
 

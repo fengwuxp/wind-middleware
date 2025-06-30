@@ -7,6 +7,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.lang.Nullable;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.util.Collections;
 import java.util.Map;
@@ -22,6 +23,7 @@ import java.util.Map;
 @Data
 public class WindAuthenticationUser implements Serializable {
 
+    @Serial
     private static final long serialVersionUID = -7270843983936135796L;
 
     /**
@@ -54,11 +56,11 @@ public class WindAuthenticationUser implements Serializable {
      * @return id
      */
     public Long getIdAsLong() {
-        if (id instanceof Number) {
-            return ((Number) id).longValue();
+        if (id instanceof Number number) {
+            return number.longValue();
         }
-        if (id instanceof String) {
-            return Long.parseLong((String) id);
+        if (id instanceof String str) {
+            return Long.parseLong(str);
         }
         throw BaseException.common("invalid user id");
     }

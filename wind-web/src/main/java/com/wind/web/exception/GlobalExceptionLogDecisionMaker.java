@@ -21,6 +21,10 @@ public final class GlobalExceptionLogDecisionMaker {
             // spring security authentication 相关异常忽略打印错误日志
             new AtomicReference<>(throwable -> !isSpringSecurityAuthenticationException(throwable));
 
+    private GlobalExceptionLogDecisionMaker() {
+        throw new AssertionError();
+    }
+
     /**
      * 该异常是否需要输出错误日志
      *
@@ -29,8 +33,8 @@ public final class GlobalExceptionLogDecisionMaker {
      */
     public static boolean requiresPrintErrorLog(Throwable throwable) {
         if (isNonePrintErrorLog(throwable)) {
-            if (throwable instanceof BaseException) {
-                return Objects.equals(((BaseException) throwable).getLogLevel(), ExceptionLogLevel.ERROR);
+            if (throwable instanceof BaseException baseException) {
+                return Objects.equals(baseException.getLogLevel(), ExceptionLogLevel.ERROR);
             }
             return SHOULD_ERROR_LOG.get().test(throwable);
         }

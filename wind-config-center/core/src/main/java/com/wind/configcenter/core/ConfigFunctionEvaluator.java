@@ -77,14 +77,14 @@ public final class ConfigFunctionEvaluator {
     }
 
     private String asText(Object val) {
-        if (val instanceof OriginTrackedValue) {
-            Object value = ((OriginTrackedValue) val).getValue();
-            if (value instanceof String) {
-                return (String) value;
+        if (val instanceof OriginTrackedValue trackedValue) {
+            Object value = trackedValue.getValue();
+            if (value instanceof String str) {
+                return str;
             }
         }
-        if (val instanceof String) {
-            return (String) val;
+        if (val instanceof String str) {
+            return str;
         }
         return String.valueOf(val);
     }

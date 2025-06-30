@@ -88,8 +88,8 @@ public class ObjectDataMasker implements WindMasker<Object, Object> {
             return;
         }
         WindMasker masker = rule.getMasker();
-        if (masker instanceof ObjectMasker) {
-            field.set(val, ((ObjectMasker) masker).mask(o, rule.getKeys()));
+        if (masker instanceof ObjectMasker objectMasker) {
+            field.set(val, objectMasker.mask(o, rule.getKeys()));
         } else {
             field.set(val, masker.mask(o));
         }

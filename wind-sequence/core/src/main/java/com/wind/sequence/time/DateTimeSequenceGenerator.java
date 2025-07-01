@@ -4,7 +4,7 @@ import com.wind.common.exception.AssertUtils;
 import com.wind.sequence.SequenceGenerator;
 import org.apache.commons.lang3.time.DateFormatUtils;
 
-import javax.validation.constraints.NotNull;
+import jakarta.validation.constraints.NotNull;
 import java.util.Date;
 
 /**

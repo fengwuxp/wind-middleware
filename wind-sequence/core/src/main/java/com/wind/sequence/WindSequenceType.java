@@ -1,7 +1,7 @@
 package com.wind.sequence;
 
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 
 /**
  * 序列号类型，建议使用枚举实现

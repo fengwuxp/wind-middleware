@@ -1,6 +1,6 @@
 package com.wind.websocket.core;
 
-import javax.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotBlank;
 
 /**
  * 会话状态操作

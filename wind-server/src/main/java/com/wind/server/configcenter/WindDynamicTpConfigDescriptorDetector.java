@@ -24,28 +24,28 @@ public final class WindDynamicTpConfigDescriptorDetector {
     /**
      * web server type
      */
-    private static final String webServerType;
+    private static final String WEB_SERVER_TYPE;
 
     /**
      * mq type
      */
-    private static final String mqType;
+    private static final String MQ_TYPE;
 
     /**
      * 通用配置，例如：告警平台配置
      */
-    private static final String commonName;
+    private static final String COMMON_NAME;
 
     /**
      * 应用线程池配置
      */
-    private static final String appExecutorName;
+    private static final String APP_EXECUTOR_NAME;
 
     static {
-        webServerType = getWebServerType();
-        mqType = getMqType();
-        commonName = getCommonName();
-        appExecutorName = StringUtils.hasText(commonName) ? "executor" : WindConstants.EMPTY;
+        WEB_SERVER_TYPE = getWebServerType();
+        MQ_TYPE = getMqType();
+        COMMON_NAME = getCommonName();
+        APP_EXECUTOR_NAME = StringUtils.hasText(COMMON_NAME) ? "executor" : WindConstants.EMPTY;
     }
 
     private WindDynamicTpConfigDescriptorDetector() {
@@ -59,11 +59,11 @@ public final class WindDynamicTpConfigDescriptorDetector {
      * @return 配置文件列表
      */
     public static List<ConfigRepository.ConfigDescriptor> getConfigDescriptors(String appName) {
-        return Stream.of(webServerType, mqType, commonName, appExecutorName)
+        return Stream.of(WEB_SERVER_TYPE, MQ_TYPE, COMMON_NAME, APP_EXECUTOR_NAME)
                 .filter(StringUtils::hasText)
                 .map(name -> {
-                    SimpleConfigDescriptor result = SimpleConfigDescriptor.of(String.format("%s-dynamictp-%s", appName, name),
-                            WindMiddlewareType.DYNAMIC_TP.name(), ConfigFileType.YAML);
+                    String configName = String.format("%s-dynamictp-%s", appName, name).toLowerCase();
+                    SimpleConfigDescriptor result = SimpleConfigDescriptor.of(configName, WindMiddlewareType.DYNAMIC_TP.name(), ConfigFileType.YAML);
                     // 支持动态监听
                     result.setRefreshable(true);
                     return result;

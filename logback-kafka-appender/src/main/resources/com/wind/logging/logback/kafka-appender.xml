@@ -29,6 +29,7 @@ Default logback configuration provided for import
                         "userAgent": "%X{User-Agent:-}",
                         "podIp": "%X{localhostIpv4:-}",
                         "thread": "%thread",
+                        "virtualThreadName": "%X{virtualThreadName:-}",
                         "logger": "%logger",
                         "message": "%msg",
                         "level": "%level",

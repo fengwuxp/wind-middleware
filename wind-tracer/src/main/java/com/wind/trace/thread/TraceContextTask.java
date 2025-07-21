@@ -6,6 +6,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.task.TaskDecorator;
 import org.springframework.lang.NonNull;
 
+import java.util.Collections;
 import java.util.Map;
 
 /**
@@ -22,15 +23,17 @@ public abstract class TraceContextTask implements TaskDecorator {
     public Runnable decorate(@NonNull Runnable task) {
         AssertUtils.notNull(task, "argument task must not null");
         // 获取当前线程的上下文
-        Map<String, Object> contextVariables = WindTracer.TRACER.getContextVariables();
+        Map<String, Object> middlewareContext = WindTracer.TRACER.getContextVariables();
+        Map<String, Object> businessContextVariables = copyContextVariables();
         return () -> {
             try {
                 if (log.isDebugEnabled()) {
-                    log.debug("task decorate, trace context: {}", contextVariables);
+                    log.debug("task decorate, trace context: {}", middlewareContext);
                 }
-                traceContext();
                 // 线程切换，复制上下文 ，traceId 也在 contextVariables 中
-                WindTracer.TRACER.trace(null, contextVariables);
+                WindTracer.TRACER.trace(null, middlewareContext);
+                traceContextVariables(businessContextVariables);
+                traceContext();
                 task.run();
             } finally {
                 if (log.isDebugEnabled()) {
@@ -38,23 +41,43 @@ public abstract class TraceContextTask implements TaskDecorator {
                 }
                 // 清除线程上下文
                 WindTracer.TRACER.clear();
+                clearContextVariables();
                 clearContext();
             }
         };
     }
 
-    /**
-     * 自定义的 trace
-     */
+    @Deprecated
     protected void traceContext() {
-        // 子类自行实现
+    }
+
+    @Deprecated
+    protected void clearContext() {
     }
 
     /**
-     * 自定义的 clear context
+     * 复制当前线程的上下文
+     *
+     * @return 上下文变量
      */
-    protected void clearContext() {
-        // 子类自行实现
+    protected Map<String, Object> copyContextVariables() {
+        return Collections.emptyMap();
+    }
+
+    /**
+     * 线程切换，复制上下文 ，traceId 也在 contextVariables 中
+     *
+     * @param contextVariables 上下文
+     */
+    protected void traceContextVariables(Map<String, Object> contextVariables) {
+
+    }
+
+    /**
+     * 清除线程上下文
+     */
+    protected void clearContextVariables() {
+
     }
 
     public static TaskDecorator of() {

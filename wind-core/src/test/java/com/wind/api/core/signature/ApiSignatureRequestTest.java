@@ -86,9 +86,9 @@ class ApiSignatureRequestTest {
     @Test
     void testParseQueryParamsAsMap() {
         Map<String, List<String>> queryParams = ApiSignatureRequest.parseQueryParamsAsMap("a=1%2B2&b=1 2&h=1=1");
-        Assertions.assertEquals("1+2", queryParams.get("a").get(0));
-        Assertions.assertEquals("1 2", queryParams.get("b").get(0));
-        Assertions.assertEquals("1=1", queryParams.get("h").get(0));
+        Assertions.assertEquals("1+2", queryParams.get("a").getFirst());
+        Assertions.assertEquals("1 2", queryParams.get("b").getFirst());
+        Assertions.assertEquals("1=1", queryParams.get("h").getFirst());
     }
 
     @Test

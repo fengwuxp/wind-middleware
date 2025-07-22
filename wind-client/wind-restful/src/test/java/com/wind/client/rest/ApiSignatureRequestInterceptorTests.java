@@ -2,6 +2,7 @@ package com.wind.client.rest;
 
 import com.wind.api.core.signature.ApiSecretAccount;
 import com.wind.api.core.signature.SignatureHttpHeaderNames;
+import jakarta.validation.constraints.NotNull;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -11,6 +12,8 @@ import org.springframework.http.HttpRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.client.ClientHttpRequestExecution;
 import org.springframework.http.client.ClientHttpResponse;
+import org.springframework.lang.NonNull;
+import org.springframework.lang.NonNullApi;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -39,11 +42,13 @@ class ApiSignatureRequestInterceptorTests {
     private static ClientHttpRequestExecution mockExecution() {
         return (request, body) -> new ClientHttpResponse() {
             @Override
+            @NonNull
             public HttpStatus getStatusCode() {
                 return HttpStatus.OK;
             }
 
             @Override
+            @NonNull
             public String getStatusText() {
                 return HttpStatus.OK.getReasonPhrase();
             }
@@ -54,11 +59,13 @@ class ApiSignatureRequestInterceptorTests {
             }
 
             @Override
+            @NonNull
             public InputStream getBody() throws IOException {
                 return new ByteArrayInputStream("success".getBytes(StandardCharsets.UTF_8));
             }
 
             @Override
+            @NonNull
             public HttpHeaders getHeaders() {
                 return request.getHeaders();
             }
@@ -67,23 +74,28 @@ class ApiSignatureRequestInterceptorTests {
 
     private HttpRequest mockHttpRequest() {
         HttpHeaders httpHeaders = new HttpHeaders();
+        httpHeaders.add("Content-Type", "application/json");
         return new HttpRequest() {
             @Override
+            @NonNull
             public HttpMethod getMethod() {
                 return HttpMethod.GET;
             }
 
             @Override
+            @NonNull
             public URI getURI() {
                 return URI.create("/api/v1/user/1");
             }
 
             @Override
+            @NonNull
             public HttpHeaders getHeaders() {
                 return httpHeaders;
             }
 
             @Override
+            @NonNull
             public Map<String, Object> getAttributes() {
                 return Map.of();
             }

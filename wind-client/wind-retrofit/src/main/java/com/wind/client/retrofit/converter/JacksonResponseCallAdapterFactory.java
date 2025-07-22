@@ -39,7 +39,7 @@ public class JacksonResponseCallAdapterFactory extends CallAdapter.Factory {
     }
 
     @Override
-    public CallAdapter<?, ?> get(@NotNull Type returnType, @NotNull Annotation[] annotations, @NotNull Retrofit retrofit) {
+    public CallAdapter<?, ?> get(@NotNull Type returnType, @NotNull Annotation @NotNull [] annotations, @NotNull Retrofit retrofit) {
         return new RespCallAdapter<>(returnType);
     }
 
@@ -72,11 +72,9 @@ public class JacksonResponseCallAdapterFactory extends CallAdapter.Factory {
         private Object parseErrorResp(ResponseBody errorBody) throws IOException {
             JavaType javaType = objectMapper.getTypeFactory().constructType(responseType);
             ObjectReader reader = objectMapper.readerFor(javaType);
-            try {
+            try (errorBody) {
                 Object resp = reader.readValue(errorBody.charStream());
                 return responseExtractor.apply(resp);
-            } finally {
-                errorBody.close();
             }
         }
     }

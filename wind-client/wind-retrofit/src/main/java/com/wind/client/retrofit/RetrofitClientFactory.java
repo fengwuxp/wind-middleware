@@ -19,11 +19,9 @@ import com.wind.common.exception.AssertUtils;
 import okhttp3.Interceptor;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
-import okhttp3.Response;
 import org.jetbrains.annotations.NotNull;
 import retrofit2.Retrofit;
 
-import java.io.IOException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
@@ -31,6 +29,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
+import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
 import static com.wind.common.WindDateFormatPatterns.HH_MM_SS;
@@ -219,16 +218,12 @@ public final class RetrofitClientFactory {
                 if (language != null) {
                     // 添加国际化请求头
                     builder.interceptors()
-                            .add(new Interceptor() {
-                                @NotNull
-                                @Override
-                                public Response intercept(@NotNull Interceptor.Chain chain) throws IOException {
-                                    Request request = chain.request()
-                                            .newBuilder()
-                                            .addHeader("Accept-Language", language.toLanguageTag())
-                                            .build();
-                                    return chain.proceed(request);
-                                }
+                            .add(chain -> {
+                                Request request = chain.request()
+                                        .newBuilder()
+                                        .addHeader("Accept-Language", language.toLanguageTag())
+                                        .build();
+                                return chain.proceed(request);
                             });
                 }
                 httpClient = builder.build();
@@ -273,7 +268,7 @@ public final class RetrofitClientFactory {
         private static Object defaultResponseExtractor(Object data) {
             if (data instanceof ApiResponse response) {
                 AssertUtils.state(response.isSuccess(), () -> new ApiClientException(response, response.getErrorMessage()));
-                return response.getData();
+                return Objects.requireNonNull(response.getData());
             }
             return data;
         }

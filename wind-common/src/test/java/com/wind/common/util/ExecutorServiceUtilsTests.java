@@ -3,6 +3,7 @@ package com.wind.common.util;
 import com.wind.trace.WindTracer;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+import org.slf4j.MDC;
 
 import java.util.Arrays;
 import java.util.concurrent.Callable;
@@ -17,12 +18,15 @@ class ExecutorServiceUtilsTests {
 
     @Test
     void testVirtual() throws Exception {
-        try (ExecutorService executor = ExecutorServiceUtils.virtual("example-")) {
-            Future<?> future = executor.submit((Callable<Object>) () -> 1);
+        try (ExecutorService executor = ExecutorServiceUtils.virtual("example")) {
+            Future<?> future = executor.submit((Callable<Object>) () -> {
+                Assertions.assertEquals("example", MDC.get("virtualThreadName"));
+                return 1;
+            });
             Assertions.assertEquals(1, future.get());
+            Assertions.assertNull(MDC.get("virtualThreadName"));
         }
     }
-
 
     @Test
     void testEnableTrace() throws Exception {
@@ -39,4 +43,5 @@ class ExecutorServiceUtilsTests {
             future.get();
         }
     }
+
 }

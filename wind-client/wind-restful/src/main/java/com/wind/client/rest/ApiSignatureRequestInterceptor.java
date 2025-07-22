@@ -53,6 +53,9 @@ public class ApiSignatureRequestInterceptor implements ClientHttpRequestIntercep
     @Override
     @NonNull
     public ClientHttpResponse intercept(@NonNull HttpRequest request, @NonNull byte[] body, @NonNull ClientHttpRequestExecution execution) throws IOException {
+        if (!SIGNE_CONTENT_TYPES.contains(request.getHeaders().getContentType())) {
+            return execution.execute(request, body);
+        }
         ApiSecretAccount account = accountProvider.apply(request);
         AssertUtils.notNull(account, "ApiSecretAccount must not null");
         ApiSignatureRequest.ApiSignatureRequestBuilder builder = ApiSignatureRequest.builder();

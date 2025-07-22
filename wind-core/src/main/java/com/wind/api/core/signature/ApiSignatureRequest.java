@@ -3,8 +3,7 @@ package com.wind.api.core.signature;
 import com.wind.common.WindConstants;
 import com.wind.common.annotations.VisibleForTesting;
 import com.wind.common.exception.AssertUtils;
-import com.wind.common.exception.BaseException;
-import com.wind.common.exception.DefaultExceptionCode;
+import jakarta.validation.constraints.NotNull;
 import lombok.Builder;
 import lombok.Data;
 import lombok.Getter;
@@ -14,8 +13,6 @@ import org.springframework.util.DigestUtils;
 import org.springframework.util.ObjectUtils;
 import org.springframework.util.StringUtils;
 
-import jakarta.validation.constraints.NotNull;
-import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
@@ -174,11 +171,7 @@ public class ApiSignatureRequest {
     @NotNull
     @VisibleForTesting
     static String decodeQueryString(String queryString) {
-        try {
-            return queryString == null ? null : URLDecoder.decode(queryString, StandardCharsets.UTF_8.name());
-        } catch (UnsupportedEncodingException exception) {
-            throw new BaseException(DefaultExceptionCode.BAD_REQUEST, "decode url error", exception);
-        }
+        return URLDecoder.decode(queryString, StandardCharsets.UTF_8);
     }
 
     public static boolean signRequireRequestBody(@Nullable String contentType) {

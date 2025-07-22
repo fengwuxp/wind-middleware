@@ -2,6 +2,7 @@ package com.wind.client.retrofit.query;
 
 import com.wind.common.query.supports.QueryType;
 
+import java.io.Serial;
 import java.util.HashMap;
 
 /**
@@ -12,6 +13,9 @@ import java.util.HashMap;
  * @date 2024-02-27 16:22
  **/
 public abstract class AbstractPageQueryMap extends HashMap<String, Object> {
+
+    @Serial
+    private static final long serialVersionUID = -32552044324827597L;
 
     protected AbstractPageQueryMap() {
         setQueryPage(1);

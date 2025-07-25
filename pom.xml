@@ -8,7 +8,7 @@
         <!-- https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-dependencies -->
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-dependencies</artifactId>
-        <version>3.5.0</version>
+        <version>3.5.3</version>
     </parent>
 
     <groupId>com.wind.middleware</groupId>

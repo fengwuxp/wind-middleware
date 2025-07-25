@@ -39,6 +39,6 @@ public class SimpleSecurityAccessOperations implements SecurityAccessOperations 
     }
 
     private boolean isGranted(AuthorizationManager<Object> manager) {
-        return Objects.requireNonNull(manager.check(SecurityContextHolder.getContext()::getAuthentication, Collections.emptyList())).isGranted();
+        return Objects.requireNonNull(manager.authorize(SecurityContextHolder.getContext()::getAuthentication, Collections.emptyList())).isGranted();
     }
 }

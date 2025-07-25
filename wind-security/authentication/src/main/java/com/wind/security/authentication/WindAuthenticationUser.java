@@ -28,9 +28,8 @@ public class WindAuthenticationUser implements Serializable {
 
     /**
      * 用户 id
-     * TODO 待优化 改为 String，临时兼容旧逻辑
      */
-    private Object id;
+    private String id;
 
     /**
      * 用户名
@@ -56,13 +55,7 @@ public class WindAuthenticationUser implements Serializable {
      * @return id
      */
     public Long getIdAsLong() {
-        if (id instanceof Number number) {
-            return number.longValue();
-        }
-        if (id instanceof String str) {
-            return Long.parseLong(str);
-        }
-        throw BaseException.common("invalid user id");
+        return Long.parseLong(id);
     }
 
     @Nullable

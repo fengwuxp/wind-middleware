@@ -2,8 +2,6 @@ package com.wind.security.crypto;
 
 import com.wind.common.annotations.VisibleForTesting;
 import com.wind.security.authentication.WindAuthenticationProperties;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeansException;
 import org.springframework.boot.context.event.ApplicationStartedEvent;
@@ -79,18 +77,11 @@ public final class AuthenticationParameterEncryptor implements ApplicationListen
     }
 
 
-    @AllArgsConstructor
-    @Getter
-    public static class AuthenticationParameter {
+    /**
+     * @param principal   登录主体，例如：手机号码、用户名、邮箱等
+     * @param credentials 登录证书，例如：密码、验证码等
+     */
+    public record AuthenticationParameter(String principal, String credentials) {
 
-        /**
-         * 登录主体，例如：手机号码、用户名、邮箱等
-         */
-        private final String principal;
-
-        /**
-         * 登录证书，例如：密码、验证码等
-         */
-        private final String credentials;
     }
 }

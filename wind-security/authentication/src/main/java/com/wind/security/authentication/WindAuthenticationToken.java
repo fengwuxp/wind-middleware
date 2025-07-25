@@ -2,50 +2,28 @@ package com.wind.security.authentication;
 
 import com.wind.common.exception.AssertUtils;
 import com.wind.common.exception.BaseException;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
+import jakarta.validation.constraints.NotNull;
 import org.springframework.lang.Nullable;
 
-import jakarta.validation.constraints.NotNull;
+import java.io.Serial;
 import java.io.Serializable;
 
 /**
  * Authentication Token
  *
+ * @param id         token id 全局唯一的
+ * @param tokenValue token
+ * @param subject    jwt subject，一般是用户 ID
+ * @param user       用户信息，如果是 refresh token，该字段为空
+ * @param expireTime token 过期时间戳
  * @author wuxp
  * @date 2023-09-26 09:35
- **/
-@AllArgsConstructor
-@Getter
-public final class WindAuthenticationToken implements Serializable {
+ */
+public record WindAuthenticationToken(String id, String tokenValue, String subject, @Nullable WindAuthenticationUser user,
+                                      Long expireTime) implements Serializable {
 
+    @Serial
     private static final long serialVersionUID = 1801730423764136024L;
-
-    /**
-     * token id 全局唯一的
-     */
-    private final String id;
-
-    /**
-     * token
-     */
-    private final String tokenValue;
-
-    /**
-     * jwt subject，一般是用户 ID
-     */
-    private final String subject;
-
-    /**
-     * 用户信息，如果是 refresh token，该字段为空
-     */
-    @Nullable
-    private final WindAuthenticationUser user;
-
-    /**
-     * token 过期时间戳
-     */
-    private final Long expireTime;
 
     /**
      * 获取长整型的 subject

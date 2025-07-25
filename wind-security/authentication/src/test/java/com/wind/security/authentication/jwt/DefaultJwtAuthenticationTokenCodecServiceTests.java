@@ -26,33 +26,33 @@ class DefaultJwtAuthenticationTokenCodecServiceTests {
     @Test
     void testGenerateToken() {
         WindAuthenticationToken token = tokenCodecService.generateToken(new WindAuthenticationUser(1L, RandomStringUtils.randomAlphabetic(12)));
-        WindAuthenticationToken parsed = tokenCodecService.parseAndValidateToken(token.getTokenValue());
-        Assertions.assertEquals(token.getId(), parsed.getId());
-        Assertions.assertEquals(token.getSubject(), parsed.getSubject());
+        WindAuthenticationToken parsed = tokenCodecService.parseAndValidateToken(token.tokenValue());
+        Assertions.assertEquals(token.id(), parsed.id());
+        Assertions.assertEquals(token.subject(), parsed.subject());
     }
 
     @Test
     void testParseAndValidateTokenWithException() {
         WindAuthenticationToken token = tokenCodecService.generateToken(new WindAuthenticationUser(1L, RandomStringUtils.randomAlphabetic(12)));
-        tokenUserMap.removeTokenId(token.getSubject());
-        BaseException exception = Assertions.assertThrows(BaseException.class, () -> tokenCodecService.parseAndValidateToken(token.getTokenValue()));
+        tokenUserMap.removeTokenId(token.subject());
+        BaseException exception = Assertions.assertThrows(BaseException.class, () -> tokenCodecService.parseAndValidateToken(token.tokenValue()));
         Assertions.assertEquals("invalid access token user", exception.getMessage());
     }
 
     @Test
     void testGenerateRefreshToken() {
         WindAuthenticationToken token = tokenCodecService.generateRefreshToken("1");
-        WindAuthenticationToken parsed = tokenCodecService.parseAndValidateRefreshToken(token.getTokenValue());
-        Assertions.assertEquals(token.getId(), parsed.getId());
-        Assertions.assertEquals(token.getSubject(), parsed.getSubject());
+        WindAuthenticationToken parsed = tokenCodecService.parseAndValidateRefreshToken(token.tokenValue());
+        Assertions.assertEquals(token.id(), parsed.id());
+        Assertions.assertEquals(token.subject(), parsed.subject());
     }
 
     @Test
     void testParseAndValidateRefreshTokenWithException() {
         WindAuthenticationToken token = tokenCodecService.generateRefreshToken("1");
-        tokenCodecService.revokeAllToken(token.getSubject());
+        tokenCodecService.revokeAllToken(token.subject());
         BaseException exception = Assertions.assertThrows(BaseException.class,
-                () -> tokenCodecService.parseAndValidateRefreshToken(token.getTokenValue()));
+                () -> tokenCodecService.parseAndValidateRefreshToken(token.tokenValue()));
         Assertions.assertEquals("invalid refresh token user", exception.getMessage());
     }
 

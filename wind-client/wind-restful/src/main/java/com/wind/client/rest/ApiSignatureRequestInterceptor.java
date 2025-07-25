@@ -22,8 +22,8 @@ import java.util.List;
 import java.util.function.Function;
 
 /**
- * 接口请求签名加签请求拦截器
- * 参见：https://www.yuque.com/suiyuerufeng-akjad/wind/zl1ygpq3pitl00qp
+ * 接口请求签名加签请求拦截器，对 application/json 和 application/x-www-form-urlencoded 请求进行签名加签
+ * 详情参见：https://www.yuque.com/suiyuerufeng-akjad/wind/zl1ygpq3pitl00qp
  *
  * @author wuxp
  * @date 2024-02-21 15:45

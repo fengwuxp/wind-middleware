@@ -11,7 +11,7 @@ import org.springframework.core.env.PropertySource;
 import org.springframework.core.env.PropertySourcesPropertyResolver;
 import org.springframework.lang.Nullable;
 
-import javax.annotation.Nonnull;
+import jakarta.annotation.Nonnull;
 import java.text.MessageFormat;
 import java.util.List;
 import java.util.Locale;

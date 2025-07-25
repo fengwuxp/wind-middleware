@@ -10,7 +10,7 @@ import com.wind.security.captcha.qrcode.QrCodeCaptchaProperties;
 import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
-import javax.annotation.Nullable;
+import jakarta.annotation.Nullable;
 import java.util.Objects;
 
 /**

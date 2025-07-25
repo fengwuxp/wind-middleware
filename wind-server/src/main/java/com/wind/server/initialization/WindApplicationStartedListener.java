@@ -9,7 +9,7 @@ import org.springframework.context.ApplicationListener;
 import org.springframework.core.OrderComparator;
 import org.springframework.util.StopWatch;
 
-import javax.annotation.Nonnull;
+import jakarta.annotation.Nonnull;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;

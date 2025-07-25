@@ -25,7 +25,6 @@ import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicReference;
-import java.util.stream.Collectors;
 
 /**
  * 线程池创建工具
@@ -281,47 +280,53 @@ public final class ExecutorServiceUtils {
         }
 
         @Override
-        public void execute(Runnable command) {
+        public void execute(@NonNull Runnable command) {
             delegate.execute(taskDecorator.decorate(command));
         }
 
         @Override
-        public <T> Future<T> submit(Callable<T> task) {
+        @NonNull
+        public <T> Future<T> submit(@NonNull Callable<T> task) {
             return delegate.submit(wrap(task));
         }
 
         @Override
-        public Future<?> submit(Runnable task) {
+        @NonNull
+        public Future<?> submit(@NonNull Runnable task) {
             return delegate.submit(taskDecorator.decorate(task));
         }
 
         @Override
-        public <T> Future<T> submit(Runnable task, T result) {
+        @NonNull
+        public <T> Future<T> submit(@NonNull Runnable task, T result) {
             return delegate.submit(taskDecorator.decorate(task), result);
         }
 
         @Override
+        @NonNull
         public <T> List<Future<T>> invokeAll(Collection<? extends Callable<T>> tasks) throws InterruptedException {
-            return delegate.invokeAll(tasks.stream().map(this::wrap).collect(Collectors.toList()));
+            return delegate.invokeAll(tasks.stream().map(this::wrap).toList());
         }
 
         @Override
-        public <T> List<Future<T>> invokeAll(Collection<? extends Callable<T>> tasks, long timeout, TimeUnit unit)
+        @NonNull
+        public <T> List<Future<T>> invokeAll(Collection<? extends Callable<T>> tasks, long timeout, @NonNull TimeUnit unit)
                 throws InterruptedException {
-            return delegate.invokeAll(tasks.stream().map(this::wrap).collect(Collectors.toList()), timeout, unit);
+            return delegate.invokeAll(tasks.stream().map(this::wrap).toList(), timeout, unit);
         }
 
         @Override
+        @NonNull
         public <T> T invokeAny(Collection<? extends Callable<T>> tasks)
                 throws InterruptedException, ExecutionException {
-            return delegate.invokeAny(tasks.stream().map(this::wrap).collect(Collectors.toList()));
+            return delegate.invokeAny(tasks.stream().map(this::wrap).toList());
         }
 
         @Override
         public <T> T invokeAny(Collection<? extends Callable<T>> tasks,
-                               long timeout, TimeUnit unit)
+                               long timeout, @NonNull TimeUnit unit)
                 throws InterruptedException, ExecutionException, TimeoutException {
-            return delegate.invokeAny(tasks.stream().map(this::wrap).collect(Collectors.toList()), timeout, unit);
+            return delegate.invokeAny(tasks.stream().map(this::wrap).toList(), timeout, unit);
         }
 
         @Override
@@ -330,6 +335,7 @@ public final class ExecutorServiceUtils {
         }
 
         @Override
+        @NonNull
         public List<Runnable> shutdownNow() {
             return delegate.shutdownNow();
         }
@@ -345,7 +351,7 @@ public final class ExecutorServiceUtils {
         }
 
         @Override
-        public boolean awaitTermination(long timeout, TimeUnit unit)
+        public boolean awaitTermination(long timeout, @NonNull TimeUnit unit)
                 throws InterruptedException {
             return delegate.awaitTermination(timeout, unit);
         }

@@ -1,10 +1,10 @@
 package com.wind.security.web.util;
 
 import com.wind.common.WindConstants;
-import com.wind.common.exception.AssertUtils;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.HttpMethod;
 import org.springframework.lang.NonNull;
+import org.springframework.lang.Nullable;
 import org.springframework.security.web.servlet.util.matcher.PathPatternRequestMatcher;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import org.springframework.security.web.util.matcher.RequestMatcher;
@@ -36,8 +36,10 @@ public final class RequestMatcherUtils {
      * @return 匹配器列表
      */
     @Deprecated
-    public static Set<RequestMatcher> convertAntMatchers(@NonNull Set<String> patterns) {
-        AssertUtils.notEmpty(patterns, "argument patterns must not null");
+    public static Set<RequestMatcher> convertAntMatchers(@Nullable Set<String> patterns) {
+        if (patterns == null) {
+            return Set.of();
+        }
         return patterns
                 .stream()
                 .map(pattern -> {
@@ -57,8 +59,10 @@ public final class RequestMatcherUtils {
      * @param patterns 支持包含 HTTP 方法 + 路径的字符串格式（如 "GET /api/**"）；
      * @return 匹配器列表
      */
-    public static Set<RequestMatcher> convertPathMatchers(@NonNull Set<String> patterns) {
-        AssertUtils.notEmpty(patterns, "argument patterns must not null");
+    public static Set<RequestMatcher> convertPathMatchers(@Nullable Set<String> patterns) {
+        if (patterns == null) {
+            return Set.of();
+        }
         return patterns.stream()
                 .map(pattern -> {
                     if (pattern.contains(WindConstants.SPACE)) {

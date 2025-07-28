@@ -32,7 +32,6 @@ class RequestMatcherUtilsTests {
         Set<RequestMatcher> matchers = RequestMatcherUtils.convertPathMatchers(patterns);
 
         MockHttpServletRequest request = new MockHttpServletRequest("HEAD", "/public/info");
-
         assertTrue(RequestMatcherUtils.matches(matchers, request));
     }
 
@@ -42,7 +41,6 @@ class RequestMatcherUtilsTests {
         Set<RequestMatcher> matchers = RequestMatcherUtils.convertPathMatchers(patterns);
 
         MockHttpServletRequest request = new MockHttpServletRequest("GET", "/secure/data");
-
         assertFalse(RequestMatcherUtils.matches(matchers, request));
     }
 }

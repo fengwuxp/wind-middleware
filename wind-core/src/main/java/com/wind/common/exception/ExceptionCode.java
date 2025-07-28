@@ -2,6 +2,7 @@ package com.wind.common.exception;
 
 import com.wind.common.enums.DescriptiveEnum;
 
+import java.io.Serial;
 import java.io.Serializable;
 
 /**
@@ -22,6 +23,7 @@ public interface ExceptionCode extends DescriptiveEnum, Serializable {
      * 表示成功的 code
      */
     ExceptionCode SUCCESSFUL = new ExceptionCode() {
+        @Serial
         private static final long serialVersionUID = 5034455936657195532L;
 
         @Override

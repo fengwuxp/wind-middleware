@@ -5,6 +5,7 @@ import com.wind.security.authentication.AuthenticationTokenCodecService;
 import com.wind.security.authentication.AuthenticationTokenUserMap;
 import com.wind.security.authentication.WindAuthenticationToken;
 import com.wind.security.authentication.WindAuthenticationUser;
+import com.wind.security.jwt.JwtTokenCodec;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;

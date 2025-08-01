@@ -1,4 +1,4 @@
-package com.wind.security.authentication.jwt;
+package com.wind.security.jwt;
 
 import com.alibaba.fastjson2.JSON;
 import com.nimbusds.jose.JWSAlgorithm;
@@ -12,6 +12,8 @@ import com.wind.common.exception.AssertUtils;
 import com.wind.security.authentication.WindAuthenticationToken;
 import com.wind.security.authentication.WindAuthenticationUser;
 import com.wind.sequence.SequenceGenerator;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.springframework.lang.Nullable;
 import org.springframework.security.oauth2.jose.jws.SignatureAlgorithm;
@@ -24,8 +26,6 @@ import org.springframework.security.oauth2.jwt.JwtEncoderParameters;
 import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
 import org.springframework.security.oauth2.jwt.NimbusJwtEncoder;
 
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
 import java.security.KeyPair;
 import java.security.interfaces.RSAPublicKey;
 import java.time.Duration;
@@ -44,7 +44,10 @@ public final class JwtTokenCodec {
 
     private static final String AUTHENTICATION_VARIABLE_NAME = "authentication";
 
-    private static final String JWT_AUTH_KEY_ID = "Jwt-Auth-Codec-Wind";
+    /**
+     * jwt 密钥 id
+     */
+    private static final String JWT_AUTH_KEY_ID = "Wind-Jwt-Auth-Codec";
 
     /**
      * jwt issuer

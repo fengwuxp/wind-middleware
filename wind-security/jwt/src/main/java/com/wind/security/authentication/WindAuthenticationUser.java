@@ -1,7 +1,6 @@
 package com.wind.security.authentication;
 
 import com.wind.common.exception.AssertUtils;
-import com.wind.common.exception.BaseException;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;

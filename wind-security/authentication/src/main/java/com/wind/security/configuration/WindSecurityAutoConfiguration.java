@@ -7,7 +7,7 @@ import com.wind.security.authentication.AuthenticationTokenUserMap;
 import com.wind.security.authentication.WindAuthenticationProperties;
 import com.wind.security.authentication.jwt.DefaultJwtAuthenticationTokenCodecService;
 import com.wind.security.authentication.jwt.JwtProperties;
-import com.wind.security.authentication.jwt.JwtTokenCodec;
+import com.wind.security.jwt.JwtTokenCodec;
 import com.wind.security.authority.SimpleSecurityAccessOperations;
 import com.wind.security.authority.WebRequestAuthorityLoader;
 import com.wind.security.authority.WebRequestAuthorizationManager;

@@ -18,10 +18,6 @@
     </properties>
 
     <dependencies>
-<!--        <dependency>-->
-<!--            <groupId>com.wind.tools</groupId>-->
-<!--            <artifactId>wind-mybatis-flex-processor</artifactId>-->
-<!--        </dependency>-->
         <dependency>
             <groupId>com.wind.middleware</groupId>
             <artifactId>logback-kafka-appender</artifactId>
@@ -73,6 +69,10 @@
         <dependency>
             <groupId>com.wind.security</groupId>
             <artifactId>wind-security-authentication</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.wind.security</groupId>
+            <artifactId>wind-security-jwt</artifactId>
         </dependency>
         <dependency>
             <groupId>com.wind.security</groupId>

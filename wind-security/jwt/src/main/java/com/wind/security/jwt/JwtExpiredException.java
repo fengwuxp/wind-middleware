@@ -1,4 +1,4 @@
-package com.wind.security.authentication.jwt;
+package com.wind.security.jwt;
 
 import org.springframework.security.oauth2.jwt.JwtException;
 

@@ -2,6 +2,8 @@ package com.wind.security.authentication.jwt;
 
 import com.wind.security.authentication.WindAuthenticationToken;
 import com.wind.security.authentication.WindAuthenticationUser;
+import com.wind.security.jwt.JwtExpiredException;
+import com.wind.security.jwt.JwtTokenCodec;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 

@@ -19,6 +19,7 @@
         <module>core</module>
         <module>mfa</module>
         <module>crypto</module>
+        <module>jwt</module>
     </modules>
 
     <dependencies>

@@ -6,6 +6,7 @@ import com.wind.security.authentication.AuthenticationTokenCodecService;
 import com.wind.security.authentication.AuthenticationTokenUserMap;
 import com.wind.security.authentication.WindAuthenticationToken;
 import com.wind.security.authentication.WindAuthenticationUser;
+import com.wind.security.jwt.JwtTokenCodec;
 import lombok.extern.slf4j.Slf4j;
 
 import java.time.Duration;

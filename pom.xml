@@ -277,6 +277,11 @@
             </dependency>
             <dependency>
                 <groupId>com.wind.security</groupId>
+                <artifactId>wind-security-jwt</artifactId>
+                <version>${revision}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.wind.security</groupId>
                 <artifactId>wind-security-mfa</artifactId>
                 <version>${revision}</version>
             </dependency>

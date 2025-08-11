@@ -3,6 +3,7 @@ package com.wind.security.authentication;
 import com.wind.common.exception.AssertUtils;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.springframework.lang.Nullable;
 
@@ -18,8 +19,7 @@ import java.util.Map;
  * @date 2023-10-26 12:49
  **/
 @AllArgsConstructor
-@NoArgsConstructor
-@Data
+@Getter
 public class WindAuthenticationUser implements Serializable {
 
     @Serial
@@ -28,17 +28,17 @@ public class WindAuthenticationUser implements Serializable {
     /**
      * 用户 id
      */
-    private String id;
+    private final String id;
 
     /**
      * 用户名
      */
-    private String userName;
+    private final String userName;
 
     /**
      * 用户属性
      */
-    private Map<String, Object> attributes = Collections.emptyMap();
+    private final Map<String, Object> attributes;
 
     public WindAuthenticationUser(Long id, String userName) {
         this(String.valueOf(id), userName);

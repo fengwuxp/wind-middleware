@@ -234,8 +234,7 @@ public final class ExecutorServiceUtils {
         public ExecutorService build() {
             if (useVirtualThreads) {
                 ExecutorService executorService = Executors.newThreadPerTaskExecutor(Thread.ofVirtual().name(threadNamePrefix, 0).factory());
-                return new DecoratingExecutorServiceWrapper(executorService, VirtualThreadMdcTaskDecorator.composite(threadNamePrefix,
-                        TASK_DECORATOR.get()));
+                return new DecoratingExecutorServiceWrapper(executorService, VirtualThreadMdcTaskDecorator.composite(threadNamePrefix, TASK_DECORATOR.get()));
             }
             return new ThreadPoolExecutor(corePoolSize, maximumPoolSize, keepAlive.getSeconds(), TimeUnit.SECONDS, workQueue,
                     new CustomizableThreadFactory(threadNamePrefix), rejectedExecutionHandler);
@@ -268,16 +267,7 @@ public final class ExecutorServiceUtils {
     /**
      * 支持任务自动b包装的 ExecutorService Wrapper
      **/
-    private static class DecoratingExecutorServiceWrapper implements ExecutorService {
-
-        private final ExecutorService delegate;
-
-        private final TaskDecorator taskDecorator;
-
-        private DecoratingExecutorServiceWrapper(ExecutorService delegate, TaskDecorator traceDecorator) {
-            this.delegate = delegate;
-            this.taskDecorator = traceDecorator;
-        }
+    private record DecoratingExecutorServiceWrapper(ExecutorService delegate, TaskDecorator taskDecorator) implements ExecutorService {
 
         @Override
         public void execute(@NonNull Runnable command) {

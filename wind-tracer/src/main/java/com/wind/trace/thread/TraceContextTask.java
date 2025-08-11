@@ -18,6 +18,17 @@ import java.util.Map;
 @Slf4j
 public abstract class TraceContextTask implements TaskDecorator {
 
+    private final boolean printExceptionLog;
+
+    protected TraceContextTask(boolean printExceptionLog) {
+        this.printExceptionLog = printExceptionLog;
+    }
+
+    protected TraceContextTask() {
+        // 默认不输出异常日志，由任务处理者输出
+        this(false);
+    }
+
     @Override
     @NonNull
     public Runnable decorate(@NonNull Runnable task) {
@@ -33,8 +44,12 @@ public abstract class TraceContextTask implements TaskDecorator {
                 // 线程切换，复制上下文 ，traceId 也在 contextVariables 中
                 WindTracer.TRACER.trace(null, middlewareContext);
                 traceContextVariables(businessContextVariables);
-                traceContext();
                 task.run();
+            } catch (Throwable throwable) {
+                if (printExceptionLog) {
+                    log.error("execute task exception, message = {}", throwable.getMessage(), throwable);
+                }
+                throw throwable;
             } finally {
                 if (log.isDebugEnabled()) {
                     log.debug("task decorate, clear trace context");
@@ -42,17 +57,8 @@ public abstract class TraceContextTask implements TaskDecorator {
                 // 清除线程上下文
                 WindTracer.TRACER.clear();
                 clearContextVariables();
-                clearContext();
             }
         };
-    }
-
-    @Deprecated
-    protected void traceContext() {
-    }
-
-    @Deprecated
-    protected void clearContext() {
     }
 
     /**
@@ -70,7 +76,9 @@ public abstract class TraceContextTask implements TaskDecorator {
      * @param contextVariables 上下文
      */
     protected void traceContextVariables(Map<String, Object> contextVariables) {
-
+        if (log.isDebugEnabled()) {
+            log.debug("task decorate, trace contextVariables = {}", contextVariables);
+        }
     }
 
     /**

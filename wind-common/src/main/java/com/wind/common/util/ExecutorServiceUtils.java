@@ -34,6 +34,8 @@ import java.util.concurrent.atomic.AtomicReference;
  **/
 public final class ExecutorServiceUtils {
 
+    private static final int DEFAULT_WORK_QUEUE_SIZE = 128;
+
     private static final AtomicReference<TaskDecorator> TASK_DECORATOR = new AtomicReference<>(TraceContextTask.of());
 
     private ExecutorServiceUtils() {
@@ -60,18 +62,71 @@ public final class ExecutorServiceUtils {
      * @return 线程池
      */
     public static ExecutorService single(String threadNamePrefix) {
-        return single(threadNamePrefix, 128);
+        return single(threadNamePrefix, DEFAULT_WORK_QUEUE_SIZE);
     }
 
     /**
-     * 创建一个单线程的线程池
+     * 创建一个单线程的线程池（支持  {@link TaskDecorator} ）
      *
      * @param threadNamePrefix 线程池名称前缀
      * @param workQueueSize    等待队列大小
      * @return 线程池
      */
     public static ExecutorService single(String threadNamePrefix, int workQueueSize) {
-        return newExecutor(threadNamePrefix, 1, 1, workQueueSize);
+        return fixed(threadNamePrefix, 1, workQueueSize);
+    }
+
+    /**
+     * 创建一个固定大小的线程池（支持  {@link TaskDecorator} ）
+     *
+     * @param threadNamePrefix 线程池名称前缀
+     * @param poolSize         线程数
+     * @return 线程池
+     */
+    public static ExecutorService fixed(String threadNamePrefix, int poolSize) {
+        return fixed(threadNamePrefix, poolSize, DEFAULT_WORK_QUEUE_SIZE);
+    }
+
+    /**
+     * 创建一个固定大小的线程池（支持  {@link TaskDecorator} ）
+     *
+     * @param threadNamePrefix 线程池名称前缀
+     * @param poolSize         线程数
+     * @param workQueueSize    等待队列大小
+     * @return 线程池
+     */
+    public static ExecutorService fixed(String threadNamePrefix, int poolSize, int workQueueSize) {
+        return custom(threadNamePrefix, poolSize, poolSize, workQueueSize);
+    }
+
+    /**
+     * 创建支持  {@link TaskDecorator} 的线程池 {@link #TASK_DECORATOR}
+     *
+     * @param threadNamePrefix 线程池名称前缀
+     * @param corePoolSize     核心线程数
+     * @param maximumPoolSize  最大线程数
+     * @param workQueueSize    等待队列大小 默认使用 {@link ArrayBlockingQueue}
+     * @return 线程池
+     */
+    public static ExecutorService custom(String threadNamePrefix, int corePoolSize, int maximumPoolSize, int workQueueSize) {
+        return custom(threadNamePrefix, corePoolSize, maximumPoolSize, new ArrayBlockingQueue<>(workQueueSize));
+    }
+
+    /**
+     * 创建支持  {@link TaskDecorator} 的线程池 {@link #TASK_DECORATOR}
+     *
+     * @param threadNamePrefix 线程池名称前缀
+     * @param corePoolSize     核心线程数
+     * @param maximumPoolSize  最大线程数
+     * @param workQueue        等待队列
+     * @return 线程池
+     */
+    public static ExecutorService custom(String threadNamePrefix, int corePoolSize, int maximumPoolSize, BlockingQueue<Runnable> workQueue) {
+        return named(threadNamePrefix)
+                .corePoolSize(corePoolSize)
+                .maximumPoolSize(maximumPoolSize)
+                .workQueue(workQueue)
+                .build();
     }
 
     /**
@@ -83,6 +138,7 @@ public final class ExecutorServiceUtils {
      * @param workQueueSize    等待队列大小 默认使用 {@link ArrayBlockingQueue}
      * @return 线程池
      */
+    @Deprecated
     public static ExecutorService newExecutor(String threadNamePrefix, int corePoolSize, int maximumPoolSize, int workQueueSize) {
         return newExecutor(threadNamePrefix, corePoolSize, maximumPoolSize, new ArrayBlockingQueue<>(workQueueSize));
     }
@@ -96,59 +152,9 @@ public final class ExecutorServiceUtils {
      * @param workQueue        等待队列
      * @return 线程池
      */
+    @Deprecated
     public static ExecutorService newExecutor(String threadNamePrefix, int corePoolSize, int maximumPoolSize, BlockingQueue<Runnable> workQueue) {
-        return named(threadNamePrefix)
-                .corePoolSize(corePoolSize)
-                .maximumPoolSize(maximumPoolSize)
-                .workQueue(workQueue)
-                .build();
-    }
-
-    /**
-     * 创建虚拟线程的线程池（每个任务一个线程，适用于高并发阻塞型任务）
-     *
-     * @param threadNamePrefix 线程名前缀（JDK 21 无法自定义虚拟线程名，但可以手动 wrap）
-     * @return ExecutorService 线程池
-     * @since JDK 21+
-     */
-    public static ExecutorService virtualDecorated(String threadNamePrefix) {
-        return named(threadNamePrefix)
-                .useVirtualThreads()
-                .buildDecorated();
-    }
-
-    /**
-     * 创建一个单线程，等待队列为 128 的线程池
-     *
-     * @param threadNamePrefix 线程池名称前缀
-     * @return 线程池
-     */
-    public static ExecutorService withDecorated(String threadNamePrefix) {
-        return withDecorated(threadNamePrefix, 128);
-    }
-
-    /**
-     * 创建一个单线程的线程池
-     *
-     * @param threadNamePrefix 线程池名称前缀
-     * @param workQueueSize    等待队列大小
-     * @return 线程池
-     */
-    public static ExecutorService withDecorated(String threadNamePrefix, int workQueueSize) {
-        return withDecorated(threadNamePrefix, 1, 1, workQueueSize);
-    }
-
-    public static ExecutorService withDecorated(String threadNamePrefix, int corePoolSize, int maximumPoolSize, int workQueueSize) {
-        return withDecorated(threadNamePrefix, corePoolSize, maximumPoolSize, new ArrayBlockingQueue<>(workQueueSize));
-    }
-
-    private static ExecutorService withDecorated(String threadNamePrefix, int corePoolSize, int maximumPoolSize,
-                                                 BlockingQueue<Runnable> workQueue) {
-        return named(threadNamePrefix)
-                .corePoolSize(corePoolSize)
-                .maximumPoolSize(maximumPoolSize)
-                .workQueue(workQueue)
-                .buildDecorated();
+        return custom(threadNamePrefix, corePoolSize, maximumPoolSize, workQueue);
     }
 
     /**
@@ -185,20 +191,13 @@ public final class ExecutorServiceUtils {
          */
         private Duration keepAlive = Duration.ofMinutes(1);
 
-        private BlockingQueue<Runnable> workQueue = new ArrayBlockingQueue<>(128);
+        private BlockingQueue<Runnable> workQueue = new ArrayBlockingQueue<>(DEFAULT_WORK_QUEUE_SIZE);
 
         private RejectedExecutionHandler rejectedExecutionHandler = new ThreadPoolExecutor.AbortPolicy();
 
         private boolean useVirtualThreads = false;
 
         private ExecutorBuilder() {
-        }
-
-        @Deprecated
-        public static ExecutorBuilder withThreadName(String threadNamePrefix) {
-            ExecutorBuilder result = new ExecutorBuilder();
-            result.threadNamePrefix = threadNamePrefix;
-            return result;
         }
 
         public ExecutorBuilder corePoolSize(int corePoolSize) {
@@ -231,7 +230,12 @@ public final class ExecutorServiceUtils {
             return this;
         }
 
-        public ExecutorService build() {
+        /**
+         * 创建线程池
+         *
+         * @return 线程池 （ThreadPoolExecutor）
+         */
+        public ExecutorService buildExecutor() {
             if (useVirtualThreads) {
                 ExecutorService executorService = Executors.newThreadPerTaskExecutor(Thread.ofVirtual().name(threadNamePrefix, 0).factory());
                 return new DecoratingExecutorServiceWrapper(executorService, VirtualThreadMdcTaskDecorator.composite(threadNamePrefix, TASK_DECORATOR.get()));
@@ -245,7 +249,7 @@ public final class ExecutorServiceUtils {
          *
          * @return 线程池
          */
-        public ExecutorService buildDecorated() {
+        public ExecutorService build() {
             return buildWithDecorator(TASK_DECORATOR.get());
         }
 
@@ -260,7 +264,7 @@ public final class ExecutorServiceUtils {
                 // 虚拟线程
                 decorator = VirtualThreadMdcTaskDecorator.composite(threadNamePrefix, decorator);
             }
-            return new DecoratingExecutorServiceWrapper(build(), decorator);
+            return new DecoratingExecutorServiceWrapper(buildExecutor(), decorator);
         }
     }
 

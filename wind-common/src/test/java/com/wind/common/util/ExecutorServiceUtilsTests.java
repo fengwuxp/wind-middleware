@@ -32,11 +32,11 @@ class ExecutorServiceUtilsTests {
     void testEnableTrace() throws Exception {
         WindTracer.TRACER.trace();
         final String traceId = WindTracer.TRACER.getTraceId();
-        ExecutorService traceExecutor = ExecutorServiceUtils.named("test-trace-").buildDecorated();
+        ExecutorService traceExecutor = ExecutorServiceUtils.named("test-trace-").build();
         Future<?> f1 = traceExecutor.submit(() -> {
             Assertions.assertEquals(traceId, WindTracer.TRACER.getTraceId());
         });
-        Future<?> f2 = ExecutorServiceUtils.single("test-").submit(() -> {
+        Future<?> f2 = ExecutorServiceUtils.named("test-").buildExecutor().submit(() -> {
             Assertions.assertNotEquals(traceId, WindTracer.TRACER.getTraceId());
         });
         for (Future<?> future : Arrays.asList(f1, f2)) {

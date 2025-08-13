@@ -30,8 +30,10 @@ class WindReflectUtilsTests {
 
     @Test
     void testResolveSuperGenericTypeV2() {
-        Type[] types = WindReflectUtils.resolveSuperGenericType(new Example2());
-        Assertions.assertEquals(2, types.length);
+        Assertions.assertEquals(2, WindReflectUtils.resolveSuperGenericType(new Example2()).length);
+        Type[] types = WindReflectUtils.resolveSuperGenericType(new Example2(), A.class);
+        Assertions.assertEquals(1, types.length);
+        Assertions.assertEquals(String.class, types[0]);
     }
 
     @Test
@@ -52,6 +54,10 @@ class WindReflectUtilsTests {
         Assertions.assertTrue(match);
     }
 
+    interface A<E> {
+
+        void say(E e);
+    }
 
     static class Example implements Function<String, List<String>> {
 
@@ -66,13 +72,18 @@ class WindReflectUtilsTests {
 
     @EqualsAndHashCode(callSuper = true)
     @Data
-    static class Example2 extends AbstractDemo<String, List<String>> {
+    static class Example2 extends AbstractDemo<String, List<String>> implements A<String> {
 
         private String name;
 
         @Override
         public List<String> apply(String s) {
             return Collections.emptyList();
+        }
+
+        @Override
+        public void say(String s) {
+
         }
     }
 

@@ -1,6 +1,7 @@
 package com.wind.security.authentication;
 
 import com.wind.common.exception.AssertUtils;
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import org.springframework.lang.Nullable;
@@ -57,7 +58,8 @@ public class WindAuthenticationUser implements Serializable {
 
     @Nullable
     @SuppressWarnings("unchecked")
-    public <T> T getAttribute(String key) {
+    public <T> T getAttribute(@NotNull String key) {
+        AssertUtils.notNull(key, "attribute name must not null");
         return (T) attributes.get(key);
     }
 
@@ -67,9 +69,20 @@ public class WindAuthenticationUser implements Serializable {
      * @param key 属性名称
      * @return 属性值
      */
-    public <T> T requireAttribute(String key) {
+    public <T> T requireAttribute(@NotNull String key) {
         T result = getAttribute(key);
         AssertUtils.notNull(result, () -> String.format("attribute name = %s must not null", key));
         return result;
+    }
+
+    /**
+     * 添加属性
+     *
+     * @param key   属性名称
+     * @param value 属性值
+     */
+    public void putAttribute(@NotNull String key, Object value) {
+        AssertUtils.notNull(key, "attribute name must not null");
+        this.attributes.put(key, value);
     }
 }

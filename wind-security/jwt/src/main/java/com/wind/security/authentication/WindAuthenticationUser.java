@@ -2,14 +2,12 @@ package com.wind.security.authentication;
 
 import com.wind.common.exception.AssertUtils;
 import lombok.AllArgsConstructor;
-import lombok.Data;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import org.springframework.lang.Nullable;
 
 import java.io.Serial;
 import java.io.Serializable;
-import java.util.Collections;
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -45,7 +43,7 @@ public class WindAuthenticationUser implements Serializable {
     }
 
     public WindAuthenticationUser(String id, String userName) {
-        this(id, userName, Collections.emptyMap());
+        this(id, userName, new HashMap<>());
     }
 
     /**

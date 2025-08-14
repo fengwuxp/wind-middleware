@@ -17,6 +17,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -26,11 +27,34 @@ import java.util.Map;
  **/
 class WindObjectDigestUtilsTests {
 
+    @Test
+    void testGenSha256WithText() {
+        String sha = WindObjectDigestUtils.sha256("123456");
+        Assertions.assertEquals("8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92", sha);
+    }
+
+    @Test
+    void testGenSha256WithPrimitive() {
+        Assertions.assertEquals("8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92", WindObjectDigestUtils.sha256(123456));
+        Assertions.assertEquals("b5bea41b6c623f7c09f1bf24dcae58ebab3c0cdd90ad966bc43a45b44867e12b", WindObjectDigestUtils.sha256(true));
+        Assertions.assertEquals("633226122f0adb51fb56c68a9dbdba0ed3f2c4359251755cf44b6da46e0152e6", WindObjectDigestUtils.sha256(new Integer[]{1, 3, 4}));
+    }
+
+    @Test
+    void testGenSha256WithCollection() {
+        Assertions.assertEquals("3eadb3a193c717651741f576ec65cfe8d9829bee8898157e18c85cd18482c4dd", WindObjectDigestUtils.sha256(Arrays.asList(1, 2, 3)));
+        Assertions.assertEquals("a6124dcc2746aacd8b55b8adaccfe33620b4000897607c47f6665cc424b3baf8", WindObjectDigestUtils.sha256(Map.of("a", 1, "b", 2)));
+        HashMap<Object, Object> target = new HashMap<>();
+        target.put("demo", "");
+        target.put("k", null);
+        Assertions.assertEquals("5f54ab3d2a4caca511cb1f9a25232591d3409f2e57ba489c8b46ef733bed5c07", WindObjectDigestUtils.sha256(target));
+    }
+
 
     @Test
     void testGenSha256Text() throws Exception {
         WindObjectDigestWindObjectDigestExample target = mockExample();
-        String text = WindObjectDigestUtils.genSha256Text(target, WindReflectUtils.getFieldNames(target.getClass()), null, WindConstants.LF);
+        String text = WindObjectDigestUtils.genSha256TextWithObject(target, WindReflectUtils.getFieldNames(target.getClass()), null, WindConstants.LF);
         Assertions.assertEquals("age=26\n" +
                 "birthday=1581379200000\n" +
                 "demo={e3=1.30912&id=demo&k1=k&l2=false&name=}\n" +
@@ -49,7 +73,7 @@ class WindObjectDigestUtilsTests {
     @Test
     void testGenSha25TextWithNames() throws Exception {
         WindObjectDigestWindObjectDigestExample target = mockExample();
-        String text = WindObjectDigestUtils.genSha256Text(target, Arrays.asList("name", "id", "sex", "myTags", "yes"), null, WindConstants.LF);
+        String text = WindObjectDigestUtils.genSha256TextWithObject(target, Arrays.asList("name", "id", "sex", "myTags", "yes"), null, WindConstants.LF);
         Assertions.assertEquals("id=1\n" +
                 "myTags={name=a&value=a1},{name=b&value=b1}\n" +
                 "name=\n" +

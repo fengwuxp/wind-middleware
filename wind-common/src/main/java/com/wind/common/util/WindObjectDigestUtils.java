@@ -88,8 +88,75 @@ public final class WindObjectDigestUtils {
      */
     public static String sha256WithNames(@NotNull Object target, @NotEmpty Collection<String> fieldNames, @Nullable String prefix) {
         AssertUtils.notNull(target, "argument target must not null");
-        AssertUtils.notEmpty(fieldNames, "argument fieldNames must not empty");
-        return DigestUtils.sha256Hex(genSha256Text(target, fieldNames, prefix, WindConstants.LF));
+        String content = tryGenSha256Text(target);
+        if (content == null) {
+            AssertUtils.notEmpty(fieldNames, "argument fieldNames must not empty");
+            return DigestUtils.sha256Hex(genSha256TextWithObject(target, fieldNames, prefix, WindConstants.LF));
+        }
+        return prefix == null ? DigestUtils.sha256Hex(content) : DigestUtils.sha256Hex(prefix + content);
+    }
+
+    private static String tryGenSha256Text(Object target) {
+        if (ClassUtils.isPrimitiveOrWrapper(target.getClass())) {
+            return String.valueOf(target);
+        }
+        switch (target) {
+            case CharSequence text -> {
+                return String.valueOf(text);
+            }
+            case TemporalAccessor accessor -> {
+                return accessor.toString();
+            }
+            case Collection<?> objects -> {
+                return objects.stream().map(String::valueOf).collect(Collectors.joining(WindConstants.AND));
+            }
+            case Map<?, ?> map -> {
+                // 使用 treeMap 确保字段排序
+                return new TreeMap<>(map)
+                        .entrySet().stream()
+                        .map(entry -> entry.getKey() + WindConstants.COLON + entry.getValue())
+                        .collect(Collectors.joining(WindConstants.AND));
+            }
+            case long[] longs -> {
+                return Arrays.toString(longs);
+            }
+            case Long[] longs -> {
+                return Arrays.toString(longs);
+            }
+            case int[] ints -> {
+                return Arrays.toString(ints);
+            }
+            case Integer[] ints -> {
+                return Arrays.toString(ints);
+            }
+            case short[] shorts -> {
+                return Arrays.toString(shorts);
+            }
+            case Short[] shorts -> {
+                return Arrays.toString(shorts);
+            }
+            case byte[] bytes -> {
+                return Arrays.toString(bytes);
+            }
+            case Byte[] bytes -> {
+                return Arrays.toString(bytes);
+            }
+            case double[] doubles -> {
+                return Arrays.toString(doubles);
+            }
+            case Double[] doubles -> {
+                return Arrays.toString(doubles);
+            }
+            case float[] floats -> {
+                return Arrays.toString(floats);
+            }
+            case Float[] floats -> {
+                return Arrays.toString(floats);
+            }
+            default -> {
+            }
+        }
+        return null;
     }
 
     private static List<String> getObjectFieldNames(Object target) {
@@ -98,7 +165,7 @@ public final class WindObjectDigestUtils {
     }
 
     @VisibleForTesting()
-    static String genSha256Text(Object target, Collection<String> fieldNames, String prefix, String joiner) {
+    static String genSha256TextWithObject(Object target, Collection<String> fieldNames, String prefix, String joiner) {
         // TODO 性能优化
         Field[] fields = WindReflectUtils.findFields(target.getClass(), fieldNames);
         Map<String, Field> fieldMaps = Arrays.stream(fields).collect(Collectors.toMap(Field::getName, Function.identity()));
@@ -175,7 +242,7 @@ public final class WindObjectDigestUtils {
             return collection.stream()
                     .map(WindObjectDigestUtils::getValueText)
                     .collect(Collectors.joining(WindConstants.COMMA));
-        } else if (val instanceof Map<?,?> map) {
+        } else if (val instanceof Map<?, ?> map) {
             // Map 使用 {}
             return String.format("%s%s%s", WindConstants.DELIM_START, getMapText(map), WindConstants.DELIM_END);
         } else if (val instanceof Number) {
@@ -183,8 +250,7 @@ public final class WindObjectDigestUtils {
             return String.valueOf(val);
         } else {
             // 对象使用 {}
-            return String.format("%s%s%s", WindConstants.DELIM_START, genSha256Text(val, getObjectFieldNames(val), null, WindConstants.AND),
-                    WindConstants.DELIM_END);
+            return String.format("%s%s%s", WindConstants.DELIM_START, genSha256TextWithObject(val, getObjectFieldNames(val), null, WindConstants.AND), WindConstants.DELIM_END);
         }
     }
 

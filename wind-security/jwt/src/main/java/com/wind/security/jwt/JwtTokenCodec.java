@@ -47,7 +47,7 @@ public final class JwtTokenCodec {
     /**
      * jwt 密钥 id
      */
-    private static final String JWT_AUTH_KEY_ID = "Wind-Jwt-Auth-Codec";
+    private static final String JWT_AUTH_KEY_ID = "Jwt-Auth-Codec-Wind";
 
     /**
      * jwt issuer

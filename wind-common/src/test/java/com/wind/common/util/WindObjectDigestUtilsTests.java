@@ -37,17 +37,17 @@ class WindObjectDigestUtilsTests {
     void testGenSha256WithPrimitive() {
         Assertions.assertEquals("8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92", WindObjectDigestUtils.sha256(123456));
         Assertions.assertEquals("b5bea41b6c623f7c09f1bf24dcae58ebab3c0cdd90ad966bc43a45b44867e12b", WindObjectDigestUtils.sha256(true));
-        Assertions.assertEquals("633226122f0adb51fb56c68a9dbdba0ed3f2c4359251755cf44b6da46e0152e6", WindObjectDigestUtils.sha256(new Integer[]{1, 3, 4}));
+        Assertions.assertEquals("9eb71bdfa958e87ff0d6d7d9a8a13e2d8cd80328ea9a69575728a90ec99dbd57", WindObjectDigestUtils.sha256(new Integer[]{1, 3, 4}));
     }
 
     @Test
     void testGenSha256WithCollection() {
-        Assertions.assertEquals("3eadb3a193c717651741f576ec65cfe8d9829bee8898157e18c85cd18482c4dd", WindObjectDigestUtils.sha256(Arrays.asList(1, 2, 3)));
-        Assertions.assertEquals("a6124dcc2746aacd8b55b8adaccfe33620b4000897607c47f6665cc424b3baf8", WindObjectDigestUtils.sha256(Map.of("a", 1, "b", 2)));
+        Assertions.assertEquals("8a6ae15122001229edb8866f56e342af12ae8187203c3e3b33931743e7c0c48d", WindObjectDigestUtils.sha256(Arrays.asList(1, 2, 3)));
+        Assertions.assertEquals("f5e35b6b1642e299fe4ebd97105d4a7c071c664edd6e5590554691c3c8e7adbf", WindObjectDigestUtils.sha256(Map.of("a", 1, "b", 2)));
         HashMap<Object, Object> target = new HashMap<>();
         target.put("demo", "");
         target.put("k", null);
-        Assertions.assertEquals("5f54ab3d2a4caca511cb1f9a25232591d3409f2e57ba489c8b46ef733bed5c07", WindObjectDigestUtils.sha256(target));
+        Assertions.assertEquals("879b69687a5f47e8e261a3c4ac16f04455a85ce647364f32348f65bde6edc041", WindObjectDigestUtils.sha256(target));
     }
 
 

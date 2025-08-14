@@ -89,72 +89,22 @@ public final class WindObjectDigestUtils {
     public static String sha256WithNames(@NotNull Object target, @NotEmpty Collection<String> fieldNames, @Nullable String prefix) {
         AssertUtils.notNull(target, "argument target must not null");
         String content = tryGenSha256Text(target);
-        if (content == null) {
-            AssertUtils.notEmpty(fieldNames, "argument fieldNames must not empty");
-            return DigestUtils.sha256Hex(genSha256TextWithObject(target, fieldNames, prefix, WindConstants.LF));
+        if (content != null) {
+            return prefix == null ? DigestUtils.sha256Hex(content) : DigestUtils.sha256Hex(prefix + content);
         }
-        return prefix == null ? DigestUtils.sha256Hex(content) : DigestUtils.sha256Hex(prefix + content);
+        AssertUtils.notEmpty(fieldNames, "argument fieldNames must not empty");
+        return DigestUtils.sha256Hex(genSha256TextWithObject(target, fieldNames, prefix, WindConstants.LF));
     }
 
     private static String tryGenSha256Text(Object target) {
-        if (ClassUtils.isPrimitiveOrWrapper(target.getClass())) {
-            return String.valueOf(target);
-        }
-        switch (target) {
-            case CharSequence text -> {
-                return String.valueOf(text);
-            }
-            case TemporalAccessor accessor -> {
-                return accessor.toString();
-            }
-            case Collection<?> objects -> {
-                return objects.stream().map(String::valueOf).collect(Collectors.joining(WindConstants.AND));
-            }
-            case Map<?, ?> map -> {
-                // 使用 treeMap 确保字段排序
-                return new TreeMap<>(map)
-                        .entrySet().stream()
-                        .map(entry -> entry.getKey() + WindConstants.COLON + entry.getValue())
-                        .collect(Collectors.joining(WindConstants.AND));
-            }
-            case long[] longs -> {
-                return Arrays.toString(longs);
-            }
-            case Long[] longs -> {
-                return Arrays.toString(longs);
-            }
-            case int[] ints -> {
-                return Arrays.toString(ints);
-            }
-            case Integer[] ints -> {
-                return Arrays.toString(ints);
-            }
-            case short[] shorts -> {
-                return Arrays.toString(shorts);
-            }
-            case Short[] shorts -> {
-                return Arrays.toString(shorts);
-            }
-            case byte[] bytes -> {
-                return Arrays.toString(bytes);
-            }
-            case Byte[] bytes -> {
-                return Arrays.toString(bytes);
-            }
-            case double[] doubles -> {
-                return Arrays.toString(doubles);
-            }
-            case Double[] doubles -> {
-                return Arrays.toString(doubles);
-            }
-            case float[] floats -> {
-                return Arrays.toString(floats);
-            }
-            case Float[] floats -> {
-                return Arrays.toString(floats);
-            }
-            default -> {
-            }
+        if (ClassUtils.isPrimitiveOrWrapper(target.getClass())
+                || target.getClass().isArray()
+                || target instanceof Number
+                || target instanceof CharSequence
+                || target instanceof TemporalAccessor
+                || target instanceof Collection<?>
+                || target instanceof Map<?, ?>) {
+            return getValueText(target);
         }
         return null;
     }
@@ -183,13 +133,10 @@ public final class WindObjectDigestUtils {
                     val = field.get(target);
                 } else {
                     Method method = WindReflectUtils.findFieldGetMethod(field);
-                    AssertUtils.notNull(method,
-                            () -> String.format("not find get method, field = %s#%s", field.getDeclaringClass().getName(), field.getName()));
+                    AssertUtils.notNull(method, () -> String.format("not find get method, field = %s#%s", field.getDeclaringClass().getName(), field.getName()));
                     val = method.invoke(target);
                 }
-                result.append(name).append(WindConstants.EQ)
-                        .append(getValueText(val))
-                        .append(joiner);
+                result.append(name).append(WindConstants.EQ).append(getValueText(val)).append(joiner);
             } catch (IllegalAccessException | InvocationTargetException exception) {
                 throw new BaseException(DefaultExceptionCode.COMMON_ERROR, String.format("get object value error, name = %s", name), exception);
             }
@@ -212,50 +159,62 @@ public final class WindObjectDigestUtils {
             // 获取时间戳
             return String.valueOf(getTemporalAccessorTimestamp(temporal));
         } else if (val.getClass().isArray()) {
-            if (ClassUtils.isPrimitiveArray(val.getClass())) {
-                // 基础数据类型数组
-                if (val.getClass().getComponentType() == byte.class) {
-                    return Arrays.toString((byte[]) val);
-                } else if (val.getClass().getComponentType() == short.class) {
-                    return Arrays.toString((short[]) val);
-                } else if (val.getClass().getComponentType() == int.class) {
-                    return Arrays.toString((int[]) val);
-                } else if (val.getClass().getComponentType() == long.class) {
-                    return Arrays.toString((long[]) val);
-                } else if (val.getClass().getComponentType() == float.class) {
-                    return Arrays.toString((float[]) val);
-                } else if (val.getClass().getComponentType() == double.class) {
-                    return Arrays.toString((double[]) val);
-                } else if (val.getClass().getComponentType() == boolean.class) {
-                    return Arrays.toString((boolean[]) val);
-                } else {
-                    return Arrays.toString((char[]) val);
-                }
-            } else {
-                // 数组
-                return Arrays.stream((Object[]) val)
-                        .map(WindObjectDigestUtils::getValueText)
-                        .collect(Collectors.joining(WindConstants.COMMA));
-            }
+            return joinArrayAsText(val);
         } else if (val instanceof Collection<?> collection) {
-            // 集合类型
-            return collection.stream()
-                    .map(WindObjectDigestUtils::getValueText)
-                    .collect(Collectors.joining(WindConstants.COMMA));
+            return joinCollectionAsText(collection);
         } else if (val instanceof Map<?, ?> map) {
-            // Map 使用 {}
-            return String.format("%s%s%s", WindConstants.DELIM_START, getMapText(map), WindConstants.DELIM_END);
+            return joinMapAsText(map);
         } else if (val instanceof Number) {
             // 数值类型
             return String.valueOf(val);
         } else {
-            // 对象使用 {}
+            // 对象类型
             return String.format("%s%s%s", WindConstants.DELIM_START, genSha256TextWithObject(val, getObjectFieldNames(val), null, WindConstants.AND), WindConstants.DELIM_END);
+        }
+    }
+
+    private static String joinMapAsText(Map<?, ?> map) {
+        return String.format("%s%s%s", WindConstants.DELIM_START, getMapText(map), WindConstants.DELIM_END);
+    }
+
+    private static String joinCollectionAsText(Collection<?> collection) {
+        // 集合类型
+        return collection.stream()
+                .map(WindObjectDigestUtils::getValueText)
+                .collect(Collectors.joining(WindConstants.COMMA));
+    }
+
+    private static String joinArrayAsText(Object val) {
+        if (ClassUtils.isPrimitiveArray(val.getClass())) {
+            // 基础数据类型数组
+            if (val.getClass().getComponentType() == byte.class) {
+                return Arrays.toString((byte[]) val);
+            } else if (val.getClass().getComponentType() == short.class) {
+                return Arrays.toString((short[]) val);
+            } else if (val.getClass().getComponentType() == int.class) {
+                return Arrays.toString((int[]) val);
+            } else if (val.getClass().getComponentType() == long.class) {
+                return Arrays.toString((long[]) val);
+            } else if (val.getClass().getComponentType() == float.class) {
+                return Arrays.toString((float[]) val);
+            } else if (val.getClass().getComponentType() == double.class) {
+                return Arrays.toString((double[]) val);
+            } else if (val.getClass().getComponentType() == boolean.class) {
+                return Arrays.toString((boolean[]) val);
+            } else {
+                return Arrays.toString((char[]) val);
+            }
+        } else {
+            // 数组
+            return Arrays.stream((Object[]) val)
+                    .map(WindObjectDigestUtils::getValueText)
+                    .collect(Collectors.joining(WindConstants.COMMA));
         }
     }
 
     @SuppressWarnings({"rawtypes", "unchecked"})
     private static String getMapText(Map map) {
+        // 保证 key 的顺序
         Map<Object, Object> sortedKeyParams = new TreeMap<>(map);
         return sortedKeyParams.entrySet()
                 .stream()

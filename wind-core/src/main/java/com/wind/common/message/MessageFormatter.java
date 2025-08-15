@@ -36,4 +36,13 @@ public interface MessageFormatter {
     static MessageFormatter simple() {
         return new SimpleMessageFormatter();
     }
+
+    /**
+     * slf4j 消息格式化处理（沿用 {} 语法）
+     *
+     * @return MessageFormatter
+     */
+    static MessageFormatter slf4j() {
+        return (pattern, args) -> org.slf4j.helpers.MessageFormatter.format(pattern, args).getMessage();
+    }
 }

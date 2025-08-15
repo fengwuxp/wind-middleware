@@ -57,6 +57,12 @@ public class TraceFilter extends OncePerRequestFilter {
     );
 
     @Override
+    protected boolean shouldNotFilterAsyncDispatch() {
+        // 允许在异步分派阶段再次执行
+        return false;
+    }
+
+    @Override
     protected void doFilterInternal(@Nonnull HttpServletRequest request, @Nonnull HttpServletResponse response, @Nonnull FilterChain chain) {
         try {
             if (!ServiceInfoUtils.isOnline()) {

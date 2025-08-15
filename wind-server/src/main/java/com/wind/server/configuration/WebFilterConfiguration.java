@@ -3,6 +3,7 @@ package com.wind.server.configuration;
 import com.wind.server.web.filters.IndexHtmlResourcesFilter;
 import com.wind.server.web.filters.WindWebFilterOrdered;
 import com.wind.web.trace.TraceFilter;
+import jakarta.servlet.DispatcherType;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
@@ -12,7 +13,6 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.filter.RequestContextFilter;
 
-import javax.servlet.DispatcherType;
 import java.util.EnumSet;
 import java.util.function.Function;
 

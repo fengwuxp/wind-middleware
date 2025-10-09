@@ -2,6 +2,7 @@ package com.wind.common.query.cursor;
 
 import com.wind.common.query.supports.DefaultOrderField;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -20,14 +21,18 @@ class AbstractCursorQueryTests {
         ExampleQuery query = new ExampleQuery();
         query.setName("zhans");
         query.setMinGmtCreate(LocalDateTime.now());
-        long lastRecordId = 1L;
-        String cursor = QueryCursorUtils.generateCursor(query, lastRecordId);
-        query.setCursor(cursor);
-        Assertions.assertEquals(String.valueOf(lastRecordId), query.asTextId());
-        Assertions.assertEquals(lastRecordId, query.asId());
+        long firstRecordId = 20L, lastRecordId = 200L;
+        String prevCursor = QueryCursorUtils.generateCursor(query, firstRecordId);
+        String nextCursor = QueryCursorUtils.generateCursor(query, lastRecordId);
+        query.setPrevCursor(prevCursor);
+        query.setNextCursor(nextCursor);
+        Assertions.assertEquals(String.valueOf(lastRecordId), query.asNextTextId());
+        Assertions.assertEquals(firstRecordId, query.asPrevNumberId());
+        Assertions.assertEquals(lastRecordId, query.asNextNumberId());
     }
 
 
+    @EqualsAndHashCode(callSuper = true)
     @Data
     public static class ExampleQuery extends AbstractCursorQuery<DefaultOrderField> {
 

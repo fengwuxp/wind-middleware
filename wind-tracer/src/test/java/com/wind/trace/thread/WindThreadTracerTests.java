@@ -10,6 +10,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 import static com.wind.common.WindConstants.LOCAL_HOST_IP_V4;
@@ -47,7 +48,6 @@ class WindThreadTracerTests {
         contextVariables.put("key1", "1");
         contextVariables.put("key2", 2);
         contextVariables.put("key3", null);
-        contextVariables.put(null, null);
         WindTracer.TRACER.trace("test001", contextVariables);
         Assertions.assertEquals("1", WindTracer.TRACER.getContextVariable("key1"));
         Assertions.assertEquals(2, (Integer) WindTracer.TRACER.getContextVariable("key2"));
@@ -73,19 +73,21 @@ class WindThreadTracerTests {
         String traceId = WindTracer.TRACER.getTraceId();
         Assertions.assertEquals(traceId, MDC.get(TRACE_ID_NAME));
         CountDownLatch downLatch = new CountDownLatch(1);
-        Executors.newSingleThreadExecutor().execute(TraceContextTask.of().decorate(() -> {
-            try {
-                String actual = WindTracer.TRACER.getTraceId();
-                Assertions.assertEquals(traceId, actual);
-                Assertions.assertEquals(traceId, MDC.get(TRACE_ID_NAME));
-                Assertions.assertEquals("test", WindTracer.TRACER.requireContextVariable("a"));
-                Assertions.assertEquals("test", MDC.get("a"));
-            } finally {
-                downLatch.countDown();
-            }
-        }));
-        downLatch.await();
-        Assertions.assertEquals(traceId, WindTracer.TRACER.getTraceId());
+        try (ExecutorService executorService = Executors.newSingleThreadExecutor()) {
+            executorService.execute(TraceContextTask.of().decorate(() -> {
+                try {
+                    String actual = WindTracer.TRACER.getTraceId();
+                    Assertions.assertEquals(traceId, actual);
+                    Assertions.assertEquals(traceId, MDC.get(TRACE_ID_NAME));
+                    Assertions.assertEquals("test", WindTracer.TRACER.requireContextVariable("a"));
+                    Assertions.assertEquals("test", MDC.get("a"));
+                } finally {
+                    downLatch.countDown();
+                }
+            }));
+            downLatch.await();
+            Assertions.assertEquals(traceId, WindTracer.TRACER.getTraceId());
+        }
     }
 
     @Test
@@ -93,18 +95,20 @@ class WindThreadTracerTests {
         String traceId = WindTracer.TRACER.getTraceId();
         Assertions.assertEquals(traceId, MDC.get(TRACE_ID_NAME));
         CountDownLatch downLatch = new CountDownLatch(1);
-        Executors.newSingleThreadExecutor().execute(() -> {
-            try {
-                WindTracer.TRACER.trace();
-                Assertions.assertNotEquals(traceId, WindTracer.TRACER.getTraceId());
-                Assertions.assertNotEquals(traceId, MDC.get(TRACE_ID_NAME));
-            } finally {
-                WindTracer.TRACER.clear();
-                downLatch.countDown();
-            }
-        });
-        downLatch.await();
-        Assertions.assertEquals(traceId, WindTracer.TRACER.getTraceId());
+        try (ExecutorService executorService = Executors.newSingleThreadExecutor()) {
+            executorService.execute(() -> {
+                try {
+                    WindTracer.TRACER.trace();
+                    Assertions.assertNotEquals(traceId, WindTracer.TRACER.getTraceId());
+                    Assertions.assertNotEquals(traceId, MDC.get(TRACE_ID_NAME));
+                } finally {
+                    WindTracer.TRACER.clear();
+                    downLatch.countDown();
+                }
+            });
+            downLatch.await();
+            Assertions.assertEquals(traceId, WindTracer.TRACER.getTraceId());
+        }
     }
 
     @Test

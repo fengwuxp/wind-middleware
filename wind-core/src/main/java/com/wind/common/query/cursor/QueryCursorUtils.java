@@ -4,6 +4,7 @@ import com.wind.common.WindConstants;
 import com.wind.common.exception.AssertUtils;
 import com.wind.common.exception.BaseException;
 import com.wind.common.exception.DefaultExceptionCode;
+import com.wind.common.query.supports.QueryOrderField;
 import com.wind.common.util.WindReflectUtils;
 import jakarta.validation.constraints.NotNull;
 import org.springframework.lang.Nullable;
@@ -15,7 +16,9 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Arrays;
 import java.util.Base64;
-import java.util.Objects;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
@@ -24,6 +27,10 @@ import java.util.stream.Collectors;
  **/
 final class QueryCursorUtils {
 
+    private static final Set<String> CURSOR_QUERY_CURSOR_FILED_NAMES = Set.of("prevCursor", "nextCursor");
+
+    static final String CURSOR_FILED_NAME = "id";
+
     private QueryCursorUtils() {
         throw new AssertionError();
     }
@@ -31,21 +38,20 @@ final class QueryCursorUtils {
     /**
      * 生成 cursor
      *
-     * @param query        查询参数
-     * @param lastRecordId 最后一条记录的 id
+     * @param query 查询参数
+     * @param id    数据记录的 id
      * @return cursor
      */
     @SuppressWarnings("rawtypes")
-    static String generateCursor(@NotNull AbstractCursorQuery query, @NotNull Object lastRecordId) {
+    static String generateCursor(@NotNull AbstractCursorQuery query, @NotNull Object id) {
         AssertUtils.notNull(query, "argument query must not null");
-        AssertUtils.notNull(lastRecordId, "argument lastRecordId must not null");
-        return genCursorSha256(query) + WindConstants.AT + lastRecordId;
+        AssertUtils.notNull(id, "argument id must not null");
+        return genCursorSha256(query) + WindConstants.AT + id;
     }
 
     @SuppressWarnings("rawtypes")
     @Nullable
-    static String checkCursorAndGetLastRecordId(AbstractCursorQuery query) {
-        String cursor = query.getCursor();
+    static String checkCursorAndGetLastRecordId(@NotNull AbstractCursorQuery query, @Nullable String cursor) {
         if (cursor == null) {
             return null;
         }
@@ -62,8 +68,8 @@ final class QueryCursorUtils {
     private static String genCursorSha256(AbstractCursorQuery query) {
         Field[] fields = WindReflectUtils.getFields(query.getClass());
         String queryString = Arrays.stream(fields)
-                .filter(field -> !Objects.equals(field.getName(), "cursor"))
-                .sorted((o1, o2) -> o1.getName().compareTo(o2.getName()))
+                .filter(field -> !CURSOR_QUERY_CURSOR_FILED_NAMES.contains(field.getName()))
+                .sorted(Comparator.comparing(Field::getName))
                 .map(field -> field.getName() + WindConstants.EQ + WindReflectUtils.getFieldValue(field, query))
                 .collect(Collectors.joining(WindConstants.AND));
         return sha256Base64(queryString);

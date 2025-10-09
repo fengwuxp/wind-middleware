@@ -10,6 +10,8 @@ import java.beans.Transient;
 import java.util.Collections;
 import java.util.List;
 
+import static com.wind.common.query.cursor.QueryCursorUtils.CURSOR_FILED_NAME;
+
 /**
  * 基于游标分页查询的分页对象
  *
@@ -26,10 +28,23 @@ public interface CursorPagination<T> extends WindPagination<T> {
     }
 
     /**
+     * @return 上一页游标，如果没有则返回 null
+     */
+    @Nullable
+    String getPrevCursor();
+
+    /**
      * @return 下一页游标，如果没有则返回 null
      */
     @Nullable
     String getNextCursor();
+
+    /**
+     * @return 是否有上一页
+     */
+    default boolean hasPrev() {
+        return getPrevCursor() != null;
+    }
 
     /**
      * @return 是否有下一页
@@ -47,29 +62,33 @@ public interface CursorPagination<T> extends WindPagination<T> {
     }
 
     static <E> CursorPagination<E> empty() {
-        return new ImmutableCursorPagination<>(-1L, Collections.emptyList(), 0, null);
+        return new ImmutableCursorPagination<>(-1L, Collections.emptyList(), 0, null, null);
     }
 
     /**
-     * 创建下一页分页对象，查询数据的结果对象必须有 id 字段
+     * 创建游标分页对象，查询数据的结果对象必须有 id 字段
      *
      * @param records 分页数据
      * @param query   查询参数
      * @param <E>     分页数据类型
      * @return 分页对象
      */
-    static <E> CursorPagination<E> next(List<E> records, AbstractCursorQuery<? extends QueryOrderField> query) {
-        E lasted = CollectionUtils.lastElement(records);
-        if (lasted == null) {
-            // 说明没有数据
+    static <E> CursorPagination<E> of(List<E> records, AbstractCursorQuery<? extends QueryOrderField> query) {
+        if (records == null || records.isEmpty()) {
             return empty();
         }
         // TODO 待优化
-        String cursor = QueryCursorUtils.generateCursor(query, WindReflectUtils.getFieldValue("id", lasted));
-        return of(-1L, records, query.getQuerySize(), cursor);
+        boolean isQueryPrev = query.getPrevCursor() != null;
+        boolean isQueryNext = query.getNextCursor() != null;
+        boolean mayQueryEnd = records.size() < query.getQuerySize();
+        E first = CollectionUtils.firstElement(records);
+        E lasted = CollectionUtils.lastElement(records);
+        String prevCursor = isQueryPrev && mayQueryEnd ? null : WindReflectUtils.getFieldValue(CURSOR_FILED_NAME, first);
+        String nextCursor = isQueryNext && mayQueryEnd ? null : WindReflectUtils.getFieldValue(CURSOR_FILED_NAME, lasted);
+        return of(-1L, records, query.getQuerySize(), prevCursor, nextCursor);
     }
 
-    static <E> CursorPagination<E> of(long total, List<E> records, int querySize, String nextCursor) {
-        return new ImmutableCursorPagination<>(total, records, querySize, nextCursor);
+    static <E> CursorPagination<E> of(long total, List<E> records, int querySize, String prevCursor, String nextCursor) {
+        return new ImmutableCursorPagination<>(total, records, querySize, prevCursor, nextCursor);
     }
 }

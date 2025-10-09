@@ -21,7 +21,7 @@ public interface WindQuery<OrderField> {
     void setQuerySize(@NonNull Integer querySize);
 
     /**
-     * 排序字段和排序类型安装数组顺序一一对应
+     * 排序字段和排序类型按数组顺序一一对应
      *
      * @return 排序字段
      */

@@ -1,5 +1,7 @@
 package com.wind.common.query.cursor;
 
+import com.wind.common.exception.AssertUtils;
+import com.wind.common.exception.BaseException;
 import com.wind.common.query.supports.QueryOrderField;
 import com.wind.common.query.supports.QueryOrderType;
 import jakarta.validation.constraints.NotNull;
@@ -7,6 +9,10 @@ import lombok.Data;
 import org.springframework.lang.Nullable;
 
 import java.beans.Transient;
+import java.util.Objects;
+import java.util.Set;
+
+import static com.wind.common.query.cursor.QueryCursorUtils.CURSOR_FILED_NAME;
 
 /**
  * @author wuxp
@@ -16,13 +22,18 @@ import java.beans.Transient;
 public abstract class AbstractCursorQuery<OrderField extends QueryOrderField> implements CursorBasedQuery<OrderField> {
 
     /**
+     * 允许的排序字段
+     */
+    private static final Set<String> ALLOW_ORDER_FIELDS = Set.of("id", "gmt_create");
+
+    /**
      * 查询大小
      */
     @NotNull
     private Integer querySize = 20;
 
     /**
-     * 排序字段
+     * 排序字
      */
     private OrderField[] orderFields;
 
@@ -32,21 +43,57 @@ public abstract class AbstractCursorQuery<OrderField extends QueryOrderField> im
     private QueryOrderType[] orderTypes;
 
     /**
-     * 游标
+     * 上一页游标
      */
-    private String cursor;
+    private String prevCursor;
 
-    @Nullable
-    @Transient
-    public String asTextId() {
-        return QueryCursorUtils.checkCursorAndGetLastRecordId(this);
+    /**
+     * 下一页游标
+     */
+    private String nextCursor;
+
+
+    public OrderField[] getOrderFields() {
+        AssertUtils.notEmpty(orderFields, "argument orderFields must not empty, cursor query must use {} order", CURSOR_FILED_NAME);
+        for (OrderField field : orderFields) {
+            AssertUtils.isTrue(ALLOW_ORDER_FIELDS.contains(field.getOrderField()), "order file must not allowed");
+        }
+        return orderFields;
     }
 
     @Nullable
     @Transient
-    public Long asId() {
-        String result = asTextId();
-        return result == null ? null : Long.valueOf(result);
+    public String asPrevTextId() {
+        return QueryCursorUtils.checkCursorAndGetLastRecordId(this, getPrevCursor());
     }
 
+    @Nullable
+    @Transient
+    public String asNextTextId() {
+        return QueryCursorUtils.checkCursorAndGetLastRecordId(this, getNextCursor());
+    }
+
+    @NotNull
+    @Transient
+    public Long asPrevNumberId() {
+        String result = asPrevTextId();
+        return result == null ? 0L : Long.parseLong(result);
+    }
+
+    @NotNull
+    @Transient
+    public Long asNextNumberId() {
+        String result = asNextTextId();
+        return result == null ? 0L : Long.parseLong(result);
+    }
+
+    @Override
+    public boolean cursorFieldIsAcs() {
+        for (int i = 0; i < orderFields.length; i++) {
+            if (Objects.equals(orderFields[i].getOrderField(), CURSOR_FILED_NAME)) {
+                return Objects.equals(orderTypes[i], QueryOrderType.ASC);
+            }
+        }
+        throw BaseException.common("Cursor query must include sorting by " + CURSOR_FILED_NAME);
+    }
 }

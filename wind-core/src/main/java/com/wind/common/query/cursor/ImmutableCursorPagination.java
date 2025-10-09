@@ -25,5 +25,7 @@ public final class ImmutableCursorPagination<T> implements CursorPagination<T> {
 
     private final int querySize;
 
+    private final String prevCursor;
+
     private final String nextCursor;
 }

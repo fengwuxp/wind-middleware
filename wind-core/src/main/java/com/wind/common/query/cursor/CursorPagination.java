@@ -10,7 +10,7 @@ import java.beans.Transient;
 import java.util.Collections;
 import java.util.List;
 
-import static com.wind.common.query.cursor.QueryCursorUtils.CURSOR_FILED_NAME;
+import static com.wind.common.query.cursor.CursorQueryUtils.CURSOR_FILED_NAME;
 
 /**
  * 基于游标分页查询的分页对象

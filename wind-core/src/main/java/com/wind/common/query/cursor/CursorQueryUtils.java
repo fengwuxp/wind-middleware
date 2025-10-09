@@ -4,7 +4,6 @@ import com.wind.common.WindConstants;
 import com.wind.common.exception.AssertUtils;
 import com.wind.common.exception.BaseException;
 import com.wind.common.exception.DefaultExceptionCode;
-import com.wind.common.query.supports.QueryOrderField;
 import com.wind.common.util.WindReflectUtils;
 import jakarta.validation.constraints.NotNull;
 import org.springframework.lang.Nullable;
@@ -17,21 +16,22 @@ import java.security.NoSuchAlgorithmException;
 import java.util.Arrays;
 import java.util.Base64;
 import java.util.Comparator;
-import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
+ * 基于游标分页查询的工具类
+ *
  * @author wuxp
  * @date 2025-09-30 13:12
  **/
-final class QueryCursorUtils {
+final class CursorQueryUtils {
 
     private static final Set<String> CURSOR_QUERY_CURSOR_FILED_NAMES = Set.of("prevCursor", "nextCursor");
 
     static final String CURSOR_FILED_NAME = "id";
 
-    private QueryCursorUtils() {
+    private CursorQueryUtils() {
         throw new AssertionError();
     }
 

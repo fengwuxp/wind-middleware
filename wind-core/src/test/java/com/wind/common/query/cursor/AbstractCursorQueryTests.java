@@ -22,8 +22,8 @@ class AbstractCursorQueryTests {
         query.setName("zhans");
         query.setMinGmtCreate(LocalDateTime.now());
         long firstRecordId = 20L, lastRecordId = 200L;
-        String prevCursor = QueryCursorUtils.generateCursor(query, firstRecordId);
-        String nextCursor = QueryCursorUtils.generateCursor(query, lastRecordId);
+        String prevCursor = CursorQueryUtils.generateCursor(query, firstRecordId);
+        String nextCursor = CursorQueryUtils.generateCursor(query, lastRecordId);
         query.setPrevCursor(prevCursor);
         query.setNextCursor(nextCursor);
         Assertions.assertEquals(String.valueOf(lastRecordId), query.asNextTextId());

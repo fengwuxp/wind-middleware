@@ -12,7 +12,7 @@ import java.beans.Transient;
 import java.util.Objects;
 import java.util.Set;
 
-import static com.wind.common.query.cursor.QueryCursorUtils.CURSOR_FILED_NAME;
+import static com.wind.common.query.cursor.CursorQueryUtils.CURSOR_FILED_NAME;
 
 /**
  * @author wuxp
@@ -64,13 +64,13 @@ public abstract class AbstractCursorQuery<OrderField extends QueryOrderField> im
     @Nullable
     @Transient
     public String asPrevTextId() {
-        return QueryCursorUtils.checkCursorAndGetLastRecordId(this, getPrevCursor());
+        return CursorQueryUtils.checkCursorAndGetLastRecordId(this, getPrevCursor());
     }
 
     @Nullable
     @Transient
     public String asNextTextId() {
-        return QueryCursorUtils.checkCursorAndGetLastRecordId(this, getNextCursor());
+        return CursorQueryUtils.checkCursorAndGetLastRecordId(this, getNextCursor());
     }
 
     @NotNull

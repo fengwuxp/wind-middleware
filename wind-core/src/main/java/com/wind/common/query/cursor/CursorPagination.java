@@ -83,8 +83,8 @@ public interface CursorPagination<T> extends WindPagination<T> {
         boolean mayQueryEnd = records.size() < query.getQuerySize();
         E first = CollectionUtils.firstElement(records);
         E lasted = CollectionUtils.lastElement(records);
-        String prevCursor = isQueryPrev && mayQueryEnd ? null : WindReflectUtils.getFieldValue(CURSOR_FILED_NAME, first);
-        String nextCursor = isQueryNext && mayQueryEnd ? null : WindReflectUtils.getFieldValue(CURSOR_FILED_NAME, lasted);
+        String prevCursor = isQueryPrev && mayQueryEnd ? null : CursorQueryUtils.generateCursor(query,WindReflectUtils.getFieldValue(CURSOR_FILED_NAME, first));
+        String nextCursor = isQueryNext && mayQueryEnd ? null :CursorQueryUtils.generateCursor(query, WindReflectUtils.getFieldValue(CURSOR_FILED_NAME, lasted));
         return of(-1L, records, query.getQuerySize(), prevCursor, nextCursor);
     }
 

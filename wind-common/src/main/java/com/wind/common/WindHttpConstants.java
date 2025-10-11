@@ -1,6 +1,7 @@
 package com.wind.common;
 
 /**
+ * http 相关常量
  * @author wuxp
  * @date 2023-10-18 22:08
  **/

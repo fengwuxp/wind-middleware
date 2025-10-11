@@ -37,11 +37,6 @@ public interface WindQuery<OrderField> {
 
     void setOrderTypes(@NonNull QueryOrderType[] orderTypes);
 
-    @Deprecated
-    default boolean requireOrderBy() {
-        return shouldOrderBy();
-    }
-
     /**
      * 是否需要处理排序
      *

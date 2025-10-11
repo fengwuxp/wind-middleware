@@ -4,6 +4,7 @@ import com.wind.common.exception.AssertUtils;
 import jakarta.validation.constraints.NotNull;
 import org.springframework.lang.Nullable;
 
+import java.beans.Transient;
 import java.io.Serial;
 import java.io.Serializable;
 import java.util.HashMap;
@@ -36,18 +37,10 @@ public record WindAuthenticationUser(String id, String userName, Map<String, Obj
      *
      * @return id
      */
-    public Long getIdAsLong() {
+    @Transient
+    @NotNull
+    public Long idAsLong() {
         return Long.parseLong(id);
-    }
-
-    @Deprecated
-    public String getId() {
-        return id;
-    }
-
-    @Deprecated
-    public String getUserName() {
-        return userName;
     }
 
     @Nullable
@@ -63,6 +56,7 @@ public record WindAuthenticationUser(String id, String userName, Map<String, Obj
      * @param key 属性名称
      * @return 属性值
      */
+    @NotNull
     public <T> T requireAttribute(@NotNull String key) {
         T result = getAttribute(key);
         AssertUtils.notNull(result, () -> String.format("attribute name = %s must not null", key));

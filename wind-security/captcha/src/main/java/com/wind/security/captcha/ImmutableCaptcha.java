@@ -1,6 +1,5 @@
 package com.wind.security.captcha;
 
-import lombok.AllArgsConstructor;
 import lombok.Builder;
 
 import java.beans.Transient;

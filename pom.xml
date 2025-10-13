@@ -38,6 +38,7 @@
         <module>tests</module>
         <module>wind-rocketmq</module>
         <module>wind-websocket</module>
+        <module>wind-idempotent</module>
     </modules>
 
     <properties>
@@ -259,6 +260,11 @@
             <dependency>
                 <groupId>com.wind.middleware</groupId>
                 <artifactId>wind-common</artifactId>
+                <version>${revision}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.wind.middleware</groupId>
+                <artifactId>wind-idempotent</artifactId>
                 <version>${revision}</version>
             </dependency>
             <dependency>

@@ -21,7 +21,7 @@ class WindIdempotentExecuteUtilsTests {
 
     @BeforeEach
     void setup() {
-        WindIdempotentExecuteUtils.setStorage(new WindIdempotentKeyStorage() {
+        WindIdempotentExecuteUtils.configureStorage(new WindIdempotentKeyStorage() {
             @Override
             public void save(String idempotentKey, Object value) {
                 keySates.put(idempotentKey, true);

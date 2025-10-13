@@ -1,5 +1,7 @@
 package com.wind.middleware.idempotent;
 
+import com.wind.common.exception.AssertUtils;
+
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Supplier;
 
@@ -23,7 +25,7 @@ public final class WindIdempotentExecuteUtils {
      * 否则执行 supplier，并缓存结果。
      */
     public static <T> T execute(String idempotentKey, Supplier<T> supplier) {
-        WindIdempotentKeyStorage storage = STORAGE.get();
+        WindIdempotentKeyStorage storage = requireStorage();
         WindIdempotentValueWrapper wrapper = storage.checkExistsAndGetValue(idempotentKey);
         if (wrapper == null) {
             // TODO 限制并发？
@@ -35,11 +37,17 @@ public final class WindIdempotentExecuteUtils {
         return wrapper.getValue();
     }
 
+    private static WindIdempotentKeyStorage requireStorage() {
+        WindIdempotentKeyStorage result = STORAGE.get();
+        AssertUtils.notNull(result, "WindIdempotentKeyStorage uninitialized");
+        return result;
+    }
+
     /**
      * 执行一个幂等任务。
      */
     public static void execute(String idempotentKey, Runnable runnable) {
-        WindIdempotentKeyStorage storage = STORAGE.get();
+        WindIdempotentKeyStorage storage = requireStorage();
         if (storage.exists(idempotentKey)) {
             return;
         }
@@ -47,7 +55,7 @@ public final class WindIdempotentExecuteUtils {
         storage.save(idempotentKey, null);
     }
 
-    public static void setStorage(WindIdempotentKeyStorage storage) {
+    public static void configureStorage(WindIdempotentKeyStorage storage) {
         STORAGE.set(storage);
     }
 }

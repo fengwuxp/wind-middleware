@@ -118,6 +118,10 @@
             <groupId>com.wind.security</groupId>
             <artifactId>wind-security-crypto</artifactId>
         </dependency>
+        <dependency>
+            <groupId>com.wind.middleware</groupId>
+            <artifactId>wind-idempotent</artifactId>
+        </dependency>
     </dependencies>
 
 </project>

@@ -9,7 +9,6 @@ import com.wind.server.web.restful.RestfulApiRespFactory;
 import com.wind.web.util.HttpServletRequestUtils;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.BeansException;
 import org.springframework.boot.context.event.ApplicationStartedEvent;
 import org.springframework.boot.web.context.ConfigurableWebServerApplicationContext;
 import org.springframework.context.ApplicationContext;
@@ -96,7 +95,7 @@ public class WindServerApplicationStartedEventListener implements ApplicationLis
                 WindIdempotentKeyStorage storage = applicationContext.getBean(WindIdempotentKeyStorage.class);
                 WindIdempotentExecuteUtils.configureStorage(storage);
                 log.info("enabled wind idempotent supported");
-            } catch (BeansException e) {
+            } catch (Exception ignore) {
                 log.info("un enabled wind idempotent supported");
             }
         }

@@ -44,9 +44,7 @@ public record ObjectMaskPrinter(MaskRuleRegistry rueRegistry) implements ObjectM
                     Temporal.class
             ));
 
-    private static final Set<Class<?>> IGNORE_CLASSES = new LinkedHashSet<>(List.of(
-            java.util.Date.class
-    ));
+    private static final Set<Class<?>> IGNORE_CLASSES = new LinkedHashSet<>(List.of());
 
     private static final Set<String> IGNORE_PACKAGES = new LinkedHashSet<>();
 

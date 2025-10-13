@@ -52,6 +52,11 @@ public final class HttpServletRequestUtils {
     }
 
     @Nullable
+    public static String getHeader(@NotBlank String headerName) {
+        return requireContextRequest().getHeader(headerName);
+    }
+
+    @Nullable
     public static <T> T getRequestAttribute(@NotBlank String name) {
         return getRequestAttribute(name, requireContextRequest());
     }

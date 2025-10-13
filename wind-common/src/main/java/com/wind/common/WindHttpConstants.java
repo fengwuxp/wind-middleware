@@ -2,6 +2,7 @@ package com.wind.common;
 
 /**
  * http 相关常量
+ *
  * @author wuxp
  * @date 2023-10-18 22:08
  **/
@@ -40,6 +41,16 @@ public final class WindHttpConstants {
      * http request Device-Id  header name
      */
     public static final String HTTP_REQUEST_CLIENT_ID_HEADER_NAME = "Wind-Device-Id";
+
+    /**
+     * http request Idempotent header name
+     */
+    public static final String HTTP_REQUEST_IDEMPOTENT_HEADER_NAME = "Wind-Idempotent-Key";
+
+    /**
+     * http request Idempotent execute prefix, 业务侧可以根据该前缀进行额外的处理
+     */
+    public static final String HTTP_REQUEST_IDEMPOTENT_EXECUTE_PREFIX = "Wind-Http@";
 
     /**
      * 匹配所有路径的 Ant pattern

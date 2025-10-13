@@ -6,7 +6,6 @@ import com.wind.script.auditlog.AuditLogRecorder;
 import com.wind.script.auditlog.ScriptAuditLogRecorder;
 import com.wind.server.actuate.health.GracefulShutdownHealthIndicator;
 import com.wind.server.aop.WindControllerMethodInterceptor;
-import com.wind.server.initialization.WindApplicationStartedListener;
 import com.wind.server.logging.WebAuditLogRecorder;
 import com.wind.server.web.exception.RestfulErrorAttributes;
 import lombok.extern.slf4j.Slf4j;
@@ -40,11 +39,6 @@ import static com.wind.common.WindConstants.WIND_SERVER_PROPERTIES_PREFIX;
 @ConditionalOnProperty(prefix = WIND_SERVER_PROPERTIES_PREFIX, name = ENABLED_NAME, havingValue = TRUE, matchIfMissing = true)
 @Slf4j
 public class WindServerAutoConfiguration {
-
-    @Bean
-    public WindApplicationStartedListener windApplicationStartedListener(){
-        return new WindApplicationStartedListener();
-    }
 
     @Bean
     public RestfulErrorAttributes restfulErrorAttributes() {

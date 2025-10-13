@@ -44,11 +44,27 @@ public record ObjectMaskPrinter(MaskRuleRegistry rueRegistry) implements ObjectM
                     Temporal.class
             ));
 
-    private static final Set<Class<?>> IGNORE_CLASSES = new LinkedHashSet<>(List.of(Date.class));
+    private static final Set<Class<?>> IGNORE_CLASSES = new LinkedHashSet<>(List.of(
+            java.util.Date.class
+    ));
 
     private static final Set<String> IGNORE_PACKAGES = new LinkedHashSet<>();
 
     static {
+        IGNORE_PACKAGES.add("java.lang.");
+        IGNORE_PACKAGES.add("java.net.");
+        IGNORE_PACKAGES.add("java.rmi.");
+        IGNORE_PACKAGES.add("java.sql.");
+        IGNORE_PACKAGES.add("java.security.");
+        IGNORE_PACKAGES.add("java.text.");
+        IGNORE_PACKAGES.add("java.io.");
+        IGNORE_PACKAGES.add("java.math.");
+        IGNORE_PACKAGES.add("java.time.");
+        IGNORE_PACKAGES.add("java.util.");
+        IGNORE_PACKAGES.add("jakarta.");
+        IGNORE_PACKAGES.add("javax.");
+        IGNORE_PACKAGES.add("sun.");
+        IGNORE_PACKAGES.add("com.sun.");
         IGNORE_PACKAGES.add("org.springframework.");
         IGNORE_PACKAGES.add("org.slf4j.");
         IGNORE_PACKAGES.add("org.apache.");
@@ -57,15 +73,7 @@ public record ObjectMaskPrinter(MaskRuleRegistry rueRegistry) implements ObjectM
         IGNORE_PACKAGES.add("org.jetbrains.");
         IGNORE_PACKAGES.add("org.jodd.");
         IGNORE_PACKAGES.add("lombok.");
-        IGNORE_PACKAGES.add("javax.persistence.");
-        IGNORE_PACKAGES.add("java.net.");
-        IGNORE_PACKAGES.add("javax.");
-        IGNORE_PACKAGES.add("java.security.");
-        IGNORE_PACKAGES.add("java.text.");
-        IGNORE_PACKAGES.add("java.io.");
-        IGNORE_PACKAGES.add("java.time.");
-        IGNORE_PACKAGES.add("java.lang.reflect");
-        IGNORE_PACKAGES.add("sun.");
+        IGNORE_PACKAGES.add("com.mysql.");
         IGNORE_PACKAGES.add("com.google.");
         IGNORE_PACKAGES.add("com.alibaba.");
         IGNORE_PACKAGES.add("com.alipay.");
@@ -75,6 +83,7 @@ public record ObjectMaskPrinter(MaskRuleRegistry rueRegistry) implements ObjectM
         IGNORE_PACKAGES.add("org.reactivestreams");
         IGNORE_PACKAGES.add("io.reactivex.");
         IGNORE_PACKAGES.add("com.zaxxer.hikari.");
+        IGNORE_PACKAGES.add("ch.qos.");
     }
 
     /**
@@ -113,9 +122,15 @@ public record ObjectMaskPrinter(MaskRuleRegistry rueRegistry) implements ObjectM
     }
 
     private static boolean isIgnoreMask(Object o) {
-        String name = o.getClass().getName();
-        return IGNORE_CLASSES.stream().anyMatch(c -> c.isInstance(o) ||
-                IGNORE_PACKAGES.stream().anyMatch(name::startsWith));
+        if (o instanceof Class<?>) {
+            return true;
+        }
+        return isIgnoreMask(o.getClass());
+    }
+
+    private static boolean isIgnoreMask(Class<?> clazz) {
+        return IGNORE_CLASSES.stream().anyMatch(c -> c == clazz) ||
+                IGNORE_PACKAGES.stream().anyMatch(clazz.getName()::startsWith);
     }
 
     /**
@@ -163,21 +178,24 @@ public record ObjectMaskPrinter(MaskRuleRegistry rueRegistry) implements ObjectM
             if (value == null) {
                 return WindConstants.NULL;
             }
-            if (isIgnoreMask(value)) {
-                return value.toString();
-            }
             if (isCycleRef(value)) {
                 return printCycleRefClassHashCode(value);
             }
-            if (value instanceof String str) {
+            if (value instanceof CharSequence) {
                 // TODO 单纯的字符串先不支持脱敏
-                return str;
+                return value.toString();
             }
             if (value instanceof Throwable) {
                 return value.toString();
             }
+            if (value instanceof Class<?>) {
+                return value.toString();
+            }
             Class<?> clazz = value.getClass();
             if (isLambdaExpression(clazz)) {
+                return value.toString();
+            }
+            if (ClassUtils.isPrimitiveOrWrapper(clazz)) {
                 return value.toString();
             }
             if (ClassUtils.isPrimitiveArray(clazz)) {
@@ -311,10 +329,19 @@ public record ObjectMaskPrinter(MaskRuleRegistry rueRegistry) implements ObjectM
         }
 
         private String printObject(Object obj) {
+            if (isIgnoreMask(obj)) {
+                return String.valueOf(obj);
+            }
             Class<?> clazz = obj.getClass();
             StringBuilder result = new StringBuilder(obj.getClass().getSimpleName()).append("(");
             for (Field field : WindReflectUtils.getFields(clazz)) {
-                Object value = WindReflectUtils.getFieldValue(field, obj);
+                Object value = null;
+                try {
+                    value = WindReflectUtils.getFieldValue(field, obj);
+                } catch (Throwable throwable) {
+                    log.error("print object field value exception, message = {}", throwable.getMessage(), throwable);
+                    value = WindConstants.UNKNOWN;
+                }
                 MaskRule rule = getFieldMaskRule(field);
                 result.append(field.getName()).append("=").append(printWithMaskRule(value, rule)).append(", ");
             }

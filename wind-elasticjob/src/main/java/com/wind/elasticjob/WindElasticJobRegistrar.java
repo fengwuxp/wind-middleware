@@ -4,12 +4,14 @@ import com.wind.common.util.ServiceInfoUtils;
 import com.wind.elasticjob.enums.ElasticJobErrorHandlerType;
 import com.wind.elasticjob.enums.ElasticJobListenerType;
 import com.wind.elasticjob.enums.ElasticJobShardingStrategyType;
+import com.wind.elasticjob.handler.WindLogJobErrorHandler;
 import com.wind.elasticjob.job.WindElasticDataFlowJob;
 import com.wind.elasticjob.job.WindElasticJob;
 import com.wind.elasticjob.job.WindElasticSimpleJob;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.shardingsphere.elasticjob.api.ElasticJob;
 import org.apache.shardingsphere.elasticjob.api.JobConfiguration;
+import org.apache.shardingsphere.elasticjob.infra.spi.ElasticJobServiceLoader;
 import org.apache.shardingsphere.elasticjob.lite.api.bootstrap.impl.ScheduleJobBootstrap;
 import org.apache.shardingsphere.elasticjob.reg.base.CoordinatorRegistryCenter;
 import org.springframework.boot.context.event.ApplicationStartedEvent;
@@ -28,6 +30,11 @@ import java.util.List;
  */
 @Slf4j
 public class WindElasticJobRegistrar {
+
+    static {
+        // 注册自定义错误处理
+        ElasticJobServiceLoader.registerTypedService(WindLogJobErrorHandler.class);
+    }
 
     private final CoordinatorRegistryCenter registryCenter;
 
@@ -73,7 +80,7 @@ public class WindElasticJobRegistrar {
         return JobConfiguration.newBuilder(job.getName(), job.getShardingTotalCount())
                 .shardingItemParameters(job.getShardingItemParameters())
                 .jobShardingStrategyType(ElasticJobShardingStrategyType.ROUND_ROBIN.name())
-                .jobErrorHandlerType(ElasticJobErrorHandlerType.LOG.name())
+                .jobErrorHandlerType(ElasticJobErrorHandlerType.WIND_LOG.name())
                 // 统一开启任务的日志 trace
                 .jobListenerTypes(ElasticJobListenerType.LOG_TRACE.getTypeName())
                 .cron(job.getCron())

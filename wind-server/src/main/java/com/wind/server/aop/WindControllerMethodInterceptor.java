@@ -3,7 +3,7 @@ package com.wind.server.aop;
 import com.wind.common.WindConstants;
 import com.wind.common.WindHttpConstants;
 import com.wind.context.injection.MethodParameterInjector;
-import com.wind.middleware.idempotent.WindIdempotentException;
+import com.wind.common.exception.WindIdempotentException;
 import com.wind.middleware.idempotent.WindIdempotentExecuteUtils;
 import com.wind.script.auditlog.ScriptAuditLogRecorder;
 import com.wind.web.util.HttpServletRequestUtils;

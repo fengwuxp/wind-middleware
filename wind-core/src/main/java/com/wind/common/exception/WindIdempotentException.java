@@ -1,4 +1,4 @@
-package com.wind.middleware.idempotent;
+package com.wind.common.exception;
 
 import java.io.Serial;
 

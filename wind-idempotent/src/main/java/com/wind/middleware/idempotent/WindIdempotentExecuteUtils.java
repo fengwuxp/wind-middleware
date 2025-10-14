@@ -1,6 +1,7 @@
 package com.wind.middleware.idempotent;
 
 import com.wind.common.exception.AssertUtils;
+import com.wind.common.exception.WindIdempotentException;
 import com.wind.common.function.WindFunctions;
 import lombok.extern.slf4j.Slf4j;
 

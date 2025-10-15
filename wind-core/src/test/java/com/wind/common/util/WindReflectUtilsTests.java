@@ -14,6 +14,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.function.Function;
 
 /**
@@ -21,6 +22,14 @@ import java.util.function.Function;
  * @date 2024-09-14 13:50
  **/
 class WindReflectUtilsTests {
+
+
+    @Test
+    void testNewInstance() {
+        Example example = WindReflectUtils.newInstance(Example.class, Map.of("name","zhangs"));
+        Assertions.assertNotNull(example);
+        Assertions.assertEquals("zhangs", example.getName());
+    }
 
     @Test
     void testFindFieldGetMethod() {
@@ -106,7 +115,6 @@ class WindReflectUtilsTests {
         example.setName("1");
         Object result = methodHandle.invoke(example);
         Assertions.assertEquals(example.name, result);
-
     }
 
     interface A<E> {

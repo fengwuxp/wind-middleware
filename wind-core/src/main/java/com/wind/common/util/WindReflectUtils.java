@@ -52,6 +52,42 @@ public final class WindReflectUtils {
     }
 
     /**
+     * 创建实例
+     *
+     * @param clazz 类类型
+     * @return 类实例
+     */
+    @NotNull
+    public static <T> T newInstance(@NotNull Class<T> clazz) {
+        return newInstance(clazz, Collections.emptyMap());
+    }
+
+    /**
+     * 创建实例
+     *
+     * @param clazz       类类型
+     * @param filedValues 字段值 {@key 字段名称, @value 字段值}
+     * @return 类实例
+     */
+    public static <T> T newInstance(@NotNull Class<T> clazz, @NotNull Map<String, Object> filedValues) {
+        AssertUtils.notNull(clazz, ERROR_MESSAGE);
+        AssertUtils.notNull(filedValues, "argument filedValues must not null");
+        try {
+            T result = clazz.getDeclaredConstructor().newInstance();
+            for (Map.Entry<String, Object> entry : filedValues.entrySet()) {
+                String fieldName = entry.getKey();
+                Object fieldValue = entry.getValue();
+                if (fieldValue != null) {
+                    setFieldValue(fieldName, result, fieldValue);
+                }
+            }
+            return result;
+        } catch (Exception e) {
+            throw new BaseException(DefaultExceptionCode.COMMON_FRIENDLY_ERROR, "new instance exception", e);
+        }
+    }
+
+    /**
      * 根据注解查找 {@link Field}，会递归查找超类
      *
      * @param clazz           类类型

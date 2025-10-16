@@ -4,6 +4,7 @@ import com.wind.common.util.ServiceInfoUtils;
 import com.wind.elasticjob.enums.ElasticJobErrorHandlerType;
 import com.wind.elasticjob.enums.ElasticJobListenerType;
 import com.wind.elasticjob.enums.ElasticJobShardingStrategyType;
+import com.wind.elasticjob.handler.WindLogJobErrorHandler;
 import com.wind.elasticjob.job.WindElasticDataFlowJob;
 import com.wind.elasticjob.job.WindElasticJob;
 import com.wind.elasticjob.job.WindElasticSimpleJob;
@@ -73,7 +74,7 @@ public class WindElasticJobRegistrar {
         return JobConfiguration.newBuilder(job.getName(), job.getShardingTotalCount())
                 .shardingItemParameters(job.getShardingItemParameters())
                 .jobShardingStrategyType(ElasticJobShardingStrategyType.ROUND_ROBIN.name())
-                .jobErrorHandlerType(ElasticJobErrorHandlerType.LOG.name())
+                .jobErrorHandlerType(WindLogJobErrorHandler.class.getSimpleName())
                 // 统一开启任务的日志 trace
                 .jobListenerTypes(ElasticJobListenerType.LOG_TRACE.getTypeName())
                 .cron(job.getCron())

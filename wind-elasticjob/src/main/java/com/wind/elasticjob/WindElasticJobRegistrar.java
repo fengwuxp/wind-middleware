@@ -73,7 +73,7 @@ public class WindElasticJobRegistrar {
         return JobConfiguration.newBuilder(job.getName(), job.getShardingTotalCount())
                 .shardingItemParameters(job.getShardingItemParameters())
                 .jobShardingStrategyType(ElasticJobShardingStrategyType.ROUND_ROBIN.name())
-                .jobErrorHandlerType(ElasticJobErrorHandlerType.LOG.name())
+                .jobErrorHandlerType(ElasticJobErrorHandlerType.WIND_LOG.name())
                 // 统一开启任务的日志 trace
                 .jobListenerTypes(ElasticJobListenerType.LOG_TRACE.getTypeName())
                 .cron(job.getCron())

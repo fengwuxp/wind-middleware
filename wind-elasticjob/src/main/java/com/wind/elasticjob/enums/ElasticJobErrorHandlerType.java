@@ -22,6 +22,11 @@ public enum ElasticJobErrorHandlerType {
     /**
      * 忽略系统异常且不中断作业执行
      */
-    IGNORE;
+    IGNORE,
+
+    /**
+     * 自定义错误处理
+     */
+    WIND_LOG;
 
 }

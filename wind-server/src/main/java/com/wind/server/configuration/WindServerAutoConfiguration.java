@@ -56,7 +56,7 @@ public class WindServerAutoConfiguration {
     private static final String ASPECT_CONTROLLER_CLASS_EXPRESSION = Stream.of(
             Controller.class,
             RestController.class
-    ).map(clazz -> "@within(" + clazz.getName() + ")").collect(Collectors.joining("||"));
+    ).map(clazz -> "@within(" + clazz.getName() + ")").collect(Collectors.joining(" || "));
 
     /**
      * 只拦截被 Web 请求映射注解标记的方法
@@ -68,7 +68,7 @@ public class WindServerAutoConfiguration {
             PutMapping.class,
             PatchMapping.class,
             DeleteMapping.class
-    ).map(clazz -> "@annotation(" + clazz.getName() + ")").collect(Collectors.joining("||"));
+    ).map(clazz -> "@annotation(" + clazz.getName() + ")").collect(Collectors.joining(" || "));
 
 
     @Bean
@@ -104,7 +104,7 @@ public class WindServerAutoConfiguration {
         String expression = properties.getControllerMethodAspect().getExpression();
         AssertUtils.hasLength(expression, String.format("%s 未配置", CONTROLLER_METHOD_ASPECT_NAME));
         AspectJExpressionPointcut pointcut = new AspectJExpressionPointcut();
-        pointcut.setExpression(String.join("&&", ASPECT_CONTROLLER_CLASS_EXPRESSION, ASPECT_CONTROLLER_METHOD_EXPRESSION, expression));
+        pointcut.setExpression(String.format("(%s) && (%s) && %s", ASPECT_CONTROLLER_CLASS_EXPRESSION, ASPECT_CONTROLLER_METHOD_EXPRESSION, expression));
         DefaultBeanFactoryPointcutAdvisor advisor = new DefaultBeanFactoryPointcutAdvisor();
         // 拦截优先级设置为最高
         advisor.setOrder(Ordered.HIGHEST_PRECEDENCE);

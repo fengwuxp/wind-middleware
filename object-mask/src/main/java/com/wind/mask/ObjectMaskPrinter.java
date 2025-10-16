@@ -45,7 +45,8 @@ public record ObjectMaskPrinter(MaskRuleRegistry rueRegistry) implements ObjectM
             ));
 
     private static final Set<Class<?>> IGNORE_CLASSES = new LinkedHashSet<>(List.of(
-            java.util.EventObject.class
+            java.util.EventObject.class,
+            java.lang.reflect.Proxy.class
     ));
 
     private static final Set<String> IGNORE_PACKAGES = new LinkedHashSet<>();

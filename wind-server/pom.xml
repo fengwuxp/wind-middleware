@@ -15,7 +15,6 @@
         <dependency>
             <groupId>com.wind.middleware</groupId>
             <artifactId>wind-idempotent</artifactId>
-            <optional>true</optional>
         </dependency>
         <dependency>
             <groupId>com.wind.middleware</groupId>

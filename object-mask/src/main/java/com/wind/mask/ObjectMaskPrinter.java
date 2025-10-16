@@ -44,7 +44,9 @@ public record ObjectMaskPrinter(MaskRuleRegistry rueRegistry) implements ObjectM
                     Temporal.class
             ));
 
-    private static final Set<Class<?>> IGNORE_CLASSES = new LinkedHashSet<>(List.of());
+    private static final Set<Class<?>> IGNORE_CLASSES = new LinkedHashSet<>(List.of(
+            java.util.EventObject.class
+    ));
 
     private static final Set<String> IGNORE_PACKAGES = new LinkedHashSet<>();
 
@@ -127,7 +129,7 @@ public record ObjectMaskPrinter(MaskRuleRegistry rueRegistry) implements ObjectM
     }
 
     private static boolean isIgnoreMask(Class<?> clazz) {
-        return IGNORE_CLASSES.stream().anyMatch(c -> c == clazz) ||
+        return IGNORE_CLASSES.stream().anyMatch(c -> c.isAssignableFrom(clazz)) ||
                 IGNORE_PACKAGES.stream().anyMatch(clazz.getName()::startsWith);
     }
 
@@ -338,6 +340,8 @@ public record ObjectMaskPrinter(MaskRuleRegistry rueRegistry) implements ObjectM
                     value = WindReflectUtils.getFieldValue(field, obj);
                 } catch (Throwable throwable) {
                     log.error("print object field value exception, message = {}", throwable.getMessage(), throwable);
+                    // 加入到忽略列表中
+                    IGNORE_CLASSES.add(clazz);
                     value = WindConstants.UNKNOWN;
                 }
                 MaskRule rule = getFieldMaskRule(field);

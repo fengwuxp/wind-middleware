@@ -36,7 +36,7 @@ import java.util.concurrent.atomic.AtomicReference;
 @Slf4j
 public final class ExecutorServiceUtils {
 
-    private static final int DEFAULT_WORK_QUEUE_SIZE = 128;
+    private static final int DEFAULT_WORK_QUEUE_SIZE = 256;
 
     private static final AtomicReference<TaskDecorator> TASK_DECORATOR = new AtomicReference<>(TraceContextTask.of());
 

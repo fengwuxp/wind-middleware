@@ -1,6 +1,5 @@
-package com.wind.elasticjob.handler;
+package org.apache.shardingsphere.elasticjob.error.handler.general;
 
-import com.wind.elasticjob.enums.ElasticJobErrorHandlerType;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.shardingsphere.elasticjob.error.handler.JobErrorHandler;
 
@@ -28,6 +27,6 @@ public class WindLogJobErrorHandler implements JobErrorHandler {
 
     @Override
     public String getType() {
-        return WindLogJobErrorHandler.class.getSimpleName();
+        return "LOG";
     }
 }

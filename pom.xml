@@ -94,6 +94,7 @@
         <bucket4j.version>8.10.1</bucket4j.version>
         <json-path.version>2.9.0</json-path.version>
         <jetbrains-annotations.version>26.0.2</jetbrains-annotations.version>
+        <error_prone_annotations.version>2.42.0</error_prone_annotations.version>
         <podam.version>8.0.2.RELEASE</podam.version>
         <junit-platform-surefire-provider.version>1.3.2</junit-platform-surefire-provider.version>
     </properties>
@@ -568,6 +569,11 @@
                 <groupId>com.bucket4j</groupId>
                 <artifactId>bucket4j-redis</artifactId>
                 <version>${bucket4j.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.google.errorprone</groupId>
+                <artifactId>error_prone_annotations</artifactId>
+                <version>${error_prone_annotations.version}</version>
             </dependency>
             <dependency>
                 <groupId>uk.co.jemos.podam</groupId>

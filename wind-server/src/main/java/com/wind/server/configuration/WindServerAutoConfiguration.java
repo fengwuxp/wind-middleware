@@ -22,8 +22,18 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.NestedRuntimeException;
 import org.springframework.core.Ordered;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.util.Collection;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static com.wind.common.WindConstants.CONTROLLER_METHOD_ASPECT_NAME;
 import static com.wind.common.WindConstants.ENABLED_NAME;
@@ -39,6 +49,27 @@ import static com.wind.common.WindConstants.WIND_SERVER_PROPERTIES_PREFIX;
 @ConditionalOnProperty(prefix = WIND_SERVER_PROPERTIES_PREFIX, name = ENABLED_NAME, havingValue = TRUE, matchIfMissing = true)
 @Slf4j
 public class WindServerAutoConfiguration {
+
+    /**
+     * 只作用在 @Controller 或 @RestController 类上
+     */
+    private static final String ASPECT_CONTROLLER_CLASS_EXPRESSION = Stream.of(
+            Controller.class,
+            RestController.class
+    ).map(clazz -> "@within(" + clazz.getName() + ")").collect(Collectors.joining("||"));
+
+    /**
+     * 只拦截被 Web 请求映射注解标记的方法
+     */
+    private static final String ASPECT_CONTROLLER_METHOD_EXPRESSION = Stream.of(
+            RequestMapping.class,
+            GetMapping.class,
+            PostMapping.class,
+            PutMapping.class,
+            PatchMapping.class,
+            DeleteMapping.class
+    ).map(clazz -> "@annotation(" + clazz.getName() + ")").collect(Collectors.joining("||"));
+
 
     @Bean
     public RestfulErrorAttributes restfulErrorAttributes() {
@@ -73,7 +104,7 @@ public class WindServerAutoConfiguration {
         String expression = properties.getControllerMethodAspect().getExpression();
         AssertUtils.hasLength(expression, String.format("%s 未配置", CONTROLLER_METHOD_ASPECT_NAME));
         AspectJExpressionPointcut pointcut = new AspectJExpressionPointcut();
-        pointcut.setExpression(expression);
+        pointcut.setExpression(String.join("&&", ASPECT_CONTROLLER_CLASS_EXPRESSION, ASPECT_CONTROLLER_METHOD_EXPRESSION, expression));
         DefaultBeanFactoryPointcutAdvisor advisor = new DefaultBeanFactoryPointcutAdvisor();
         // 拦截优先级设置为最高
         advisor.setOrder(Ordered.HIGHEST_PRECEDENCE);

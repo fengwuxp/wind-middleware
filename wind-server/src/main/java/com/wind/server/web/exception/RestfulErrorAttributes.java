@@ -54,8 +54,7 @@ public record RestfulErrorAttributes(DefaultErrorAttributes attributes) implemen
     public Map<String, Object> getErrorAttributes(WebRequest webRequest, ErrorAttributeOptions options) {
         Map<String, Object> result = attributes.getErrorAttributes(webRequest, options);
         String message = (String) result.remove("message");
-        ApiResp<Map<String, Object>> resp = RestfulApiRespFactory.error(result, WRAPPER_SPRING_HANDLE_ERROR, message == null ?
-                WindConstants.UNKNOWN : message);
+        ApiResp<Map<String, Object>> resp = RestfulApiRespFactory.error(result, WRAPPER_SPRING_HANDLE_ERROR, message == null ? WindConstants.UNKNOWN : message);
         return (Map<String, Object>) JSON.toJSON(resp);
     }
 

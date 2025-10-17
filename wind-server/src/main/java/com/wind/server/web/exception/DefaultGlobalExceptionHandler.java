@@ -3,6 +3,7 @@ package com.wind.server.web.exception;
 
 import com.wind.common.WindConstants;
 import com.wind.common.exception.BaseException;
+import com.wind.common.exception.ExecutionWrapperException;
 import com.wind.common.i18n.SpringI18nMessageUtils;
 import com.wind.server.web.restful.RestfulApiRespFactory;
 import com.wind.server.web.supports.ApiResp;
@@ -90,6 +91,7 @@ public class DefaultGlobalExceptionHandler {
     @ExceptionHandler(value = MaxUploadSizeExceededException.class)
     @ResponseBody
     public ApiResp<Void> handleMaxUploadSizeExceededException(MaxUploadSizeExceededException exception) {
+        log.error("上传文件文件过大, message = {}", exception.getMessage(), exception);
         return RestfulApiRespFactory.payloadToLarge();
     }
 
@@ -160,6 +162,16 @@ public class DefaultGlobalExceptionHandler {
             log.error("业务异常，code = {}，message: {}", exception.getTextCode(), exception.getMessage(), exception);
         }
         return RestfulApiRespFactory.withThrowable(exception);
+    }
+
+    /**
+     * 执行任务包装异常
+     */
+    @ExceptionHandler({ExecutionWrapperException.class})
+    @ResponseBody
+    public ApiResp<Integer> handleExecutionWrapperException(ExecutionWrapperException exception) {
+        log.error("执行任务包装异常, message = {}", exception.getMessage(), exception);
+        return RestfulApiRespFactory.withThrowable(exception.getCause());
     }
 
     /**

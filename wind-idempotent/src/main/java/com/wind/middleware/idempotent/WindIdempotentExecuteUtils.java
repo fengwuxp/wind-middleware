@@ -1,7 +1,7 @@
 package com.wind.middleware.idempotent;
 
 import com.wind.common.exception.AssertUtils;
-import com.wind.common.exception.WindIdempotentException;
+import com.wind.common.exception.ExecutionWrapperException;
 import com.wind.common.function.WindFunctions;
 import lombok.extern.slf4j.Slf4j;
 
@@ -54,7 +54,7 @@ public final class WindIdempotentExecuteUtils {
                 storage.save(idempotentKey, value);
                 return value;
             } catch (Throwable e) {
-                throw WindIdempotentException.withThrows(e);
+                throw ExecutionWrapperException.withThrows(e);
             }
         }
         T result = wrapper.getValue();
@@ -88,7 +88,7 @@ public final class WindIdempotentExecuteUtils {
         try {
             runnable.run();
         } catch (Throwable e) {
-            throw WindIdempotentException.withThrows(e);
+            throw ExecutionWrapperException.withThrows(e);
         }
         storage.save(idempotentKey, null);
     }

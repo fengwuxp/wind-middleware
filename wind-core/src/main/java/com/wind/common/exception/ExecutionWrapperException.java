@@ -1,23 +1,25 @@
 package com.wind.common.exception;
 
+import jakarta.validation.constraints.NotNull;
+
 import java.io.Serial;
 
 /**
- * 幂等服务执行异常
+ * 执行任务包装异常，{@link com.wind.common.function.WindFunctions}
  *
  * @author wuxp
  * @date 2025-10-13 15:13
  **/
-public class WindIdempotentException extends RuntimeException {
+public class ExecutionWrapperException extends RuntimeException {
 
     @Serial
     private static final long serialVersionUID = -69962151270633546L;
 
-    public WindIdempotentException(String message) {
+    public ExecutionWrapperException(String message) {
         super(message);
     }
 
-    public WindIdempotentException(String message, Throwable cause) {
+    public ExecutionWrapperException(String message, Throwable cause) {
         super(message, cause);
     }
 
@@ -27,7 +29,7 @@ public class WindIdempotentException extends RuntimeException {
      * @param cause 原始异常
      * @return WindIdempotentException
      */
-    public static WindIdempotentException withThrows(Throwable cause) {
-        throw new WindIdempotentException("Only wrapper cause throwable", cause);
+    public static ExecutionWrapperException withThrows(@NotNull Throwable cause) {
+        throw new ExecutionWrapperException("wrapper execute cause throwable", cause);
     }
 }

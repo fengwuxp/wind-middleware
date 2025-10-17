@@ -1,19 +1,20 @@
 package com.wind.web.trace;
 
 import com.wind.common.WindConstants;
+import com.wind.common.exception.ExecutionWrapperException;
 import com.wind.common.util.IpAddressUtils;
 import com.wind.common.util.ServiceInfoUtils;
 import com.wind.server.web.restful.RestfulApiRespFactory;
 import com.wind.trace.WindTracer;
 import com.wind.web.exception.GlobalExceptionLogDecisionMaker;
 import com.wind.web.util.HttpResponseMessageUtils;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.web.filter.OncePerRequestFilter;
-
 import jakarta.annotation.Nonnull;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.web.filter.OncePerRequestFilter;
+
 import java.net.URI;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -74,11 +75,15 @@ public class TraceFilter extends OncePerRequestFilter {
             chain.doFilter(request, response);
         } catch (Throwable throwable) {
             // 统一错误捕获
-            if (GlobalExceptionLogDecisionMaker.requiresPrintErrorLog(throwable)) {
+            Throwable th = throwable;
+            if (GlobalExceptionLogDecisionMaker.requiresPrintErrorLog(th)) {
                 // 表明该异常未输出过 error 日志
-                log.error("request error, cause by = {}", throwable.getMessage(), throwable);
+                log.error("request error, cause by = {}", th.getMessage(), th);
             }
-            HttpResponseMessageUtils.writeApiResp(response, RestfulApiRespFactory.withThrowable(throwable));
+            if (th instanceof ExecutionWrapperException) {
+                th = th.getCause();
+            }
+            HttpResponseMessageUtils.writeApiResp(response, RestfulApiRespFactory.withThrowable(th));
         } finally {
             WindTracer.TRACER.clear();
         }

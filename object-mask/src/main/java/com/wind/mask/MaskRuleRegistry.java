@@ -40,19 +40,19 @@ public class MaskRuleRegistry {
      * @return true 需要
      */
     public boolean requireMask(Class<?> clazz) {
-        return !ObjectUtils.isEmpty(getRuleGroup(clazz)) ||
+        return !ObjectUtils.isEmpty(computeIfAbsent(clazz)) ||
                 (clazz.isAnnotationPresent(Sensitive.class) && WindReflectUtils.findFields(clazz, Sensitive.class).length > 0);
     }
 
     @NotNull
-    public MaskRuleGroup getRuleGroup(Class<?> target) {
+    public MaskRuleGroup computeIfAbsent(Class<?> target) {
         AssertUtils.notNull(target, "argument target must not null");
         return groups.computeIfAbsent(target, this::buildRuleGroup);
     }
 
     @Nullable
     public MaskRule getRuleByField(Field field) {
-        return getRuleGroup(field.getDeclaringClass()).getRuleByField(field);
+        return computeIfAbsent(field.getDeclaringClass()).getRuleByField(field);
     }
 
     public boolean hasRule(@NotNull Class<?> clazz) {

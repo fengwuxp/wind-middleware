@@ -3,13 +3,12 @@ package com.wind.mask;
 import com.wind.common.WindConstants;
 import com.wind.common.exception.AssertUtils;
 import com.wind.mask.masker.MaskerFactory;
-import lombok.Data;
-
 import jakarta.validation.constraints.NotNull;
+
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashSet;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.regex.Pattern;
@@ -17,39 +16,20 @@ import java.util.regex.Pattern;
 /**
  * 脱敏规则
  *
+ * @param name   需要脱敏的字段名称或表达式
+ * @param keys   在字段为 {@link Map} 类型或 json字符串等情况下用于保存需要脱敏的 keys
+ *               支持正则表达式
+ * @param masker 脱敏器
  * @author wuxp
  * @date 2024-08-06 12:55
- **/
-@Data
-public class MaskRule {
+ */
+public record MaskRule(@NotNull String name, @NotNull Set<String> keys, @SuppressWarnings("rawtypes") WindMasker masker) {
 
     private static final String[] REGEX_PARTS = {"*", "$", "^", "+"};
 
-    /**
-     * 需要脱敏的字段名称或表达式
-     */
-    @NotNull
-    private final String name;
-
-    /**
-     * 在字段为 {@link java.util.Map} 类型或 json字符串等情况下用于保存需要脱敏的 keys
-     * 支持正则表达式
-     */
-    @NotNull
-    private final Set<String> keys;
-
-    /**
-     * 脱敏器
-     */
-    @SuppressWarnings("rawtypes")
-    private final WindMasker masker;
-
-
     @SuppressWarnings("rawtypes")
     public MaskRule(String name, Collection<String> keys, WindMasker masker) {
-        this.name = name;
-        this.keys = keys == null ? Collections.emptySet() : Collections.unmodifiableSet(new HashSet<>(keys));
-        this.masker = masker;
+        this(name, keys == null ? Collections.emptySet() : Set.copyOf(keys), masker);
     }
 
     boolean eq(String name) {

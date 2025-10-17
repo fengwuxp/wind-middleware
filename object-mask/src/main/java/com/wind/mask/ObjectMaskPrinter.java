@@ -216,7 +216,7 @@ public record ObjectMaskPrinter(MaskRuleRegistry rueRegistry) implements ObjectM
             if (isCycleRef(value)) {
                 return printCycleRefClassHashCode(value);
             }
-            Object result = (masker instanceof ObjectMasker om) ? om.mask(value, fieldRule.getKeys()) : masker.mask(value);
+            Object result = (masker instanceof ObjectMasker om) ? om.mask(value, fieldRule.keys()) : masker.mask(value);
             return String.valueOf(result);
         }
 
@@ -297,7 +297,7 @@ public record ObjectMaskPrinter(MaskRuleRegistry rueRegistry) implements ObjectM
             if (isOverPrintSize(map.size())) {
                 return toOverMaxSizeString(map.getClass());
             }
-            MaskRuleGroup group = maskRule == null ? rueRegistry.getRuleGroup(Map.class) : convertMapRules(maskRule);
+            MaskRuleGroup group = maskRule == null ? rueRegistry.computeIfAbsent(Map.class) : convertMapRules(maskRule);
             StringBuilder result = new StringBuilder();
             result.append('{');
             for (Map.Entry<?, ?> entry : map.entrySet()) {
@@ -324,13 +324,14 @@ public record ObjectMaskPrinter(MaskRuleRegistry rueRegistry) implements ObjectM
             StringBuilder result = new StringBuilder(obj.getClass().getSimpleName()).append("(");
             for (Field field : WindReflectUtils.getFields(clazz)) {
                 Object value = WindConstants.UNKNOWN;
-                if (!isIgnoreMask(field.getDeclaringClass())) {
+                if (!isIgnoreMask(field.getDeclaringClass())  ) {
                     try {
                         value = WindReflectUtils.getFieldValue(field, obj);
                     } catch (Throwable throwable) {
                         log.error("print object field value exception, message = {}", throwable.getMessage(), throwable);
                         // 加入到忽略列表中
                         IGNORE_CLASSES.add(clazz);
+                        return String.valueOf(obj);
                     }
                 }
                 MaskRule rule = value == WindConstants.UNKNOWN ? null : rueRegistry.getRuleByField(field);
@@ -374,7 +375,7 @@ public record ObjectMaskPrinter(MaskRuleRegistry rueRegistry) implements ObjectM
             if (rule == null) {
                 return null;
             }
-            return rule.getMasker();
+            return rule.masker();
         }
 
         private void deleteLastBlank(StringBuilder builder) {

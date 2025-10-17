@@ -67,7 +67,7 @@ public class ObjectDataMasker implements WindMasker<Object, Object> {
     private Object maskObject(Object object) {
         Class<?> clazz = object.getClass();
         if (registry.requireMask(clazz)) {
-            for (MaskRule rule : registry.getRuleGroup(clazz).getRules()) {
+            for (MaskRule rule : registry.computeIfAbsent(clazz).getRules()) {
                 maskObjectField(rule, object);
             }
         }
@@ -76,14 +76,14 @@ public class ObjectDataMasker implements WindMasker<Object, Object> {
 
     @SuppressWarnings({"rawtypes", "unchecked"})
     private void maskObjectField(MaskRule rule, Object val) {
-        Field field = WindReflectUtils.findField(val.getClass(), rule.getName());
+        Field field = WindReflectUtils.findField(val.getClass(), rule.name());
         Object o = WindReflectUtils.getFieldValue(field, val);
         if (o == null) {
             return;
         }
-        WindMasker masker = rule.getMasker();
+        WindMasker masker = rule.masker();
         if (masker instanceof ObjectMasker objectMasker) {
-            WindReflectUtils.setFieldValue(field, val, objectMasker.mask(o, rule.getKeys()));
+            WindReflectUtils.setFieldValue(field, val, objectMasker.mask(o, rule.keys()));
         } else {
             WindReflectUtils.setFieldValue(field, val, masker.mask(o));
         }
@@ -124,11 +124,11 @@ public class ObjectDataMasker implements WindMasker<Object, Object> {
     private Map<Object, Object> maskMap(Map<Object, Object> map) {
         if (map instanceof HashMap || map instanceof ConcurrentMap) {
             // TODO 优化改用 json path ？
-            MaskRuleGroup group = registry.getRuleGroup(Map.class);
+            MaskRuleGroup group = registry.computeIfAbsent(Map.class);
             map.replaceAll((key, value) -> {
                 if (key instanceof String k && value instanceof String) {
                     MaskRule rule = group.matchesWithKey(k);
-                    return rule == null ? value : rule.getMasker().mask(value);
+                    return rule == null ? value : rule.masker().mask(value);
                 }
                 return maskAs(value);
             });

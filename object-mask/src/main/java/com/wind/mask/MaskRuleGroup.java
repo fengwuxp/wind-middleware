@@ -32,7 +32,7 @@ import java.util.stream.Collectors;
 public record MaskRuleGroup(@NotNull Class<?> target, Map<String, MaskRule> rules) {
 
     public MaskRuleGroup(@NotNull Class<?> target, Collection<MaskRule> maskRules) {
-        this(target, new ConcurrentHashMap<>(maskRules.stream().collect(Collectors.toMap(MaskRule::getName, Function.identity(), (v1, v2) -> v1))));
+        this(target, new ConcurrentHashMap<>(maskRules.stream().collect(Collectors.toMap(MaskRule::name, Function.identity(), (v1, v2) -> v1))));
     }
 
     public MaskRuleGroup {
@@ -77,7 +77,7 @@ public record MaskRuleGroup(@NotNull Class<?> target, Map<String, MaskRule> rule
 
     public void addRules(MaskRule... rules) {
         for (MaskRule rule : rules) {
-            this.rules.put(rule.getName(), rule);
+            this.rules.put(rule.name(), rule);
         }
     }
 
@@ -87,8 +87,8 @@ public record MaskRuleGroup(@NotNull Class<?> target, Map<String, MaskRule> rule
      * @param rule Map 类型字段的规则
      */
     public static MaskRuleGroup convertMapRules(MaskRule rule) {
-        List<MaskRule> rules = rule.getKeys().stream()
-                .map(key -> MaskRule.mark(key, rule.getMasker()))
+        List<MaskRule> rules = rule.keys().stream()
+                .map(key -> MaskRule.mark(key, rule.masker()))
                 .toList();
         return new MaskRuleGroup(Map.class, rules);
     }

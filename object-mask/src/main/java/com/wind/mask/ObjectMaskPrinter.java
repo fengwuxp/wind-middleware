@@ -323,14 +323,15 @@ public record ObjectMaskPrinter(MaskRuleRegistry rueRegistry) implements ObjectM
             Class<?> clazz = obj.getClass();
             StringBuilder result = new StringBuilder(obj.getClass().getSimpleName()).append("(");
             for (Field field : WindReflectUtils.getFields(clazz)) {
-                Object value;
-                try {
-                    value = WindReflectUtils.getFieldValue(field, obj);
-                } catch (Throwable throwable) {
-                    log.error("print object field value exception, message = {}", throwable.getMessage(), throwable);
-                    // 加入到忽略列表中
-                    IGNORE_CLASSES.add(clazz);
-                    value = WindConstants.UNKNOWN;
+                Object value = WindConstants.UNKNOWN;
+                if (!isIgnoreMask(field.getDeclaringClass())) {
+                    try {
+                        value = WindReflectUtils.getFieldValue(field, obj);
+                    } catch (Throwable throwable) {
+                        log.error("print object field value exception, message = {}", throwable.getMessage(), throwable);
+                        // 加入到忽略列表中
+                        IGNORE_CLASSES.add(clazz);
+                    }
                 }
                 MaskRule rule = value == WindConstants.UNKNOWN ? null : rueRegistry.getRuleByField(field);
                 result.append(field.getName()).append("=").append(printWithMaskRule(value, rule)).append(", ");

@@ -28,6 +28,6 @@ public class WindLogJobErrorHandler implements JobErrorHandler {
 
     @Override
     public String getType() {
-        return ElasticJobErrorHandlerType.WIND_LOG.name();
+        return ElasticJobErrorHandlerType.LOG.name();
     }
 }

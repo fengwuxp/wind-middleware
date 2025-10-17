@@ -5,6 +5,7 @@ import com.wind.common.WindConstants;
 import com.wind.common.exception.AssertUtils;
 import com.wind.common.exception.BaseException;
 import com.wind.common.message.MessagePlaceholder;
+import com.wind.web.http.WindMediaType;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -156,30 +157,6 @@ public final class WebServletFileUtils {
             }
         }
         throw BaseException.common(MessagePlaceholder.of("Not found filename {} mime type", filename));
-    }
-
-    private static class WindMediaType {
-
-        private static final String IMAGE = "image";
-
-        private static final String APPLICATION = "application";
-
-        public static final MimeType IMAGE_WEBP = new MimeType(IMAGE, "webp");
-
-        public static final MimeType IMAGE_SVG = new MimeType(IMAGE, "svg+xml");
-
-        public static final MimeType APPLICATION_PDF = new MimeType(APPLICATION, "pdf");
-
-        public static final MimeType MICROSOFT_EXCEL = new MimeType(APPLICATION, "vnd.openxmlformats-officedocument.spreadsheetml.sheet");
-
-        public static final MimeType MICROSOFT_WORD = new MimeType(APPLICATION, "vnd.openxmlformats-officedocument.wordprocessingml.document");
-
-        public static final MimeType MICROSOFT_EXCEL_2003 = new MimeType(APPLICATION, "vnd.ms-excel");
-
-        public static final MimeType MICROSOFT_WORD_2003 = new MimeType(APPLICATION, "msword");
-
-        public static final MimeType APPLICATION_CSV = new MimeType(APPLICATION, "csv");
-
     }
 
 }

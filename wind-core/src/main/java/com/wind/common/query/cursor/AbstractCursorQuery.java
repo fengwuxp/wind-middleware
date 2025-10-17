@@ -73,18 +73,18 @@ public abstract class AbstractCursorQuery<OrderField extends QueryOrderField> im
         return CursorQueryUtils.checkCursorAndGetLastRecordId(this, getNextCursor());
     }
 
-    @NotNull
+    @Nullable
     @Transient
     public Long asPrevNumberId() {
         String result = asPrevTextId();
-        return result == null ? 0L : Long.parseLong(result);
+        return result == null ? null : Long.parseLong(result);
     }
 
-    @NotNull
+    @Nullable
     @Transient
     public Long asNextNumberId() {
         String result = asNextTextId();
-        return result == null ? 0L : Long.parseLong(result);
+        return result == null ? null : Long.parseLong(result);
     }
 
     @Override

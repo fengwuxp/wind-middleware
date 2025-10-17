@@ -47,6 +47,8 @@ public final class WindHttpConstants {
      */
     public static final String HTTP_REQUEST_IDEMPOTENT_HEADER_NAME = "Wind-Idempotent-Key";
 
+    public static final String HTTP_REQUEST_IDEMPOTENT_RESULT_ATTRIBUTE_NAME = "http-request-idempotent-result";
+
     /**
      * http request Idempotent execute prefix, 业务侧可以根据该前缀进行额外的处理
      */

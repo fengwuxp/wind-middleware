@@ -1,12 +1,14 @@
 package com.wind.common.query.cursor;
 
 import com.wind.common.WindConstants;
+import com.wind.common.annotations.VisibleForTesting;
 import com.wind.common.exception.AssertUtils;
 import com.wind.common.exception.BaseException;
 import com.wind.common.exception.DefaultExceptionCode;
 import com.wind.common.util.WindReflectUtils;
 import jakarta.validation.constraints.NotNull;
 import org.springframework.lang.Nullable;
+import org.springframework.util.ClassUtils;
 import org.springframework.util.StringUtils;
 
 import java.lang.reflect.Field;
@@ -15,6 +17,7 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Arrays;
 import java.util.Base64;
+import java.util.Collection;
 import java.util.Comparator;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -70,9 +73,29 @@ final class CursorQueryUtils {
         String queryString = Arrays.stream(fields)
                 .filter(field -> !CURSOR_QUERY_CURSOR_FILED_NAMES.contains(field.getName()))
                 .sorted(Comparator.comparing(Field::getName))
-                .map(field -> field.getName() + WindConstants.EQ + WindReflectUtils.getFieldValue(field, query))
+                .map(field -> {
+                    Object value = WindReflectUtils.getFieldValue(field, query);
+                    if (value == null) {
+                        return WindConstants.EMPTY;
+                    }
+                    return field.getName() + WindConstants.EQ + queryParamValueAsText(value);
+                })
                 .collect(Collectors.joining(WindConstants.AND));
         return sha256Base64(queryString);
+    }
+
+    @SuppressWarnings({"unchecked", "rawtypes"})
+    @VisibleForTesting
+    static String queryParamValueAsText(Object value) {
+        if (value.getClass().isArray()) {
+            if (ClassUtils.isPrimitiveArray(value.getClass())) {
+                return WindArrayStringUtils.arrayToString(value);
+            }
+            return String.join(WindConstants.COMMA, Arrays.stream((Object[]) value).map(Object::toString).toList());
+        } else if (value instanceof Collection val) {
+            return String.join(WindConstants.COMMA, val.stream().map(Object::toString).toList());
+        }
+        return value.toString();
     }
 
     private static String sha256Base64(String text) {

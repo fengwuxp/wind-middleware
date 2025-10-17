@@ -3,9 +3,11 @@ package com.wind.mask;
 import com.wind.common.exception.AssertUtils;
 import com.wind.common.util.WindReflectUtils;
 import com.wind.mask.annotation.Sensitive;
+import jakarta.validation.constraints.NotNull;
+import org.springframework.lang.Nullable;
 import org.springframework.util.ObjectUtils;
 
-import jakarta.validation.constraints.NotNull;
+import java.lang.reflect.Field;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Map;
@@ -44,12 +46,21 @@ public class MaskRuleRegistry {
 
     @NotNull
     public MaskRuleGroup getRuleGroup(Class<?> target) {
-        AssertUtils.notNull(target, "get sensitive rule class not null");
-        return groups.computeIfAbsent(target, key -> this.buildRuleGroup(target));
+        AssertUtils.notNull(target, "argument target must not null");
+        return groups.computeIfAbsent(target, this::buildRuleGroup);
+    }
+
+    @Nullable
+    public MaskRule getRuleByField(Field field) {
+        return getRuleGroup(field.getDeclaringClass()).getRuleByField(field);
+    }
+
+    public boolean hasRule(@NotNull Class<?> clazz) {
+        return groups.containsKey(clazz);
     }
 
     public void registerRule(MaskRuleGroup group) {
-        this.groups.put(group.getTarget(), group);
+        this.groups.put(group.target(), group);
     }
 
     public void registerRules(@NotNull Collection<MaskRuleGroup> groups) {

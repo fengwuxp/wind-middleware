@@ -3,8 +3,6 @@ package com.wind.mask;
 import com.wind.common.WindConstants;
 import com.wind.common.annotations.VisibleForTesting;
 import com.wind.common.util.WindReflectUtils;
-import com.wind.mask.annotation.Sensitive;
-import com.wind.mask.masker.MaskerFactory;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.lang.Nullable;
 import org.springframework.util.ClassUtils;
@@ -15,11 +13,11 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Date;
-import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.CopyOnWriteArraySet;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import static com.wind.mask.MaskRuleGroup.convertMapRules;
@@ -36,7 +34,7 @@ public record ObjectMaskPrinter(MaskRuleRegistry rueRegistry) implements ObjectM
     /**
      * 不需要计算循环引用的类类型
      */
-    private static final Set<Class<?>> IGNORE_CYCLE_REF_CLASSES = new HashSet<>(
+    private static final Set<Class<?>> IGNORE_CYCLE_REF_CLASSES = new CopyOnWriteArraySet<>(
             List.of(
                     CharSequence.class,
                     Number.class,
@@ -44,7 +42,7 @@ public record ObjectMaskPrinter(MaskRuleRegistry rueRegistry) implements ObjectM
                     Temporal.class
             ));
 
-    private static final Set<Class<?>> IGNORE_CLASSES = new LinkedHashSet<>(List.of(
+    private static final Set<Class<?>> IGNORE_CLASSES = new CopyOnWriteArraySet<>(List.of(
             java.util.EventObject.class,
             java.lang.reflect.Proxy.class
     ));
@@ -122,17 +120,6 @@ public record ObjectMaskPrinter(MaskRuleRegistry rueRegistry) implements ObjectM
         IGNORE_CYCLE_REF_CLASSES.addAll(Arrays.asList(classes));
     }
 
-    private static boolean isIgnoreMask(Object o) {
-        if (o instanceof Class<?>) {
-            return true;
-        }
-        return isIgnoreMask(o.getClass());
-    }
-
-    private static boolean isIgnoreMask(Class<?> clazz) {
-        return IGNORE_CLASSES.stream().anyMatch(c -> c.isAssignableFrom(clazz)) ||
-                IGNORE_PACKAGES.stream().anyMatch(clazz.getName()::startsWith);
-    }
 
     /**
      * 打印时通过 {@link #references} 检查对象是否存在循环引用的 ObjectSanitizer 实现
@@ -336,7 +323,7 @@ public record ObjectMaskPrinter(MaskRuleRegistry rueRegistry) implements ObjectM
             Class<?> clazz = obj.getClass();
             StringBuilder result = new StringBuilder(obj.getClass().getSimpleName()).append("(");
             for (Field field : WindReflectUtils.getFields(clazz)) {
-                Object value = null;
+                Object value;
                 try {
                     value = WindReflectUtils.getFieldValue(field, obj);
                 } catch (Throwable throwable) {
@@ -345,23 +332,12 @@ public record ObjectMaskPrinter(MaskRuleRegistry rueRegistry) implements ObjectM
                     IGNORE_CLASSES.add(clazz);
                     value = WindConstants.UNKNOWN;
                 }
-                MaskRule rule = getFieldMaskRule(field);
+                MaskRule rule = value == WindConstants.UNKNOWN ? null : rueRegistry.getRuleByField(field);
                 result.append(field.getName()).append("=").append(printWithMaskRule(value, rule)).append(", ");
             }
             deleteLastBlank(result);
             result.append(')');
             return result.toString();
-        }
-
-        @Nullable
-        private MaskRule getFieldMaskRule(Field field) {
-            Sensitive annotation = field.getAnnotation(Sensitive.class);
-            String name = field.getName();
-            if (annotation == null) {
-                MaskRuleGroup ruleGroup = rueRegistry.getRuleGroup(field.getDeclaringClass());
-                return ruleGroup.matchesWithName(name);
-            }
-            return new MaskRule(name, Arrays.asList(annotation.names()), MaskerFactory.getMasker(annotation.masker()));
         }
 
         private String printPrimitiveArray(Object o) {
@@ -417,6 +393,22 @@ public record ObjectMaskPrinter(MaskRuleRegistry rueRegistry) implements ObjectM
 
         private String toOverMaxSizeString(Class<?> clazz) {
             return String.format("%s 对象的大小超过：%d", clazz.getName(), MAX_COLLECTION_SIZE);
+        }
+
+        private boolean isIgnoreMask(Object o) {
+            if (o instanceof Class<?>) {
+                // 忽略类类型
+                return true;
+            }
+            if (rueRegistry.hasRule(o.getClass())) {
+                // 存在脱敏规则
+                return false;
+            }
+            return isIgnoreMask(o.getClass());
+        }
+
+        private static boolean isIgnoreMask(Class<?> clazz) {
+            return IGNORE_CLASSES.stream().anyMatch(c -> c.isAssignableFrom(clazz)) || IGNORE_PACKAGES.stream().anyMatch(clazz.getName()::startsWith);
         }
     }
 }

@@ -1,49 +1,59 @@
 package com.wind.mask;
 
+import com.wind.common.exception.AssertUtils;
 import com.wind.common.util.WindReflectUtils;
 import com.wind.mask.annotation.Sensitive;
 import com.wind.mask.masker.MaskerFactory;
-import lombok.Data;
+import jakarta.validation.constraints.NotNull;
 import org.springframework.lang.Nullable;
 
-import jakarta.validation.constraints.NotNull;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
 /**
  * 脱敏规则组
  *
+ * @param target 脱敏的目标类类型
+ * @param rules  字段的脱敏规则
  * @author wuxp
  * @date 2024-03-11 13:30
  * @see MaskRule
- **/
-@Data
-public final class MaskRuleGroup {
+ */
 
+public record MaskRuleGroup(@NotNull Class<?> target, Map<String, MaskRule> rules) {
 
-    /**
-     * 脱敏的目标类类型
-     */
+    public MaskRuleGroup(@NotNull Class<?> target, Collection<MaskRule> maskRules) {
+        this(target, new ConcurrentHashMap<>(maskRules.stream().collect(Collectors.toMap(MaskRule::getName, Function.identity(), (v1, v2) -> v1))));
+    }
+
+    public MaskRuleGroup {
+        AssertUtils.notNull(target, "argument target must not null");
+        AssertUtils.notNull(rules, "argument rules must not null");
+    }
+
     @NotNull
-    private final Class<?> target;
+    public Set<MaskRule> getRules() {
+        return Set.copyOf(rules.values());
+    }
 
-    /**
-     * 字段的脱敏规则
-     */
-    private final Set<MaskRule> rules;
-
-    public MaskRuleGroup(Class<?> target, Collection<MaskRule> rules) {
-        this.target = target;
-        this.rules = new LinkedHashSet<>(rules);
+    @Nullable
+    public MaskRule getRuleByField(Field field) {
+        return rules.computeIfAbsent(field.getName(), name -> {
+            Sensitive annotation = field.getAnnotation(Sensitive.class);
+            if (annotation == null) {
+                return null;
+            }
+            return new MaskRule(name, Arrays.asList(annotation.names()), MaskerFactory.getMasker(annotation.masker()));
+        });
     }
 
     @Nullable
@@ -51,10 +61,7 @@ public final class MaskRuleGroup {
         if (fieldName == null && rules.isEmpty()) {
             return null;
         }
-        return rules.stream()
-                .filter(rule -> rule.eq(fieldName))
-                .findFirst()
-                .orElse(null);
+        return rules.get(fieldName);
     }
 
     @Nullable
@@ -62,12 +69,17 @@ public final class MaskRuleGroup {
         if (key == null && rules.isEmpty()) {
             return null;
         }
-        return rules.stream()
+        return rules.values().stream()
                 .filter(rule -> rule.matches(key))
                 .findFirst()
                 .orElse(null);
     }
 
+    public void addRules(MaskRule... rules) {
+        for (MaskRule rule : rules) {
+            this.rules.put(rule.getName(), rule);
+        }
+    }
 
     /**
      * 将 {@link Map} 类型字段的 {@link MaskRule} 转为 {@link  MaskRuleGroup}
@@ -77,7 +89,7 @@ public final class MaskRuleGroup {
     public static MaskRuleGroup convertMapRules(MaskRule rule) {
         List<MaskRule> rules = rule.getKeys().stream()
                 .map(key -> MaskRule.mark(key, rule.getMasker()))
-                .collect(Collectors.toList());
+                .toList();
         return new MaskRuleGroup(Map.class, rules);
     }
 
@@ -155,7 +167,7 @@ public final class MaskRuleGroup {
         }
 
         /**
-         * 标记 {@link java.util.Map} 类型的字段
+         * 标记 {@link Map} 类型的字段
          *
          * @param masker     脱敏器实例
          * @param fieldNames 需要脱敏的字段名称

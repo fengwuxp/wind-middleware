@@ -80,11 +80,16 @@ public interface CursorPagination<T> extends WindPagination<T> {
         // TODO 待优化
         boolean isQueryPrev = query.getPrevCursor() != null;
         boolean isQueryNext = query.getNextCursor() != null;
-        boolean mayQueryEnd = records.size() < query.getQuerySize();
+        boolean isQueryEnd = records.size() < query.getQuerySize();
         E first = CollectionUtils.firstElement(records);
         E lasted = CollectionUtils.lastElement(records);
-        String prevCursor = isQueryPrev && mayQueryEnd ? null : CursorQueryUtils.generateCursor(query,WindReflectUtils.getFieldValue(CURSOR_FILED_NAME, first));
-        String nextCursor = isQueryNext && mayQueryEnd ? null :CursorQueryUtils.generateCursor(query, WindReflectUtils.getFieldValue(CURSOR_FILED_NAME, lasted));
+        Object prevCursorId = first == null ? null : WindReflectUtils.getFieldValue(CURSOR_FILED_NAME, first);
+        if (!isQueryEnd && prevCursorId instanceof Number id) {
+            // 如果是 id 是数值类型，id <= querySize 则认为已到查询结束
+            isQueryEnd = id.longValue() <= query.getQuerySize();
+        }
+        String prevCursor = isQueryPrev && isQueryEnd ? null : CursorQueryUtils.generateCursor(query, prevCursorId);
+        String nextCursor = isQueryNext && isQueryEnd ? null : CursorQueryUtils.generateCursor(query, WindReflectUtils.getFieldValue(CURSOR_FILED_NAME, lasted));
         return of(-1L, records, query.getQuerySize(), prevCursor, nextCursor);
     }
 

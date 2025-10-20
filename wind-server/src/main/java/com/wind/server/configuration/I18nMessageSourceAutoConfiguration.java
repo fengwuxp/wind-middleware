@@ -3,8 +3,8 @@ package com.wind.server.configuration;
 import com.wind.common.WindConstants;
 import com.wind.common.i18n.SpringI18nMessageUtils;
 import com.wind.configcenter.core.ConfigRepository;
-import com.wind.server.i18n.WindI18nLanguageSupplier;
 import com.wind.server.i18n.WindI18nMessageSource;
+import com.wind.server.i18n.WindI18nMessageSupplier;
 import com.wind.server.i18n.WindMessageSourceProperties;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
@@ -52,8 +52,8 @@ public class I18nMessageSourceAutoConfiguration {
 
     @Bean
     @Primary
-    @ConditionalOnBean({WindI18nLanguageSupplier.class, WindMessageSourceProperties.class})
-    public WindI18nMessageSource windI18nMessageSource(WindI18nLanguageSupplier supplier, WindMessageSourceProperties properties) {
+    @ConditionalOnBean({WindI18nMessageSupplier.class, WindMessageSourceProperties.class})
+    public WindI18nMessageSource windI18nMessageSource(WindI18nMessageSupplier supplier, WindMessageSourceProperties properties) {
         WindI18nMessageSource result = new WindI18nMessageSource(supplier, properties);
         if (properties.getEncoding() != null) {
             result.setDefaultEncoding(properties.getEncoding().name());
@@ -77,13 +77,13 @@ public class I18nMessageSourceAutoConfiguration {
      * 配置中心国际化语言提供者
      */
     @Bean
-    @ConditionalOnMissingBean(WindI18nLanguageSupplier.class)
+    @ConditionalOnMissingBean(WindI18nMessageSupplier.class)
     @ConditionalOnBean({ConfigRepository.class, WindMessageSourceProperties.class})
-    public WindI18nLanguageSupplier configCenterWindI18nLanguageSupplier(ConfigRepository repository, WindMessageSourceProperties properties) {
-        return new WindI18nLanguageSupplier() {
+    public WindI18nMessageSupplier configCenterWindI18nMessageSupplier(ConfigRepository repository, WindMessageSourceProperties properties) {
+        return new WindI18nMessageSupplier() {
             @Override
             public Map<Locale, PropertyResolver> get() {
-                final Map<Locale, PropertyResolver> result = new ConcurrentHashMap<>();
+                Map<Locale, PropertyResolver> result = new ConcurrentHashMap<>();
                 for (Locale locale : properties.getLocales()) {
                     String name = String.format("%s-%s", properties.getName(), locale);
                     ConfigRepository.ConfigDescriptor descriptor = ConfigRepository.ConfigDescriptor.immutable(name, I18N_GROUP, properties.getFileType());

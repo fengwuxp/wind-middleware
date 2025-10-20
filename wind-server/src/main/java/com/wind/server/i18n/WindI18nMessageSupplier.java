@@ -12,5 +12,5 @@ import java.util.function.Supplier;
  * @author wuxp
  * @date 2025-10-20 10:45
  **/
-public interface WindI18nLanguageSupplier extends Supplier<Map<Locale, PropertyResolver>> {
+public interface WindI18nMessageSupplier extends Supplier<Map<Locale, PropertyResolver>> {
 }

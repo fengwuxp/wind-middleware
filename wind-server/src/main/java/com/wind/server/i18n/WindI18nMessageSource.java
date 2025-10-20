@@ -27,7 +27,7 @@ public class WindI18nMessageSource extends AbstractResourceBasedMessageSource {
 
     private final Cache<@NotNull String, MessageFormat> messageFormatCache;
 
-    public WindI18nMessageSource(WindI18nLanguageSupplier supplier, WindMessageSourceProperties properties) {
+    public WindI18nMessageSource(WindI18nMessageSupplier supplier, WindMessageSourceProperties properties) {
         this.localPropertyResolvers = supplier.get();
         this.messageFormatCache = Caffeine.newBuilder()
                 .maximumSize(3000)

@@ -25,11 +25,11 @@ public class WindI18nMessageSource extends AbstractResourceBasedMessageSource {
 
     private final Map<Locale, PropertyResolver> localPropertyResolvers;
 
-    private final Cache<@NotNull String, MessageFormat> messageFormatCache;
+    private final Cache<@NotNull CacheKey, MessageFormat> messageFormates;
 
     public WindI18nMessageSource(WindI18nMessageSupplier supplier, WindMessageSourceProperties properties) {
         this.localPropertyResolvers = supplier.get();
-        this.messageFormatCache = Caffeine.newBuilder()
+        this.messageFormates = Caffeine.newBuilder()
                 .maximumSize(3000)
                 .initialCapacity(500)
                 .expireAfterAccess(properties.getCacheDuration())
@@ -56,24 +56,25 @@ public class WindI18nMessageSource extends AbstractResourceBasedMessageSource {
     @Override
     @Nullable
     protected MessageFormat resolveCode(@Nonnull String code, @Nonnull Locale locale) {
-        String key = String.format("%s@%s", code, locale);
-        return messageFormatCache.get(key, k -> {
-            String message = resolveCodeWithoutArguments(code, locale);
-            if (message == null) {
-                String text = convertSlf4jPlaceholders(code);
-                // 如果 code 中有占位符，直接返回 MessageFormat
-                return text.contains("{0}") ? new MessageFormat(text, locale) : null;
-            }
-            // 转换 Slf4j {} 格式为 MessageFormat {0}、{1}...
-            String convertedMessage = convertSlf4jPlaceholders(message);
-            return new MessageFormat(convertedMessage, locale);
-        });
+        CacheKey key = new CacheKey(code, locale);
+        return messageFormates.get(key, this::buildMessageFormat);
+    }
+
+    protected MessageFormat buildMessageFormat(CacheKey key) {
+        String code = tryConvertSlf4jPlaceholders(key.code());
+        String message = resolveCodeWithoutArguments(code, key.locale());
+        if (message == null) {
+            // 如果 code 中有占位符，直接返回 MessageFormat
+            return code.contains("{0}") ? new MessageFormat(code, key.locale()) : null;
+        }
+        // 转换 Slf4j {} 格式为 MessageFormat {0}、{1}...
+        return new MessageFormat(tryConvertSlf4jPlaceholders(message), key.locale());
     }
 
     /**
      * 将 Slf4j {} 占位符 转为 MessageFormat 占位符 {0}, {1}, ...
      */
-    private String convertSlf4jPlaceholders(String text) {
+    private String tryConvertSlf4jPlaceholders(String text) {
         if (!text.contains("{}")) {
             return text;
         }
@@ -90,6 +91,10 @@ public class WindI18nMessageSource extends AbstractResourceBasedMessageSource {
             index = bracePos + 2;
         }
         return sb.toString();
+    }
+
+    record CacheKey(String code, Locale locale) {
+
     }
 
 }

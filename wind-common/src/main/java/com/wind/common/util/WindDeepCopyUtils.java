@@ -1,6 +1,5 @@
 package com.wind.common.util;
 
-import com.wind.common.codec.KryoCodec;
 import org.springframework.lang.Nullable;
 
 /**
@@ -28,7 +27,7 @@ public final class WindDeepCopyUtils {
         if (object == null) {
             return null;
         }
-        KryoCodec codec = KryoCodec.getInstance();
+        KryoSerializationUtils codec = KryoSerializationUtils.getInstance();
         return (T) codec.decode(codec.encode(object));
     }
 }

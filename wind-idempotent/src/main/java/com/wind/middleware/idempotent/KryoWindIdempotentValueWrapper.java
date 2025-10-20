@@ -1,13 +1,11 @@
 package com.wind.middleware.idempotent;
 
 
-import com.wind.common.codec.KryoCodec;
-import com.wind.common.exception.AssertUtils;
+import com.wind.common.util.KryoSerializationUtils;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 
 import java.beans.Transient;
-import java.util.Base64;
 
 /**
  * 使用 Kryo 序列化的幂等值包装类
@@ -31,21 +29,17 @@ public record KryoWindIdempotentValueWrapper(@NotNull Object value) implements W
      */
     @Transient
     public String asText() {
-        byte[] bytes = KryoCodec.getInstance().encode(value);
-        return Base64.getEncoder().encodeToString(bytes);
+        return KryoSerializationUtils.getInstance().encodeToString(value);
     }
 
     @NotNull
     public static KryoWindIdempotentValueWrapper of(@NotBlank String text) {
-        AssertUtils.hasText(text, "argument text must not empty");
-        byte[] bytes = Base64.getDecoder().decode(text);
-        return of(bytes);
+        return new KryoWindIdempotentValueWrapper(KryoSerializationUtils.getInstance().decode(text));
     }
 
     @NotNull
     public static KryoWindIdempotentValueWrapper of(@NotNull byte[] bytes) {
-        AssertUtils.isTrue(bytes != null && bytes.length > 0, "argument bytes must not empty");
-        return new KryoWindIdempotentValueWrapper(KryoCodec.getInstance().decode(bytes));
+        return new KryoWindIdempotentValueWrapper(KryoSerializationUtils.getInstance().decode(bytes));
     }
 
 }

@@ -1,6 +1,7 @@
 package com.wind.middleware.idempotent;
 
-import org.springframework.lang.Nullable;
+
+import jakarta.annotation.Nullable;
 
 /**
  * 幂等值包装类

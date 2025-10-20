@@ -162,6 +162,8 @@ public final class WindConstants {
 
     public static final String ENABLED_NAME = "enabled";
 
+    public static final String FALSE = "false";
+
     public static final String TRUE = "true";
 
     /**
@@ -183,6 +185,11 @@ public final class WindConstants {
      * index html Filter 开启表达式
      */
     public static final String INDEX_HTML_FILTER_EXPRESSION = "wind.server.filter.index-html-filter";
+
+    /**
+     * 请求幂等性过滤器开启表达式
+     */
+    public static final String HTTP_REQUEST_IDEMPOTENT_FILTER_EXPRESSION = "wind.server.filter.request-idempotent-filter";
 
     /**
      * trace Filter 开启表达式

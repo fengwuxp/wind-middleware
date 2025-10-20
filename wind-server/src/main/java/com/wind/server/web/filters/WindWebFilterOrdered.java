@@ -23,6 +23,8 @@ public enum WindWebFilterOrdered implements Ordered, DescriptiveEnum {
     INDEX_HTML_RESOURCES_FILTER(Ordered.HIGHEST_PRECEDENCE + 100, "IndexHtmlResourcesFilter"),
 
     REQUEST_SIGN_FILTER(Ordered.HIGHEST_PRECEDENCE + 1030, "RequestSignFilter"),
+
+    HTTP_REQEUST_IDEMPOTENT_FILTER(REQUEST_SIGN_FILTER.getOrder() + 100, "HttpRequestIdempotentFilter"),
     ;
 
     private final int order;

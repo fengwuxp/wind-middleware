@@ -1,5 +1,7 @@
 package com.wind.server.configuration;
 
+import com.wind.middleware.idempotent.WindIdempotentKeyStorage;
+import com.wind.server.web.filters.HttpRequestIdempotentFilter;
 import com.wind.server.web.filters.IndexHtmlResourcesFilter;
 import com.wind.server.web.filters.WindWebFilterOrdered;
 import com.wind.web.trace.TraceFilter;
@@ -17,6 +19,8 @@ import java.util.EnumSet;
 import java.util.function.Function;
 
 import static com.wind.common.WindConstants.ENABLED_NAME;
+import static com.wind.common.WindConstants.FALSE;
+import static com.wind.common.WindConstants.HTTP_REQUEST_IDEMPOTENT_FILTER_EXPRESSION;
 import static com.wind.common.WindConstants.INDEX_HTML_FILTER_EXPRESSION;
 import static com.wind.common.WindConstants.TRACE_FILTER_EXPRESSION;
 import static com.wind.common.WindConstants.TRUE;
@@ -71,6 +75,16 @@ public class WebFilterConfiguration {
         FilterRegistrationBean<IndexHtmlResourcesFilter> result = new FilterRegistrationBean<>();
         result.setFilter(new IndexHtmlResourcesFilter(context.getBean(INDEX_HTML_RESOURCE_LOADER_BEAN_NAME, Function.class)));
         result.setOrder(WindWebFilterOrdered.INDEX_HTML_RESOURCES_FILTER.getOrder());
+        return result;
+    }
+
+    @Bean
+    @ConditionalOnProperty(prefix = HTTP_REQUEST_IDEMPOTENT_FILTER_EXPRESSION, name = ENABLED_NAME, havingValue = FALSE)
+    @ConditionalOnBean(WindIdempotentKeyStorage.class)
+    public FilterRegistrationBean<HttpRequestIdempotentFilter> httpRequestIdempotentFilter(ApplicationContext context) {
+        FilterRegistrationBean<HttpRequestIdempotentFilter> result = new FilterRegistrationBean<>();
+        result.setFilter(new HttpRequestIdempotentFilter());
+        result.setOrder(WindWebFilterOrdered.HTTP_REQEUST_IDEMPOTENT_FILTER.getOrder());
         return result;
     }
 

@@ -42,16 +42,12 @@ public interface CursorPagination<T> extends WindPagination<T> {
     /**
      * @return 是否有上一页
      */
-    default boolean hasPrev() {
-        return getPrevCursor() != null;
-    }
+    boolean hasPrev();
 
     /**
      * @return 是否有下一页
      */
-    default boolean hasNext() {
-        return getNextCursor() != null;
-    }
+    boolean hasNext();
 
     /**
      * @return {@link #getRecords()}是否为 null 或空集合

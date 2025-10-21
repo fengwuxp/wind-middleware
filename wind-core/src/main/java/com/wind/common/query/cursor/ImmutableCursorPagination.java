@@ -28,4 +28,15 @@ public final class ImmutableCursorPagination<T> implements CursorPagination<T> {
     private final String prevCursor;
 
     private final String nextCursor;
+
+
+    @Override
+    public boolean hasPrev() {
+        return prevCursor != null;
+    }
+
+    @Override
+    public boolean hasNext() {
+        return nextCursor != null;
+    }
 }

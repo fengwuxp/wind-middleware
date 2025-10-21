@@ -82,7 +82,7 @@ class ObjectDataMaskerTests {
     @Test
     void testMask4() {
         List<DefaultObjectSanitizerDemo2> result = maker.maskAs(Collections.singletonList(mockDemo2()));
-        Assertions.assertTrue(result.get(0).getSensitiveText2().contains("***"));
+        Assertions.assertTrue(result.getFirst().getSensitiveText2().contains("***"));
     }
 
     @Test

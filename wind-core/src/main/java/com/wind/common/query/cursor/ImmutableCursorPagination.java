@@ -1,5 +1,6 @@
 package com.wind.common.query.cursor;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -29,12 +30,13 @@ public final class ImmutableCursorPagination<T> implements CursorPagination<T> {
 
     private final String nextCursor;
 
-
+    @JsonProperty("hasPrev")
     @Override
     public boolean hasPrev() {
         return prevCursor != null;
     }
 
+    @JsonProperty("hasNext")
     @Override
     public boolean hasNext() {
         return nextCursor != null;

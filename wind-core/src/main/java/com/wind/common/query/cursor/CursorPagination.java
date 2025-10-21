@@ -73,19 +73,30 @@ public interface CursorPagination<T> extends WindPagination<T> {
         if (records == null || records.isEmpty()) {
             return empty();
         }
-        // TODO 待优化
-        boolean isQueryPrev = query.getPrevCursor() != null;
-        boolean isQueryNext = query.getNextCursor() != null;
-        boolean isQueryEnd = records.size() < query.getQuerySize();
+
+        boolean queryingPrev = query.getPrevCursor() != null;
+        boolean queryingNext = query.getNextCursor() != null;
+        int querySize = query.getQuerySize();
+        boolean reachedEnd = records.size() < querySize;
+
         E first = CollectionUtils.firstElement(records);
-        E lasted = CollectionUtils.lastElement(records);
-        Object prevCursorId = first == null ? null : WindReflectUtils.getFieldValue(CURSOR_FILED_NAME, first);
-        if (!isQueryEnd && prevCursorId instanceof Number id) {
-            // 如果是 id 是数值类型，id <= querySize 则认为已到查询结束
-            isQueryEnd = id.longValue() <= query.getQuerySize();
+        E last = CollectionUtils.lastElement(records);
+
+        String prevCursor = null;
+        String nextCursor = null;
+
+        if (!queryingPrev && !queryingNext) {
+            // 首页
+            nextCursor = reachedEnd ? null : CursorQueryUtils.generateCursor(query, WindReflectUtils.getFieldValue(CursorQueryUtils.CURSOR_FILED_NAME, last));
+        } else if (queryingNext) {
+            // 向后翻页
+            prevCursor = CursorQueryUtils.generateCursor(query, WindReflectUtils.getFieldValue(CursorQueryUtils.CURSOR_FILED_NAME, first));
+            nextCursor = reachedEnd ? null : CursorQueryUtils.generateCursor(query, WindReflectUtils.getFieldValue(CursorQueryUtils.CURSOR_FILED_NAME, last));
+        } else {
+            // 向前翻页
+            prevCursor = reachedEnd ? null : CursorQueryUtils.generateCursor(query, WindReflectUtils.getFieldValue(CursorQueryUtils.CURSOR_FILED_NAME, last));
+            nextCursor = CursorQueryUtils.generateCursor(query, WindReflectUtils.getFieldValue(CursorQueryUtils.CURSOR_FILED_NAME, first));
         }
-        String prevCursor = isQueryPrev && isQueryEnd ? null : CursorQueryUtils.generateCursor(query, prevCursorId);
-        String nextCursor = isQueryNext && isQueryEnd ? null : CursorQueryUtils.generateCursor(query, WindReflectUtils.getFieldValue(CURSOR_FILED_NAME, lasted));
         return of(-1L, records, query.getQuerySize(), prevCursor, nextCursor);
     }
 

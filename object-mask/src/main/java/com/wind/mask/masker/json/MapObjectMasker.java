@@ -1,10 +1,7 @@
 package com.wind.mask.masker.json;
 
 
-import com.alibaba.fastjson2.JSONPath;
-import com.wind.mask.ObjectMaskPrinter;
 import com.wind.mask.ObjectMasker;
-import com.wind.mask.WindMasker;
 
 import java.util.Collection;
 import java.util.Map;
@@ -24,17 +21,6 @@ public final class MapObjectMasker implements ObjectMasker<Map<String, Object>, 
         if (map == null || map.isEmpty()) {
             return map;
         }
-        // TODO 增加 deep copy 支持
-        for (String key : keys) {
-            try {
-                Object eval = JSONPath.eval(map, key);
-                if (eval != null) {
-                    JSONPath.set(map, key, WindMasker.ASTERISK.mask(eval));
-                }
-            } catch (Exception exception) {
-                // ignore
-            }
-        }
-        return map;
+        return MaskJsonJsonUtils.mask(keys, map);
     }
 }

@@ -3,11 +3,9 @@ package com.wind.mask.masker.json;
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
 import com.jayway.jsonpath.Configuration;
-import com.jayway.jsonpath.DocumentContext;
 import com.jayway.jsonpath.JsonPath;
 import com.jayway.jsonpath.Option;
 import com.wind.mask.ObjectMasker;
-import com.wind.mask.WindMasker;
 import jakarta.validation.constraints.NotNull;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
@@ -45,29 +43,6 @@ public final class JsonStringMasker implements ObjectMasker<String, String> {
         if (!StringUtils.hasText(json) || CollectionUtils.isEmpty(keys)) {
             return json;
         }
-
-        DocumentContext doc;
-        try {
-            doc = JsonPath.using(JSON_PATH_CONFIG).parse(json);
-        } catch (Exception e) {
-            // 非法 JSON，直接返回原文
-            return json;
-        }
-
-        for (String key : keys) {
-            // 获取或缓存 JsonPath
-            JsonPath path = JSON_PATHS.get(key.trim(), JsonPath::compile);
-            try {
-                Object value = doc.read(path);
-                if (value != null) {
-                    doc.set(path, WindMasker.ASTERISK.mask(value));
-                }
-            } catch (Exception e) {
-                // 路径不存在或类型不匹配等异常，安全忽略
-                // log.debug("Mask failed for path [{}]: {}", key, e.getMessage());
-            }
-        }
-
-        return doc.jsonString();
+        return MaskJsonJsonUtils.mask(keys, json);
     }
 }

@@ -65,6 +65,11 @@ public interface WindFunctions {
     }
 
     @FunctionalInterface
+    interface ThrowsBiFunction<T, U, R> {
+        R apply(T t, U u) throws Throwable;
+    }
+
+    @FunctionalInterface
     interface ThrowsConsumer<T> {
         void accept(T t) throws Throwable;
     }

@@ -8,9 +8,9 @@ import org.springframework.util.MimeType;
  * @author wuxp
  * @date 2025-10-17 10:29
  **/
-public final class WindMediaType {
+public final class WindMediaTypes {
 
-    private WindMediaType() {
+    private WindMediaTypes() {
         throw new AssertionError();
     }
 

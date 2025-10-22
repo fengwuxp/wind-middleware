@@ -5,21 +5,22 @@ import com.wind.common.WindConstants;
 import com.wind.common.exception.AssertUtils;
 import com.wind.common.exception.BaseException;
 import com.wind.common.message.MessagePlaceholder;
-import com.wind.web.http.WindMediaType;
+import com.wind.web.http.WindMediaTypes;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import org.springframework.http.HttpHeaders;
-import org.springframework.http.MediaType;
 import org.springframework.lang.Nullable;
 import org.springframework.util.MimeType;
 
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
-import java.util.Arrays;
 import java.util.Map;
-import java.util.Set;
-import java.util.concurrent.CopyOnWriteArraySet;
+
+import static com.wind.common.WindFileConstants.CSV_EXTENSION_NAME;
+import static com.wind.common.WindFileConstants.EXCEL_EXTENSION_NAME;
+import static com.wind.common.WindFileConstants.PDF_EXTENSION_NAME;
+import static com.wind.common.WindFileConstants.WORD_EXTENSION_NAME;
 
 /**
  * web servlet file 工具类
@@ -29,41 +30,12 @@ import java.util.concurrent.CopyOnWriteArraySet;
  **/
 public final class WebServletFileUtils {
 
-    /**
-     * 允许上传的文件类型
-     */
-    private static final Set<String> ALLOW_UPLOAD_MIME_TYPES = new CopyOnWriteArraySet<>(
-            Arrays.asList(
-                    MediaType.IMAGE_JPEG_VALUE,
-                    MediaType.IMAGE_PNG_VALUE,
-                    MediaType.IMAGE_GIF_VALUE,
-                    WindMediaType.IMAGE_WEBP.toString(),
-                    WindMediaType.IMAGE_SVG.toString(),
-                    WindMediaType.APPLICATION_PDF.toString(),
-                    // Microsoft Word (97-2003)
-                    WindMediaType.MICROSOFT_WORD_2003.toString(),
-                    // Microsoft Word (2007+)
-                    WindMediaType.MICROSOFT_WORD.toString(),
-                    // Microsoft Excel (97-2003)
-                    WindMediaType.MICROSOFT_EXCEL_2003.toString(),
-                    // Microsoft Excel (2007+)
-                    WindMediaType.MICROSOFT_EXCEL.toString()
-            )
-    );
-
-    private static final String EXCEL_EXTENSION_NAME = ".xlsx";
-
-    private static final String WORD_EXTENSION_NAME = ".docx";
-
-    private static final String PDF_EXTENSION_NAME = ".pdf";
-
-    private static final String CSV_EXTENSION_NAME = ".csv";
 
     private static final Map<MimeType, String> MEDIA_TYPE_NAMES = Map.of(
-            WindMediaType.APPLICATION_PDF, PDF_EXTENSION_NAME,
-            WindMediaType.MICROSOFT_EXCEL, EXCEL_EXTENSION_NAME,
-            WindMediaType.MICROSOFT_WORD, WORD_EXTENSION_NAME,
-            WindMediaType.APPLICATION_CSV, CSV_EXTENSION_NAME
+            WindMediaTypes.APPLICATION_PDF, PDF_EXTENSION_NAME,
+            WindMediaTypes.MICROSOFT_EXCEL, EXCEL_EXTENSION_NAME,
+            WindMediaTypes.MICROSOFT_WORD, WORD_EXTENSION_NAME,
+            WindMediaTypes.APPLICATION_CSV, CSV_EXTENSION_NAME
     );
 
     private WebServletFileUtils() {
@@ -77,7 +49,7 @@ public final class WebServletFileUtils {
      * @param writeFunc 写回文件流的函数
      */
     public static void writeExcel(@NotBlank String filename, @NotNull Runnable writeFunc) {
-        writeFile(filename, WindMediaType.MICROSOFT_EXCEL, writeFunc);
+        writeFile(filename, WindMediaTypes.MICROSOFT_EXCEL, writeFunc);
     }
 
     /**
@@ -126,17 +98,6 @@ public final class WebServletFileUtils {
         AssertUtils.notNull(contentType, "contentType must not null, filename = {}", filename);
         response.setContentType(contentType.toString());
         response.setHeader(HttpHeaders.CONTENT_DISPOSITION, String.format("attachment;filename=%s", filename));
-    }
-
-    /**
-     * 判断文件是否允许上传
-     *
-     * @param mimeType 文件类型
-     * @return true 允许上传
-     */
-    public static boolean isAllowUpload(@NotBlank String mimeType) {
-        AssertUtils.hasText(mimeType, "argument mimeType must not empty");
-        return ALLOW_UPLOAD_MIME_TYPES.contains(mimeType);
     }
 
     private static String parseContentType(MimeType mediaType) {

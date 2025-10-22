@@ -10,6 +10,7 @@ import java.beans.Transient;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * 基于游标分页查询的分页对象
@@ -75,18 +76,17 @@ public interface CursorPagination<T> extends WindPagination<T> {
 
         boolean queryingPrev = query.getPrevCursor() != null;
         boolean queryingNext = query.getNextCursor() != null;
-        int querySize = query.getQuerySize();
-        boolean reachedEnd = records.size() < querySize;
+        // TODO 该判断不稳定，待优化
+        boolean reachedEnd = records.size() < query.getQuerySize();
 
         if (queryingPrev) {
             // 向前翻页和向后翻页的排序方式相反，为了保证数据排序一致(游标一致)，需要翻转数据
-            // TODO 待优化
             records = new ArrayList<>(records);
             Collections.reverse(records);
         }
 
-        E first = CollectionUtils.firstElement(records);
-        E last = CollectionUtils.lastElement(records);
+        E first = Objects.requireNonNull(CollectionUtils.firstElement(records));
+        E last = Objects.requireNonNull(CollectionUtils.lastElement(records));
 
         String prevCursor = null;
         String nextCursor = null;

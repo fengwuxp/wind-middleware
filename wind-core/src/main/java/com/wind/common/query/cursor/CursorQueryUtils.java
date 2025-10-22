@@ -30,7 +30,7 @@ import java.util.stream.Collectors;
  **/
 final class CursorQueryUtils {
 
-    private static final Set<String> CURSOR_QUERY_CURSOR_FILED_NAMES = Set.of("prevCursor", "nextCursor");
+    private static final Set<String> CURSOR_QUERY_CURSOR_FILED_NAMES = Set.of("prevCursor", "nextCursor", "orderTypes");
 
     static final String CURSOR_FILED_NAME = "id";
 

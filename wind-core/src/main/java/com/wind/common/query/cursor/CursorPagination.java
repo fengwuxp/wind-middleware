@@ -7,10 +7,9 @@ import jakarta.annotation.Nullable;
 import org.springframework.util.CollectionUtils;
 
 import java.beans.Transient;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-
-import static com.wind.common.query.cursor.CursorQueryUtils.CURSOR_FILED_NAME;
 
 /**
  * 基于游标分页查询的分页对象
@@ -79,6 +78,13 @@ public interface CursorPagination<T> extends WindPagination<T> {
         int querySize = query.getQuerySize();
         boolean reachedEnd = records.size() < querySize;
 
+        if (queryingPrev) {
+            // 向前翻页和向后翻页的排序方式相反，为了保证数据排序一致(游标一致)，需要翻转数据
+            // TODO 待优化
+            records = new ArrayList<>(records);
+            Collections.reverse(records);
+        }
+
         E first = CollectionUtils.firstElement(records);
         E last = CollectionUtils.lastElement(records);
 
@@ -94,8 +100,8 @@ public interface CursorPagination<T> extends WindPagination<T> {
             nextCursor = reachedEnd ? null : CursorQueryUtils.generateCursor(query, WindReflectUtils.getFieldValue(CursorQueryUtils.CURSOR_FILED_NAME, last));
         } else {
             // 向前翻页
-            prevCursor = reachedEnd ? null : CursorQueryUtils.generateCursor(query, WindReflectUtils.getFieldValue(CursorQueryUtils.CURSOR_FILED_NAME, last));
-            nextCursor = CursorQueryUtils.generateCursor(query, WindReflectUtils.getFieldValue(CursorQueryUtils.CURSOR_FILED_NAME, first));
+            prevCursor = reachedEnd ? null : CursorQueryUtils.generateCursor(query, WindReflectUtils.getFieldValue(CursorQueryUtils.CURSOR_FILED_NAME, first));
+            nextCursor = CursorQueryUtils.generateCursor(query, WindReflectUtils.getFieldValue(CursorQueryUtils.CURSOR_FILED_NAME, last));
         }
         return of(-1L, records, query.getQuerySize(), prevCursor, nextCursor);
     }

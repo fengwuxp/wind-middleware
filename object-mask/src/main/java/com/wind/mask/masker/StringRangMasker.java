@@ -28,6 +28,10 @@ public record StringRangMasker(int begin, int end) implements WindMasker<String,
         return of(3, 7);
     }
 
+    public static StringRangMasker email() {
+        return of(2, 9);
+    }
+
     public static StringRangMasker secret() {
         return of(-1, -1);
     }

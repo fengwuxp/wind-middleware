@@ -20,12 +20,20 @@ public record StringRangMasker(int begin, int end) implements WindMasker<String,
         AssertUtils.isTrue(begin <= end, "argument begin must lte end");
     }
 
+    public static StringRangMasker of(int begin, int end) {
+        return new StringRangMasker(begin, end);
+    }
+
     public static StringRangMasker phone() {
-        return new StringRangMasker(3, 7);
+        return of(3, 7);
     }
 
     public static StringRangMasker secret() {
-        return new StringRangMasker(-1, -1);
+        return of(-1, -1);
+    }
+
+    public static StringRangMasker idNumCn() {
+        return of(4, 14);
     }
 
     @Override

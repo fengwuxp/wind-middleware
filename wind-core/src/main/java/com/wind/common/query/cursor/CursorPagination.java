@@ -2,7 +2,6 @@ package com.wind.common.query.cursor;
 
 import com.wind.common.query.WindPagination;
 import com.wind.common.query.supports.QueryOrderField;
-import com.wind.common.util.WindReflectUtils;
 import jakarta.annotation.Nullable;
 import org.springframework.util.CollectionUtils;
 
@@ -10,7 +9,6 @@ import java.beans.Transient;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Objects;
 
 /**
  * 基于游标分页查询的分页对象
@@ -73,37 +71,13 @@ public interface CursorPagination<T> extends WindPagination<T> {
         if (records == null || records.isEmpty()) {
             return empty();
         }
-
-        boolean queryingPrev = query.getPrevCursor() != null;
-        boolean queryingNext = query.getNextCursor() != null;
-        // TODO 该判断不稳定，待优化
-        boolean reachedEnd = records.size() < query.getQuerySize();
-
-        if (queryingPrev) {
+        if (query.getPrevCursor() != null) {
             // 向前翻页和向后翻页的排序方式相反，为了保证数据排序一致(游标一致)，需要翻转数据
             records = new ArrayList<>(records);
             Collections.reverse(records);
         }
-
-        E first = Objects.requireNonNull(CollectionUtils.firstElement(records));
-        E last = Objects.requireNonNull(CollectionUtils.lastElement(records));
-
-        String prevCursor = null;
-        String nextCursor = null;
-
-        if (!queryingPrev && !queryingNext) {
-            // 首页
-            nextCursor = reachedEnd ? null : CursorQueryUtils.generateCursor(query, WindReflectUtils.getFieldValue(CursorQueryUtils.CURSOR_FILED_NAME, last));
-        } else if (queryingNext) {
-            // 向后翻页
-            prevCursor = CursorQueryUtils.generateCursor(query, WindReflectUtils.getFieldValue(CursorQueryUtils.CURSOR_FILED_NAME, first));
-            nextCursor = reachedEnd ? null : CursorQueryUtils.generateCursor(query, WindReflectUtils.getFieldValue(CursorQueryUtils.CURSOR_FILED_NAME, last));
-        } else {
-            // 向前翻页
-            prevCursor = reachedEnd ? null : CursorQueryUtils.generateCursor(query, WindReflectUtils.getFieldValue(CursorQueryUtils.CURSOR_FILED_NAME, first));
-            nextCursor = CursorQueryUtils.generateCursor(query, WindReflectUtils.getFieldValue(CursorQueryUtils.CURSOR_FILED_NAME, last));
-        }
-        return of(-1L, records, query.getQuerySize(), prevCursor, nextCursor);
+        String[] cursors = CursorQueryUtils.generateCursors(query, records);
+        return of(-1L, records, query.getQuerySize(), cursors[0], cursors[1]);
     }
 
     static <E> CursorPagination<E> of(long total, List<E> records, int querySize, String prevCursor, String nextCursor) {

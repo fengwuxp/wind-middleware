@@ -88,6 +88,7 @@ public abstract class AbstractCursorQuery<OrderField extends QueryOrderField> im
     }
 
     @Override
+    @Transient
     public boolean cursorFieldIsAcs() {
         for (int i = 0; i < orderFields.length; i++) {
             if (Objects.equals(orderFields[i].getOrderField(), CURSOR_FILED_NAME)) {
@@ -95,5 +96,10 @@ public abstract class AbstractCursorQuery<OrderField extends QueryOrderField> im
             }
         }
         throw BaseException.common("Cursor query must include sorting by " + CURSOR_FILED_NAME);
+    }
+
+    @Transient
+    public boolean isFirst() {
+        return prevCursor == null && nextCursor == null;
     }
 }

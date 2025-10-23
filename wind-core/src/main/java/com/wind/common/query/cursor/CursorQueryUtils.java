@@ -5,10 +5,12 @@ import com.wind.common.annotations.VisibleForTesting;
 import com.wind.common.exception.AssertUtils;
 import com.wind.common.exception.BaseException;
 import com.wind.common.exception.DefaultExceptionCode;
+import com.wind.common.query.supports.QueryOrderField;
 import com.wind.common.util.WindReflectUtils;
 import jakarta.validation.constraints.NotNull;
 import org.springframework.lang.Nullable;
 import org.springframework.util.ClassUtils;
+import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
 import java.lang.reflect.Field;
@@ -19,6 +21,8 @@ import java.util.Arrays;
 import java.util.Base64;
 import java.util.Collection;
 import java.util.Comparator;
+import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -32,43 +36,89 @@ final class CursorQueryUtils {
 
     private static final Set<String> CURSOR_QUERY_CURSOR_FILED_NAMES = Set.of("prevCursor", "nextCursor", "orderTypes");
 
+    private static final int FIRST_PAGE_NUM = 1;
+
     static final String CURSOR_FILED_NAME = "id";
 
     private CursorQueryUtils() {
         throw new AssertionError();
     }
 
+
+    static String[] generateCursors(@NotNull AbstractCursorQuery<? extends QueryOrderField> query, List<?> records) {
+        boolean reachedEnd = records.size() < query.getQuerySize();
+        Object first = Objects.requireNonNull(CollectionUtils.firstElement(records));
+        Object last = Objects.requireNonNull(CollectionUtils.lastElement(records));
+
+        String prevCursor = null;
+        String nextCursor = null;
+        int currentPage = getQueryCurrentPageNum(query);
+        if (query.isFirst()) {
+            // 首页
+            nextCursor = reachedEnd ? null : CursorQueryUtils.generateCursor(query, WindReflectUtils.getFieldValue(CursorQueryUtils.CURSOR_FILED_NAME, last), currentPage + 1);
+        } else if (query.getNextCursor() != null) {
+            // 向后翻页
+            prevCursor = CursorQueryUtils.generateCursor(query, WindReflectUtils.getFieldValue(CursorQueryUtils.CURSOR_FILED_NAME, first), currentPage);
+            nextCursor = reachedEnd ? null : CursorQueryUtils.generateCursor(query, WindReflectUtils.getFieldValue(CursorQueryUtils.CURSOR_FILED_NAME, last), currentPage + 1);
+        } else {
+            // 向前翻页
+            int prevNum = currentPage - 1;
+            prevCursor = (reachedEnd ||  prevNum == FIRST_PAGE_NUM) ? null : CursorQueryUtils.generateCursor(query,
+                    WindReflectUtils.getFieldValue(CursorQueryUtils.CURSOR_FILED_NAME, first), prevNum);
+            nextCursor = CursorQueryUtils.generateCursor(query, WindReflectUtils.getFieldValue(CursorQueryUtils.CURSOR_FILED_NAME, last), currentPage);
+        }
+        return new String[]{prevCursor, nextCursor};
+    }
+
     /**
      * 生成 cursor
      *
-     * @param query 查询参数
-     * @param id    数据记录的 id
-     * @return cursor
+     * @param query   查询参数
+     * @param id      数据记录的 id
+     * @param pageNum 游标标记指向的页码
+     * @return cursor  {sha256验签串}#{cursorId@pageNum}
      */
-    @SuppressWarnings("rawtypes")
-    static String generateCursor(@NotNull AbstractCursorQuery query, @NotNull Object id) {
+    static String generateCursor(@NotNull AbstractCursorQuery<? extends QueryOrderField> query, @NotNull Object id, int pageNum) {
         AssertUtils.notNull(query, "argument query must not null");
         AssertUtils.notNull(id, "argument id must not null");
-        return genCursorSha256(query) + WindConstants.AT + id;
+        String cursorText = id + WindConstants.AT + pageNum;
+        return genCursorSha256(query, cursorText) + WindConstants.SHARP + Base64.getEncoder().encodeToString(cursorText.getBytes(StandardCharsets.UTF_8));
     }
 
-    @SuppressWarnings("rawtypes")
     @Nullable
-    static String checkCursorAndGetLastRecordId(@NotNull AbstractCursorQuery query, @Nullable String cursor) {
+    static String checkCursorAndGetLastRecordId(@NotNull AbstractCursorQuery<? extends QueryOrderField> query, @Nullable String cursor) {
         if (cursor == null) {
             return null;
         }
-        String[] parts = cursor.split(WindConstants.AT);
+        String[] parts = cursor.split(WindConstants.SHARP);
         if (parts.length != 2) {
             throw new BaseException(DefaultExceptionCode.COMMON_FRIENDLY_ERROR, "cursor 格式错误");
         }
         String signature = parts[0];
-        AssertUtils.equals(genCursorSha256(query), signature, "cursor 签名错误");
-        return StringUtils.hasText(parts[1]) ? parts[1] : null;
+        String cursorText = new String(Base64.getDecoder().decode(parts[1]));
+        AssertUtils.equals(genCursorSha256(query, cursorText), signature, "cursor 签名错误");
+        return StringUtils.hasText(cursorText) ? cursorText.split(WindConstants.AT)[0] : null;
     }
 
-    @SuppressWarnings("rawtypes")
-    private static String genCursorSha256(AbstractCursorQuery query) {
+    @VisibleForTesting
+    static int getQueryCurrentPageNum(AbstractCursorQuery<?> query) {
+        if (query.isFirst()) {
+            return FIRST_PAGE_NUM;
+        }
+        return query.getPrevCursor() == null ? parseCursorPageNum(query.getNextCursor()) : parseCursorPageNum(query.getPrevCursor());
+    }
+
+    @VisibleForTesting
+    static int parseCursorPageNum(String cursor) {
+        String[] parts = cursor.split(WindConstants.SHARP);
+        if (parts.length != 2) {
+            throw new BaseException(DefaultExceptionCode.COMMON_FRIENDLY_ERROR, "cursor 格式错误");
+        }
+        String cursorText = new String(Base64.getDecoder().decode(parts[1]));
+        return Integer.parseInt(cursorText.split(WindConstants.AT)[1]);
+    }
+
+    private static String genCursorSha256(AbstractCursorQuery<?> query, String text) {
         Field[] fields = WindReflectUtils.getFields(query.getClass());
         String queryString = Arrays.stream(fields)
                 .filter(field -> !CURSOR_QUERY_CURSOR_FILED_NAMES.contains(field.getName()))
@@ -81,7 +131,7 @@ final class CursorQueryUtils {
                     return field.getName() + WindConstants.EQ + queryParamValueAsText(value);
                 })
                 .collect(Collectors.joining(WindConstants.AND));
-        return sha256Base64(queryString);
+        return sha256Base64(queryString + WindConstants.SHARP + text);
     }
 
     @SuppressWarnings({"unchecked", "rawtypes"})

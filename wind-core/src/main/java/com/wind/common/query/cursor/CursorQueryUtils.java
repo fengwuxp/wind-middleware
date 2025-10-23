@@ -63,7 +63,7 @@ final class CursorQueryUtils {
         } else {
             // 向前翻页
             int prevNum = currentPage - 1;
-            prevCursor = (reachedEnd ||  prevNum == FIRST_PAGE_NUM) ? null : CursorQueryUtils.generateCursor(query,
+            prevCursor = (reachedEnd || prevNum == FIRST_PAGE_NUM) ? null : CursorQueryUtils.generateCursor(query,
                     WindReflectUtils.getFieldValue(CursorQueryUtils.CURSOR_FILED_NAME, first), prevNum);
             nextCursor = CursorQueryUtils.generateCursor(query, WindReflectUtils.getFieldValue(CursorQueryUtils.CURSOR_FILED_NAME, last), currentPage);
         }
@@ -82,7 +82,8 @@ final class CursorQueryUtils {
         AssertUtils.notNull(query, "argument query must not null");
         AssertUtils.notNull(id, "argument id must not null");
         String cursorText = id + WindConstants.AT + pageNum;
-        return genCursorSha256(query, cursorText) + WindConstants.SHARP + Base64.getEncoder().encodeToString(cursorText.getBytes(StandardCharsets.UTF_8));
+        String cursor = genCursorSha256(query, cursorText) + WindConstants.SHARP + cursorText;
+        return Base64.getEncoder().encodeToString(cursor.getBytes(StandardCharsets.UTF_8));
     }
 
     @Nullable
@@ -90,12 +91,9 @@ final class CursorQueryUtils {
         if (cursor == null) {
             return null;
         }
-        String[] parts = cursor.split(WindConstants.SHARP);
-        if (parts.length != 2) {
-            throw new BaseException(DefaultExceptionCode.COMMON_FRIENDLY_ERROR, "cursor 格式错误");
-        }
+        String[] parts = decodeCursorAndSplit(cursor);
         String signature = parts[0];
-        String cursorText = new String(Base64.getDecoder().decode(parts[1]));
+        String cursorText = parts[1];
         AssertUtils.equals(genCursorSha256(query, cursorText), signature, "cursor 签名错误");
         return StringUtils.hasText(cursorText) ? cursorText.split(WindConstants.AT)[0] : null;
     }
@@ -110,12 +108,16 @@ final class CursorQueryUtils {
 
     @VisibleForTesting
     static int parseCursorPageNum(String cursor) {
-        String[] parts = cursor.split(WindConstants.SHARP);
+        String[] parts = decodeCursorAndSplit(cursor);
+        return Integer.parseInt(parts[1].split(WindConstants.AT)[1]);
+    }
+
+    private static String[] decodeCursorAndSplit(String cursor) {
+        String[] parts = new String(Base64.getDecoder().decode(cursor)).split(WindConstants.SHARP);
         if (parts.length != 2) {
             throw new BaseException(DefaultExceptionCode.COMMON_FRIENDLY_ERROR, "cursor 格式错误");
         }
-        String cursorText = new String(Base64.getDecoder().decode(parts[1]));
-        return Integer.parseInt(cursorText.split(WindConstants.AT)[1]);
+        return parts;
     }
 
     private static String genCursorSha256(AbstractCursorQuery<?> query, String text) {

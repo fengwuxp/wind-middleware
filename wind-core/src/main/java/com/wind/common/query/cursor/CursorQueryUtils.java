@@ -14,6 +14,7 @@ import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
 import java.lang.reflect.Field;
+import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -113,7 +114,8 @@ final class CursorQueryUtils {
     }
 
     private static String[] decodeCursorAndSplit(String cursor) {
-        String[] parts = new String(Base64.getDecoder().decode(cursor)).split(WindConstants.SHARP);
+        String decode = URLDecoder.decode(cursor, StandardCharsets.UTF_8);
+        String[] parts = new String(Base64.getDecoder().decode(decode)).split(WindConstants.SHARP);
         if (parts.length != 2) {
             throw new BaseException(DefaultExceptionCode.COMMON_FRIENDLY_ERROR, "cursor 格式错误");
         }

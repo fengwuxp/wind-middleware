@@ -5,7 +5,6 @@ import com.wind.common.util.WindReflectUtils;
 import com.wind.mask.annotation.Sensitive;
 import jakarta.validation.constraints.NotNull;
 import org.springframework.lang.Nullable;
-import org.springframework.util.ObjectUtils;
 
 import java.lang.reflect.Field;
 import java.util.Collection;
@@ -40,8 +39,7 @@ public class MaskRuleRegistry {
      * @return true 需要
      */
     public boolean requireMask(Class<?> clazz) {
-        return !ObjectUtils.isEmpty(computeIfAbsent(clazz)) ||
-                (clazz.isAnnotationPresent(Sensitive.class) && WindReflectUtils.findFields(clazz, Sensitive.class).length > 0);
+        return hasRule(clazz) || (clazz.isAnnotationPresent(Sensitive.class) && WindReflectUtils.findFields(clazz, Sensitive.class).length > 0);
     }
 
     @NotNull
@@ -56,7 +54,8 @@ public class MaskRuleRegistry {
     }
 
     public boolean hasRule(@NotNull Class<?> clazz) {
-        return groups.containsKey(clazz);
+        MaskRuleGroup group = groups.getOrDefault(clazz,MaskRuleGroup.EMPTY);
+        return group.isNotEmpty();
     }
 
     public void registerRule(MaskRuleGroup group) {

@@ -29,9 +29,11 @@ import java.util.stream.Collectors;
  * @see MaskRule
  */
 
-public record MaskRuleGroup(@NotNull Class<?> target, Map<String, MaskRule> rules) {
+public record MaskRuleGroup(@NotNull Class<?> target, @NotNull Map<String, MaskRule> rules) {
 
-    public MaskRuleGroup(@NotNull Class<?> target, Collection<MaskRule> maskRules) {
+    static final MaskRuleGroup EMPTY = new MaskRuleGroup(Object.class, Collections.emptyMap());
+
+    public MaskRuleGroup(@NotNull Class<?> target, @NotNull Collection<MaskRule> maskRules) {
         this(target, new ConcurrentHashMap<>(maskRules.stream().collect(Collectors.toMap(MaskRule::name, Function.identity(), (v1, v2) -> v1))));
     }
 
@@ -54,6 +56,11 @@ public record MaskRuleGroup(@NotNull Class<?> target, Map<String, MaskRule> rule
             }
             return new MaskRule(name, Arrays.asList(annotation.names()), MaskerFactory.getMasker(annotation.masker()));
         });
+    }
+
+
+    boolean isNotEmpty() {
+        return !rules.isEmpty();
     }
 
     @Nullable
@@ -101,9 +108,7 @@ public record MaskRuleGroup(@NotNull Class<?> target, Map<String, MaskRule> rule
     /**
      * {@link MaskRuleGroup} 建造器
      */
-    public static final class GroupBuilder {
-
-        private final List<MaskRuleGroup> groups;
+    public record GroupBuilder(List<MaskRuleGroup> groups) {
 
         public GroupBuilder(List<MaskRuleGroup> groups) {
             this.groups = new ArrayList<>(groups);

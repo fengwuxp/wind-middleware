@@ -10,6 +10,7 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -65,7 +66,7 @@ class ObjectMaskPrinterTests {
     }
 
     @Test
-    void testSanitizeObject() {
+    void testSanitizeObject() throws Exception{
         Map<String, Object> map = new HashMap<>();
         map.put("test1", 1);
         map.put("test2", "test");

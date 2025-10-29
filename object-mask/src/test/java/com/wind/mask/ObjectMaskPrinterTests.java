@@ -11,6 +11,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.net.URI;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -66,7 +67,7 @@ class ObjectMaskPrinterTests {
     }
 
     @Test
-    void testSanitizeObject() throws Exception{
+    void testSanitizeObject() {
         Map<String, Object> map = new HashMap<>();
         map.put("test1", 1);
         map.put("test2", "test");
@@ -77,6 +78,12 @@ class ObjectMaskPrinterTests {
         Assertions.assertNotNull(result);
         Assertions.assertTrue(result.contains("***"));
         Assertions.assertTrue(result.contains("@ref["));
+    }
+
+    @Test
+    void testSanitizeObjectWithIgnore() throws Exception {
+        String url = "https://www.baidu.com";
+        Assertions.assertEquals(url, printer.mask(new URI(url)));
     }
 
     @Test

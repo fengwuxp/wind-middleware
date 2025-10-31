@@ -29,14 +29,13 @@ public record ImmutableCaptcha(String owner, CaptchaType type, CaptchaUseScene u
     }
 
     /**
-     * 统计已验证次数
+     * 统计已发送次数
      *
      * @return 新的验证码
      */
     public ImmutableCaptcha increaseSendTimes() {
         // 重新发送，过期时间延长 5 分钟
-        return new ImmutableCaptcha(owner, type, useScene, value, content, verificationCount, sendTimes + 1, allowVerificationTimes,
-                expireTime + 5 * 60 * 1000);
+        return new ImmutableCaptcha(owner, type, useScene, value, content, verificationCount, sendTimes + 1, allowVerificationTimes, expireTime);
     }
 
     /**

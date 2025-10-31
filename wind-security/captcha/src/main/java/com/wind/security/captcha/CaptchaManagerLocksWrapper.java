@@ -49,7 +49,6 @@ public record CaptchaManagerLocksWrapper(CaptchaManager delegate, LockFactory lo
         } finally {
             lock.unlock();
         }
-
     }
 
     /**

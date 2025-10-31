@@ -4,6 +4,7 @@ import com.wind.common.locks.LockFactory;
 import com.wind.security.captcha.CaptchaContentProvider;
 import com.wind.security.captcha.CaptchaGenerateChecker;
 import com.wind.security.captcha.CaptchaManager;
+import com.wind.security.captcha.CaptchaManagerLocksWrapper;
 import com.wind.security.captcha.CaptchaStorage;
 import com.wind.security.captcha.DefaultCaptchaManager;
 import com.wind.security.captcha.SimpleCaptchaGenerateChecker;
@@ -78,11 +79,9 @@ public class CaptchaAutoConfiguration {
     }
 
     @Bean
-    @ConditionalOnBean(LockFactory.class)
     @ConditionalOnMissingBean({CaptchaGenerateChecker.class})
-    public SimpleCaptchaGenerateChecker simpleCaptchaGenerateChecker(CacheManager cacheManager, CaptchaProperties properties,
-                                                                     LockFactory lockFactory) {
-        return new SimpleCaptchaGenerateChecker(cacheManager, properties, lockFactory);
+    public SimpleCaptchaGenerateChecker simpleCaptchaGenerateChecker(CacheManager cacheManager, CaptchaProperties properties) {
+        return new SimpleCaptchaGenerateChecker(cacheManager, properties);
     }
 
     @Bean
@@ -111,10 +110,11 @@ public class CaptchaAutoConfiguration {
     }
 
     @Bean
-    @ConditionalOnBean({CaptchaContentProvider.class, CaptchaStorage.class, CaptchaGenerateChecker.class})
+    @ConditionalOnBean({CaptchaContentProvider.class, CaptchaStorage.class, CaptchaGenerateChecker.class, LockFactory.class})
     public CaptchaManager defaultCaptchaManager(Collection<CaptchaContentProvider> delegates, CaptchaStorage captchaStorage,
-                                                CaptchaGenerateChecker generateLimiter, CaptchaProperties properties) {
-        return new DefaultCaptchaManager(delegates, captchaStorage, generateLimiter, properties.isVerificationIgnoreCase());
+                                                CaptchaGenerateChecker generateLimiter, CaptchaProperties properties, LockFactory lockFactory) {
+        DefaultCaptchaManager result = new DefaultCaptchaManager(delegates, captchaStorage, generateLimiter, properties.isVerificationIgnoreCase());
+        return new CaptchaManagerLocksWrapper(result, lockFactory);
     }
 
 }

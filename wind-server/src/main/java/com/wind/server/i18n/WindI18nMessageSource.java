@@ -60,7 +60,7 @@ public class WindI18nMessageSource extends AbstractResourceBasedMessageSource {
         return messageFormates.get(key, this::buildMessageFormat);
     }
 
-    protected MessageFormat buildMessageFormat(CacheKey key) {
+    private MessageFormat buildMessageFormat(CacheKey key) {
         String code = tryConvertSlf4jPlaceholders(key.code());
         String message = resolveCodeWithoutArguments(code, key.locale());
         if (message == null) {

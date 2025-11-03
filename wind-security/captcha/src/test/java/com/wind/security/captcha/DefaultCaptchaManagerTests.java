@@ -125,13 +125,14 @@ class DefaultCaptchaManagerTests {
             Captcha captcha = captchaManager.generate(type, scene, owner);
             Assertions.assertNotNull(captcha);
             String expected = RandomStringUtils.secure().nextAlphanumeric(4);
-            for (int i = 0; i < maxAllowVerificationTimes - 1; i++) {
-                captchaManager.verify(expected, type, scene, owner);
-            }
             BaseException exception = Assertions.assertThrows(BaseException.class, () -> captchaManager.verify(expected, type, scene, owner));
             Assertions.assertEquals(CaptchaI18nMessageKeys.getCaptchaVerityFailure(type), exception.getMessage());
             Captcha result = captchaManager.captchaStorage().get(captcha.type(), captcha.useScene(), owner);
-            Assertions.assertNull(result);
+            if (maxAllowVerificationTimes <= 1) {
+                Assertions.assertNull(result);
+            } else {
+                Assertions.assertNotNull(result);
+            }
         }
     }
 

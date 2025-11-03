@@ -115,8 +115,8 @@ public record DefaultCaptchaManager(Collection<CaptchaContentGenerator> delegate
             } else {
                 // 验证码已失效，移除
                 captchaStorage.remove(type, useScene, realOwner);
-                throw BaseException.common(CaptchaI18nMessageKeys.getCaptchaVerityFailure(type));
             }
+            throw BaseException.common(CaptchaI18nMessageKeys.getCaptchaVerityFailure(type));
         }
     }
 

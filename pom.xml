@@ -42,7 +42,7 @@
     </modules>
 
     <properties>
-        <revision>1.0.1-jdk21-SNAPSHOT</revision>
+        <revision>1.0.2-jdk21-SNAPSHOT</revision>
         <!--   测试相关     -->
         <jacoco-coverage-agent/>
         <tests.fork.count/>

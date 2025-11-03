@@ -76,7 +76,7 @@ public record DefaultCaptchaManager(Collection<CaptchaContentGenerator> delegate
                 .owner(realOwner)
                 .type(type)
                 .useScene(useScene)
-                .sendTimes(1)
+                .sendTimes(0)
                 .verificationCount(0)
                 .maxVerificationTimes(delegate.getMaxAllowVerificationTimes())
                 .expireTime(System.currentTimeMillis() + delegate.getEffectiveTime().toMillis())

@@ -1,6 +1,9 @@
 package com.wind.security.captcha;
 
+import jakarta.validation.constraints.NotNull;
 import org.springframework.lang.Nullable;
+
+import java.util.List;
 
 /**
  * 验证码存储器
@@ -22,25 +25,36 @@ public interface CaptchaStorage {
      *
      * @param type     验证码类型
      * @param useScene 验证码使用场景
-     * @param key      验证码存储 key
+     * @param owner    验证码 owner
      */
     @Nullable
-    Captcha get(Captcha.CaptchaType type, Captcha.CaptchaUseScene useScene, String key);
+    Captcha get(Captcha.CaptchaType type, Captcha.CaptchaUseScene useScene, String owner);
 
     /**
      * 删除验证码
      *
      * @param type     验证码类型
      * @param useScene 验证码使用场景
-     * @param key      验证码存储 key
+     * @param owner    验证码 owner
      */
-    void remove(Captcha.CaptchaType type, Captcha.CaptchaUseScene useScene, String key);
+    void remove(Captcha.CaptchaType type, Captcha.CaptchaUseScene useScene, String owner);
 
     /**
-     * 移除某个类型的验证码
+     * 获取验证码发送流控滑动窗口
      *
-     * @param type 验证码类型
+     * @param type  验证码类型
+     * @param owner 验证码 owner
      */
-    default void removeAll(Captcha.CaptchaType type) {
-    }
+    @NotNull
+    List<Long> getCaptchaSendSlideWindows(Captcha.CaptchaType type, String owner);
+
+    /**
+     * 更新验证码发送流控滑动窗口
+     *
+     * @param type  验证码类型
+     * @param owner 验证码 owner
+     * @param times 验证码发送次数
+     */
+    void putCaptchaSendSlideWindows(Captcha.CaptchaType type, String owner, List<Long> times);
+
 }

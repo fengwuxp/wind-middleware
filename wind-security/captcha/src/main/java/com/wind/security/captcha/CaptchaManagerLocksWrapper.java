@@ -6,6 +6,7 @@ import com.wind.common.exception.DefaultExceptionCode;
 import com.wind.common.locks.LockFactory;
 import com.wind.common.locks.WindLock;
 
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -17,6 +18,8 @@ import java.util.concurrent.atomic.AtomicInteger;
  **/
 public record CaptchaManagerLocksWrapper(CaptchaManager delegate, LockFactory lockFactory) implements CaptchaManager {
 
+    private static final Set<Captcha.CaptchaType> IGNORES = Set.of(SimpleCaptchaType.PICTURE, SimpleCaptchaType.QR_CODE);
+
     private static final AtomicInteger LOCK_LEASE_TIME = new AtomicInteger(5 * 1000);
 
     private static final String GEN_LOCK_KEY_PREFIX = "captcha-gen-%s-%s-%s";
@@ -24,7 +27,15 @@ public record CaptchaManagerLocksWrapper(CaptchaManager delegate, LockFactory lo
     private static final String VERIFY_LOCK_KEY_PREFIX = "captcha-verify-%s-%s-%s";
 
     @Override
+    public void send(Captcha captcha) {
+        delegate.send(captcha);
+    }
+
+    @Override
     public Captcha generate(Captcha.CaptchaType type, Captcha.CaptchaUseScene useScene, String owner) {
+        if (IGNORES.contains(type)) {
+            return delegate.generate(type, useScene, owner);
+        }
         WindLock lock = lockFactory.apply(String.format(GEN_LOCK_KEY_PREFIX, type, useScene, owner));
         try {
             AssertUtils.state(lock.tryLock(500, LOCK_LEASE_TIME.get(), TimeUnit.MICROSECONDS), () -> BaseException.friendly("captcha gen get lock failure"));
@@ -39,6 +50,10 @@ public record CaptchaManagerLocksWrapper(CaptchaManager delegate, LockFactory lo
 
     @Override
     public void verify(String expected, Captcha.CaptchaType type, Captcha.CaptchaUseScene useScene, String owner) {
+        if (IGNORES.contains(type)) {
+            delegate.verify(expected, type, useScene, owner);
+            return;
+        }
         WindLock lock = lockFactory.apply(String.format(VERIFY_LOCK_KEY_PREFIX, type, useScene, owner));
         try {
             AssertUtils.isTrue(lock.tryLock(500, LOCK_LEASE_TIME.get(), TimeUnit.MICROSECONDS), "captcha verify get lock failure");

@@ -1,12 +1,12 @@
 package com.wind.security.captcha;
 
 /**
- * 验证码内容提供者
+ * 验证码内容生成器
  *
  * @author wuxp
  * @date 2023-09-24 09:39
  **/
-public interface CaptchaContentProvider extends Captcha.CaptchaConfiguration {
+public interface CaptchaContentGenerator extends Captcha.CaptchaConfiguration {
 
     /**
      * @return 获取验证码值

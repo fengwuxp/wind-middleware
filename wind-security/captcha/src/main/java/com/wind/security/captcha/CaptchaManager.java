@@ -9,18 +9,28 @@ import jakarta.validation.constraints.NotNull;
  * @author wuxp
  * @date 2023-11-13 21:24
  **/
-public interface CaptchaManager {
-
+public interface CaptchaManager extends CaptchaSender {
 
     /**
-     * 生成验证码
+     * 发送验证码
+     *
+     * @param type     验证码类型
+     * @param useScene 验证码使用场景
+     * @param owner    验证码所有者
+     */
+    default void send(@NotNull Captcha.CaptchaType type, @NotNull Captcha.CaptchaUseScene useScene, @NotBlank String owner) {
+        send(generate(type, useScene, owner));
+    }
+
+    /**
+     * 生成验证码内容，若验证码未失效会根据类型返回缓存中的验证码
      *
      * @param type     验证码类型
      * @param useScene 验证码使用场景
      * @param owner    验证码所有者
      * @return 验证码
      */
-    Captcha generate(@NotNull Captcha.CaptchaType type, @NotNull Captcha.CaptchaUseScene useScene,  @NotBlank String owner);
+    Captcha generate(@NotNull Captcha.CaptchaType type, @NotNull Captcha.CaptchaUseScene useScene, @NotBlank String owner);
 
     /**
      * 验证验证码
@@ -30,6 +40,6 @@ public interface CaptchaManager {
      * @param useScene 验证码使用场景
      * @param owner    验证码所有者
      */
-    void verify(@NotBlank String expected, @NotNull Captcha.CaptchaType type,  @NotNull Captcha.CaptchaUseScene useScene,  @NotBlank String owner);
+    void verify(@NotBlank String expected, @NotNull Captcha.CaptchaType type, @NotNull Captcha.CaptchaUseScene useScene, @NotBlank String owner);
 }
 

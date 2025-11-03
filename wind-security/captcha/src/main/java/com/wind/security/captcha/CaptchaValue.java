@@ -1,6 +1,7 @@
 package com.wind.security.captcha;
 
 import java.beans.Transient;
+import java.io.Serializable;
 
 /**
  * 验证码值
@@ -8,7 +9,7 @@ import java.beans.Transient;
  * @author wuxp
  * @date 2023-09-24 12:52
  **/
-public interface CaptchaValue {
+public interface CaptchaValue extends Serializable {
 
     /**
      * @return 验证码值，用于验证

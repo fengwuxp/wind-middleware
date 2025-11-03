@@ -1,18 +1,17 @@
 package com.wind.security.captcha.configuration;
 
 import com.wind.common.locks.LockFactory;
-import com.wind.security.captcha.CaptchaContentProvider;
-import com.wind.security.captcha.CaptchaGenerateChecker;
+import com.wind.security.captcha.CaptchaContentGenerator;
 import com.wind.security.captcha.CaptchaManager;
 import com.wind.security.captcha.CaptchaManagerLocksWrapper;
+import com.wind.security.captcha.CaptchaSender;
 import com.wind.security.captcha.CaptchaStorage;
 import com.wind.security.captcha.DefaultCaptchaManager;
-import com.wind.security.captcha.SimpleCaptchaGenerateChecker;
-import com.wind.security.captcha.email.EmailCaptchaContentProvider;
+import com.wind.security.captcha.email.EmailCaptchaContentGenerator;
 import com.wind.security.captcha.email.EmailCaptchaProperties;
-import com.wind.security.captcha.mobile.MobilePhoneCaptchaContentProvider;
+import com.wind.security.captcha.mobile.MobilePhoneCaptchaContentGenerator;
 import com.wind.security.captcha.mobile.MobilePhoneCaptchaProperties;
-import com.wind.security.captcha.picture.PictureCaptchaContentProvider;
+import com.wind.security.captcha.picture.PictureCaptchaContentGenerator;
 import com.wind.security.captcha.picture.PictureCaptchaProperties;
 import com.wind.security.captcha.picture.PictureGenerator;
 import com.wind.security.captcha.picture.SimplePictureGenerator;
@@ -79,12 +78,6 @@ public class CaptchaAutoConfiguration {
     }
 
     @Bean
-    @ConditionalOnMissingBean({CaptchaGenerateChecker.class})
-    public SimpleCaptchaGenerateChecker simpleCaptchaGenerateChecker(CacheManager cacheManager, CaptchaProperties properties) {
-        return new SimpleCaptchaGenerateChecker(cacheManager, properties);
-    }
-
-    @Bean
     @ConditionalOnMissingBean(PictureGenerator.class)
     public SimplePictureGenerator simplePictureGenerator() {
         return new SimplePictureGenerator();
@@ -92,28 +85,28 @@ public class CaptchaAutoConfiguration {
 
     @Bean
     @ConditionalOnBean({PictureGenerator.class})
-    @ConditionalOnMissingBean(PictureCaptchaContentProvider.class)
-    public PictureCaptchaContentProvider pictureCaptchaContentProvider(CaptchaProperties properties, PictureGenerator pictureGenerator) {
-        return new PictureCaptchaContentProvider(properties.getPicture(), pictureGenerator);
+    @ConditionalOnMissingBean(PictureCaptchaContentGenerator.class)
+    public PictureCaptchaContentGenerator pictureCaptchaContentProvider(CaptchaProperties properties, PictureGenerator pictureGenerator) {
+        return new PictureCaptchaContentGenerator(properties.getPicture(), pictureGenerator);
     }
 
     @Bean
-    @ConditionalOnMissingBean(MobilePhoneCaptchaContentProvider.class)
-    public MobilePhoneCaptchaContentProvider mobilePhoneCaptchaContentProvider(CaptchaProperties properties) {
-        return new MobilePhoneCaptchaContentProvider(properties.getMobilePhone());
+    @ConditionalOnMissingBean(MobilePhoneCaptchaContentGenerator.class)
+    public MobilePhoneCaptchaContentGenerator mobilePhoneCaptchaContentProvider(CaptchaProperties properties) {
+        return new MobilePhoneCaptchaContentGenerator(properties.getMobilePhone());
     }
 
     @Bean
-    @ConditionalOnMissingBean(EmailCaptchaContentProvider.class)
-    public EmailCaptchaContentProvider emailCaptchaContentProvider(CaptchaProperties properties) {
-        return new EmailCaptchaContentProvider(properties.getEmail());
+    @ConditionalOnMissingBean(EmailCaptchaContentGenerator.class)
+    public EmailCaptchaContentGenerator emailCaptchaContentProvider(CaptchaProperties properties) {
+        return new EmailCaptchaContentGenerator(properties.getEmail());
     }
 
     @Bean
-    @ConditionalOnBean({CaptchaContentProvider.class, CaptchaStorage.class, CaptchaGenerateChecker.class, LockFactory.class})
-    public CaptchaManager defaultCaptchaManager(Collection<CaptchaContentProvider> delegates, CaptchaStorage captchaStorage,
-                                                CaptchaGenerateChecker generateLimiter, CaptchaProperties properties, LockFactory lockFactory) {
-        DefaultCaptchaManager result = new DefaultCaptchaManager(delegates, captchaStorage, generateLimiter, properties.isVerificationIgnoreCase());
+    @ConditionalOnBean({CaptchaContentGenerator.class, CaptchaStorage.class, LockFactory.class})
+    public CaptchaManager defaultCaptchaManager(Collection<CaptchaContentGenerator> delegates, Collection<CaptchaSender> senders,
+                                                CaptchaStorage storage, CaptchaProperties properties, LockFactory lockFactory) {
+        DefaultCaptchaManager result = new DefaultCaptchaManager(delegates, senders, storage, properties);
         return new CaptchaManagerLocksWrapper(result, lockFactory);
     }
 

@@ -2,19 +2,19 @@ package com.wind.security.captcha.email;
 
 import com.wind.security.captcha.Captcha;
 import com.wind.security.captcha.SimpleCaptchaType;
-import com.wind.security.captcha.mobile.MobilePhoneCaptchaContentProvider;
+import com.wind.security.captcha.mobile.MobilePhoneCaptchaContentGenerator;
 
 import java.util.Objects;
 
 /**
- * 邮箱验证码内容提供者
+ * 邮箱验证码内容生成器
  *
  * @author wuxp
  * @date 2023-09-24 13:31
  **/
-public class EmailCaptchaContentProvider extends MobilePhoneCaptchaContentProvider {
+public class EmailCaptchaContentGenerator extends MobilePhoneCaptchaContentGenerator {
 
-    public EmailCaptchaContentProvider(EmailCaptchaProperties properties) {
+    public EmailCaptchaContentGenerator(EmailCaptchaProperties properties) {
         super(properties);
     }
 

@@ -1,7 +1,7 @@
 package com.wind.security.captcha.picture;
 
 import com.wind.security.captcha.Captcha;
-import com.wind.security.captcha.CaptchaContentProvider;
+import com.wind.security.captcha.CaptchaContentGenerator;
 import com.wind.security.captcha.CaptchaValue;
 import com.wind.security.captcha.SimpleCaptchaType;
 import org.apache.commons.lang3.RandomUtils;
@@ -15,7 +15,7 @@ import java.util.Objects;
  * @author wuxp
  * @date 2023-09-24 10:33
  **/
-public record PictureCaptchaContentProvider(PictureCaptchaProperties properties, PictureGenerator pictureGenerator) implements CaptchaContentProvider {
+public record PictureCaptchaContentGenerator(PictureCaptchaProperties properties, PictureGenerator pictureGenerator) implements CaptchaContentGenerator {
 
     /**
      * 随机范围，移除数字 0、2 字母 i、o、z

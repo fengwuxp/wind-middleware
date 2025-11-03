@@ -2,7 +2,7 @@ package com.wind.security.captcha.mobile;
 
 import com.wind.common.WindConstants;
 import com.wind.security.captcha.Captcha;
-import com.wind.security.captcha.CaptchaContentProvider;
+import com.wind.security.captcha.CaptchaContentGenerator;
 import com.wind.security.captcha.CaptchaValue;
 import com.wind.security.captcha.SimpleCaptchaType;
 import lombok.AllArgsConstructor;
@@ -12,13 +12,13 @@ import java.time.Duration;
 import java.util.Objects;
 
 /**
- * 手机验证码内容提供者
+ * 手机验证码内容生成器
  *
  * @author wuxp
  * @date 2023-09-24 13:31
  **/
 @AllArgsConstructor
-public class MobilePhoneCaptchaContentProvider implements CaptchaContentProvider {
+public class MobilePhoneCaptchaContentGenerator implements CaptchaContentGenerator {
 
     private final MobilePhoneCaptchaProperties properties;
 

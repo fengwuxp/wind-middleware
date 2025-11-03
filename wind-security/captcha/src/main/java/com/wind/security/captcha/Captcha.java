@@ -42,9 +42,16 @@ public interface Captcha extends CaptchaValue {
     int sendTimes();
 
     /**
-     * @return 允许验证次数
+     * @return 允许验证的最大验证次数
      */
-    int allowVerificationTimes();
+    int maxVerificationTimes();
+
+    /**
+     * @return 允许发送的最大次数
+     */
+    default int maxSendTimes() {
+        return 3;
+    }
 
     /**
      * @return 验证码失效时间戳
@@ -54,7 +61,7 @@ public interface Captcha extends CaptchaValue {
     /**
      * 累计一次发送次数
      *
-     * @return {@link #verificationCount()} 值更新后的验证码对象
+     * @return {@link #sendTimes()} 值更新后的验证码对象
      */
     Captcha increaseSendTimes();
 
@@ -66,16 +73,23 @@ public interface Captcha extends CaptchaValue {
     Captcha increaseVerificationCount();
 
     /**
-     * @return 是否有效
+     * @return 是否允许发送
+     */
+    default boolean isAllowSend() {
+        return sendTimes() < maxSendTimes() && isAvailable();
+    }
+
+    /**
+     * @return 是否有效，如果有效则可以进行验证
      */
     @Transient
     default boolean isAvailable() {
-        if (expireTime() == 0L) {
+        if (expireTime() <= 0L) {
             // 过期时间没有，表示位过期
             return false;
         }
-        // 发送次数 < 3 & 验证次数 < 最大允许验证次数 & 失效时间 > 当前时间
-        return sendTimes() < 3 && verificationCount() < allowVerificationTimes() && expireTime() > System.currentTimeMillis();
+        //  验证次数 < 最大允许验证次数 & 失效时间 > 当前时间
+        return verificationCount() < maxVerificationTimes() && expireTime() > System.currentTimeMillis();
     }
 
     /**

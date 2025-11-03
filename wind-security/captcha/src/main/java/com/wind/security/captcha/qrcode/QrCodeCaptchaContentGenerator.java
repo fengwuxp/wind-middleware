@@ -1,7 +1,7 @@
 package com.wind.security.captcha.qrcode;
 
 import com.wind.security.captcha.Captcha;
-import com.wind.security.captcha.CaptchaContentProvider;
+import com.wind.security.captcha.CaptchaContentGenerator;
 import com.wind.security.captcha.CaptchaValue;
 import com.wind.security.captcha.SimpleCaptchaType;
 
@@ -10,16 +10,16 @@ import java.util.Objects;
 import java.util.function.Supplier;
 
 /**
- * 二维码验证码生成
+ * 二维码验证码生成器
  *
  * @param qrCodeValueSupplier 二维码值提供者
  * @author wuxp
  * @date 2023-09-24 14:12
  */
-public record QrCodeCaptchaContentProvider(Supplier<String> qrCodeValueSupplier, QrCodeGenerator qrCodeGenerator,
-                                           QrCodeCaptchaProperties properties) implements CaptchaContentProvider {
+public record QrCodeCaptchaContentGenerator(Supplier<String> qrCodeValueSupplier, QrCodeGenerator qrCodeGenerator,
+                                            QrCodeCaptchaProperties properties) implements CaptchaContentGenerator {
 
-    public QrCodeCaptchaContentProvider(Supplier<String> qrCodeValueSupplier, QrCodeCaptchaProperties properties) {
+    public QrCodeCaptchaContentGenerator(Supplier<String> qrCodeValueSupplier, QrCodeCaptchaProperties properties) {
         this(qrCodeValueSupplier, new ZxingQrCodeGenerator(), properties);
     }
 

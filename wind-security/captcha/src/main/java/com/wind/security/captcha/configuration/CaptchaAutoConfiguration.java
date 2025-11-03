@@ -1,9 +1,7 @@
 package com.wind.security.captcha.configuration;
 
-import com.wind.common.locks.LockFactory;
 import com.wind.security.captcha.CaptchaContentGenerator;
 import com.wind.security.captcha.CaptchaManager;
-import com.wind.security.captcha.CaptchaManagerLocksWrapper;
 import com.wind.security.captcha.CaptchaSender;
 import com.wind.security.captcha.CaptchaStorage;
 import com.wind.security.captcha.DefaultCaptchaManager;
@@ -103,11 +101,10 @@ public class CaptchaAutoConfiguration {
     }
 
     @Bean
-    @ConditionalOnBean({CaptchaContentGenerator.class, CaptchaStorage.class, LockFactory.class})
-    public CaptchaManager defaultCaptchaManager(Collection<CaptchaContentGenerator> delegates, Collection<CaptchaSender> senders,
-                                                CaptchaStorage storage, CaptchaProperties properties, LockFactory lockFactory) {
-        DefaultCaptchaManager result = new DefaultCaptchaManager(delegates, senders, storage, properties);
-        return new CaptchaManagerLocksWrapper(result, lockFactory);
+    @ConditionalOnBean({CaptchaContentGenerator.class, CaptchaStorage.class})
+    public CaptchaManager defaultCaptchaManager(Collection<CaptchaContentGenerator> delegates, Collection<CaptchaSender> senders, CaptchaStorage storage,
+                                                CaptchaProperties properties) {
+        return new DefaultCaptchaManager(delegates, senders, storage, properties);
     }
 
 }

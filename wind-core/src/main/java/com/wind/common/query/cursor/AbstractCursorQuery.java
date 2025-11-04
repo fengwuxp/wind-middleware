@@ -36,7 +36,7 @@ public abstract class AbstractCursorQuery<OrderField extends QueryOrderField> im
     /**
      * 查询类型
      */
-    private QueryType queryType = QueryType.QUERY_BOTH;
+    private QueryType queryType = QueryType.QUERY_RESET;
 
     /**
      * 排序字

@@ -56,7 +56,7 @@ public interface CursorPagination<T> extends WindPagination<T> {
     }
 
     static <E> CursorPagination<E> empty() {
-        return new ImmutableCursorPagination<>(-1L, Collections.emptyList(), 0, null, null);
+        return of(-1L, Collections.emptyList(), 0, null, null);
     }
 
     /**
@@ -68,6 +68,19 @@ public interface CursorPagination<T> extends WindPagination<T> {
      * @return 分页对象
      */
     static <E> CursorPagination<E> of(List<E> records, AbstractCursorQuery<? extends QueryOrderField> query) {
+        return of(-1, records, query);
+    }
+
+    /**
+     * 创建游标分页对象
+     *
+     * @param total   总记录数
+     * @param records 分页数据
+     * @param query   查询参数
+     * @param <E>     分页数据类型
+     * @return 分页对象
+     */
+    static <E> CursorPagination<E> of(long total, List<E> records, AbstractCursorQuery<? extends QueryOrderField> query) {
         if (records == null || records.isEmpty()) {
             return empty();
         }
@@ -77,7 +90,7 @@ public interface CursorPagination<T> extends WindPagination<T> {
             Collections.reverse(records);
         }
         String[] cursors = CursorQueryUtils.generateCursors(query, records);
-        return of(-1L, records, query.getQuerySize(), cursors[0], cursors[1]);
+        return of(total, records, query.getQuerySize(), cursors[0], cursors[1]);
     }
 
     static <E> CursorPagination<E> of(long total, List<E> records, int querySize, String prevCursor, String nextCursor) {

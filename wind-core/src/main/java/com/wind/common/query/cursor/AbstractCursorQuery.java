@@ -4,6 +4,7 @@ import com.wind.common.exception.AssertUtils;
 import com.wind.common.exception.BaseException;
 import com.wind.common.query.supports.QueryOrderField;
 import com.wind.common.query.supports.QueryOrderType;
+import com.wind.common.query.supports.QueryType;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 import org.springframework.lang.Nullable;
@@ -31,6 +32,11 @@ public abstract class AbstractCursorQuery<OrderField extends QueryOrderField> im
      */
     @NotNull
     private Integer querySize = 20;
+
+    /**
+     * 查询类型
+     */
+    private QueryType queryType = QueryType.QUERY_BOTH;
 
     /**
      * 排序字

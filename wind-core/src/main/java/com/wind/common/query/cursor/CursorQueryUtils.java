@@ -35,7 +35,10 @@ import java.util.stream.Collectors;
  **/
 final class CursorQueryUtils {
 
-    private static final Set<String> CURSOR_QUERY_CURSOR_FILED_NAMES = Set.of("prevCursor", "nextCursor", "orderTypes");
+    /**
+     * 忽略签名的字段名称
+     */
+    private static final Set<String> CURSOR_QUERY_IGNORE_SIGN_FILED_NAMES = Set.of("prevCursor", "nextCursor", "orderTypes", "queryType");
 
     private static final int FIRST_PAGE_NUM = 1;
 
@@ -125,7 +128,7 @@ final class CursorQueryUtils {
     private static String genCursorSha256(AbstractCursorQuery<?> query, String text) {
         Field[] fields = WindReflectUtils.getFields(query.getClass());
         String queryString = Arrays.stream(fields)
-                .filter(field -> !CURSOR_QUERY_CURSOR_FILED_NAMES.contains(field.getName()))
+                .filter(field -> !CURSOR_QUERY_IGNORE_SIGN_FILED_NAMES.contains(field.getName()))
                 .sorted(Comparator.comparing(Field::getName))
                 .map(field -> {
                     Object value = WindReflectUtils.getFieldValue(field, query);

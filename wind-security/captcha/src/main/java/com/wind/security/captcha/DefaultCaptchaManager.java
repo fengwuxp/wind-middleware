@@ -57,6 +57,9 @@ public record DefaultCaptchaManager(Collection<CaptchaContentGenerator> delegate
      */
     @Override
     public Captcha generate(Captcha.CaptchaType type, Captcha.CaptchaUseScene useScene, String owner) {
+        AssertUtils.notNull(type, "argument type must not empty");
+        AssertUtils.notNull(useScene, "argument useScene must not empty");
+        AssertUtils.hasText(owner, "argument owner must not empty");
         // 检查是否允许生成验证码
         String realOwner = owner.trim();
         if (ALLOW_USE_PREVIOUS_CAPTCHA_TYPES.contains(type)) {
@@ -95,6 +98,10 @@ public record DefaultCaptchaManager(Collection<CaptchaContentGenerator> delegate
      */
     @Override
     public void verify(String expected, Captcha.CaptchaType type, Captcha.CaptchaUseScene useScene, String owner) {
+        AssertUtils.hasText(expected, "argument expected must not empty");
+        AssertUtils.notNull(type, "argument type must not empty");
+        AssertUtils.notNull(useScene, "argument useScene must not empty");
+        AssertUtils.hasText(owner, "argument owner must not empty");
         String realOwner = owner.trim();
         Captcha captcha = captchaStorage.get(type, useScene, realOwner);
         AssertUtils.notNull(captcha, CaptchaI18nMessageKeys.getCaptchaNotExistOrExpired(type));

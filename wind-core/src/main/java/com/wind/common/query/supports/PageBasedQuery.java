@@ -14,14 +14,6 @@ import jakarta.validation.constraints.NotNull;
 public interface PageBasedQuery<OrderField> extends WindQuery<OrderField> {
 
     /**
-     * @return 查询类型
-     */
-    @NotNull
-    QueryType getQueryType();
-
-    void setQueryType(@NotNull QueryType queryType);
-
-    /**
      * @return 查询页码
      */
     @NotNull

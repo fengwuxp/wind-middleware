@@ -16,6 +16,8 @@ import java.util.Set;
 import static com.wind.common.query.cursor.CursorQueryUtils.CURSOR_FILED_NAME;
 
 /**
+ * 抽象的游标查询对象
+ *
  * @author wuxp
  * @date 2025-09-30 13:12
  **/

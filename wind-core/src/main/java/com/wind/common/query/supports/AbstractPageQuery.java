@@ -2,15 +2,15 @@ package com.wind.common.query.supports;
 
 
 import com.wind.common.exception.AssertUtils;
+import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 import org.springframework.lang.NonNull;
 
-import jakarta.validation.constraints.NotNull;
 import java.beans.Transient;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
- * 分页查询对象
+ * 抽象的分页查询对象
  *
  * @author wxup
  */

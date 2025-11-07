@@ -3,10 +3,11 @@ package com.wind.elasticjob.job;
 import com.alibaba.fastjson2.JSON;
 import com.alibaba.fastjson2.TypeReference;
 import com.wind.common.exception.AssertUtils;
+import jakarta.annotation.Nullable;
+import jakarta.validation.constraints.Null;
 import org.apache.shardingsphere.elasticjob.api.ShardingContext;
 import org.springframework.util.StringUtils;
 
-import jakarta.validation.constraints.Null;
 import java.util.Map;
 
 /**
@@ -15,13 +16,10 @@ import java.util.Map;
  * @author wuxp
  * @date 2025-05-23 13:46
  **/
-public class WindElasticShardingContext {
+public record WindElasticShardingContext(ShardingContext context) {
 
-    private final ShardingContext context;
-
-    public WindElasticShardingContext(ShardingContext context) {
+    public WindElasticShardingContext {
         AssertUtils.notNull(context, "argument sharding context must not null");
-        this.context = context;
     }
 
     public String getJobName() {
@@ -48,11 +46,13 @@ public class WindElasticShardingContext {
         return context.getShardingParameter();
     }
 
+    @Nullable
     public <T> T asJobParameter(Class<T> clazz) {
         return asJobParameter(clazz, null);
     }
 
     @SuppressWarnings("unchecked")
+    @Nullable
     public <T> T getJobParameterVariable(String variableName) {
         if (context.getJobParameter() == null) {
             return null;
@@ -63,6 +63,7 @@ public class WindElasticShardingContext {
     }
 
     @SuppressWarnings("unchecked")
+    @Nullable
     public <T> T getJobShardingParameterVariable(String variableName) {
         if (context.getShardingParameter() == null) {
             return null;
@@ -79,7 +80,7 @@ public class WindElasticShardingContext {
      * @param defaultValue 默认值
      * @return 参数实例
      */
-    @Null
+    @Nullable
     public <T> T asJobParameter(Class<T> clazz, @Null T defaultValue) {
         if (StringUtils.hasText(context.getJobParameter())) {
             return JSON.parseObject(context.getJobParameter(), clazz);
@@ -87,7 +88,7 @@ public class WindElasticShardingContext {
         return defaultValue;
     }
 
-    @Null
+    @Nullable
     public <T> T asJobShardingParameter(Class<T> clazz) {
         return asJobShardingParameter(clazz, null);
     }
@@ -99,7 +100,7 @@ public class WindElasticShardingContext {
      * @param defaultValue 默认值
      * @return 参数实例
      */
-    @Null
+    @Nullable
     public <T> T asJobShardingParameter(Class<T> clazz, T defaultValue) {
         if (StringUtils.hasText(context.getShardingParameter())) {
             return JSON.parseObject(context.getShardingParameter(), clazz);

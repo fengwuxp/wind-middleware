@@ -19,7 +19,7 @@ import java.nio.file.Path;
 
 /**
  * 文件 MimeType 检测工具类
- * 参见：https://zh.wikipedia.org/zh-cn/%E4%BA%92%E8%81%94%E7%BD%91%E5%AA%92%E4%BD%93%E7%B1%BB%E5%9E%8B?utm_source=chatgpt.com
+ * 参见：<a href="https://zh.wikipedia.org/zh-cn/%E4%BA%92%E8%81%94%E7%BD%91%E5%AA%92%E4%BD%93%E7%B1%BB%E5%9E%8B?utm_source=chatgpt.com">互联网媒体类型</a>
  *
  * @author wuxp
  * @date 2025-10-22 13:51

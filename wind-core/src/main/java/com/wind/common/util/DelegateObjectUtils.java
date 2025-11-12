@@ -1,10 +1,10 @@
 package com.wind.common.util;
 
 import com.wind.common.exception.AssertUtils;
+import jakarta.validation.constraints.NotNull;
 import org.springframework.lang.Nullable;
 import org.springframework.util.ReflectionUtils;
 
-import jakarta.validation.constraints.NotNull;
 import java.lang.reflect.Method;
 
 /**
@@ -47,7 +47,7 @@ public final class DelegateObjectUtils {
     @NotNull
     public static <T> T requireDelegate(Object delegator, String getDelegateMethodName, Class<T> targetClass) {
         T result = findDelegate(delegator, getDelegateMethodName, targetClass);
-        AssertUtils.notNull(result, "not found targetClass = " + targetClass.getName() + " delegate object");
+        AssertUtils.notNull(result, () -> "not found targetClass = " + targetClass.getName() + " delegate object");
         return result;
     }
 
@@ -81,8 +81,7 @@ public final class DelegateObjectUtils {
             return (T) delegator;
         }
         Method getMethod = ReflectionUtils.findMethod(delegator.getClass(), getDelegateMethodName);
-        AssertUtils.notNull(getMethod,
-                "not found getDelegateMethodName = " + getDelegateMethodName + ", delegator class = " + delegator.getClass().getName());
+        AssertUtils.notNull(getMethod, () -> "not found getDelegateMethodName = " + getDelegateMethodName + ", delegator class = " + delegator.getClass().getName());
         return findDelegate(ReflectionUtils.invokeMethod(getMethod, delegator), getDelegateMethodName, targetClass);
     }
 }

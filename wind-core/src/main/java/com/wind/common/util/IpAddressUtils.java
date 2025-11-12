@@ -16,133 +16,90 @@ import java.util.Enumeration;
 import java.util.function.Predicate;
 
 /**
- * 获取 http 请求的 来源 ip ip 地址
+ * IP地址工具类，用于获取HTTP请求的来源IP地址
  *
  * @author wxup
  */
 @Slf4j
 public final class IpAddressUtils {
 
-    // ip 缓存
-    private static final String HOST_IP_V4 = IpAddressUtils.getLocalIpv4();
+    private static final String HOST_IP_V4 = getLocalIpv4();
+    private static final String HOST_IP_V6 = getLocalIpv6();
 
-    private static final String HOST_IP_V6 = IpAddressUtils.getLocalIpv6();
+    // IPv4地址段数
+    private static final int IPV4_SECTION_COUNT = 4;
+    // IPv6最小段数（含IPv4内嵌表示法）
+    private static final int IPV6_MIN_SECTION_COUNT = 7;
+    // IPv6标准段数
+    private static final int IPV6_STANDARD_SECTION_COUNT = 8;
+
+    // 双冒号压缩表示
+    private static final String DOUBLE_COLON = "::";
 
     private IpAddressUtils() {
-        throw new AssertionError();
+        throw new AssertionError("Utility class should not be instantiated");
     }
 
-
     /**
-     * 是否为一个有效的 ip 地址
+     * 检查是否为有效的IP地址
      *
-     * @param ip ip 地址
-     * @return if <code>true</code> 是
+     * @param ip IP地址
+     * @return 如果是有效IP地址返回true
      */
     public static boolean isValidIp(String ip) {
         return isIpV4(ip) || isIpV6(ip);
     }
 
     /**
-     * IPv6的地址长度为128位，是IPv4地址长度的4倍。于是IPv4点分十进制格式不再适用，采用十六进制表示。IPv6有3种表示方法。
-     * 一、冒分十六进制表示法
-     * 　　格式为X:X:X:X:X:X:X:X，其中每个X表示地址中的16b，以十六进制表示，例如：
-     * 　　ABCD:EF01:2345:6789:ABCD:EF01:2345:6789
-     * 　　这种表示法中，每个X的前导0是可以省略的，例如：
-     * 　　2001:0DB8:0000:0023:0008:0800:200C:417A→ 2001:DB8:0:23:8:800:200C:417A
-     * 二、0位压缩表示法
-     * 　　在某些情况下，一个IPv6地址中间可能包含很长的一段0，可以把连续的一段0压缩为“::”。但为保证地址解析的唯一性，地址中”::”只能出现一次，例如：
-     * 　　FF01:0:0:0:0:0:0:1101 → FF01::1101
-     * 　　0:0:0:0:0:0:0:1 → ::1
-     * 　　0:0:0:0:0:0:0:0 → ::
-     * 三、内嵌IPv4地址表示法
-     * 　　为了实现IPv4-IPv6互通，IPv4地址会嵌入IPv6地址中，此时地址常表示为：X:X:X:X:X:X:d.d.d.d，前96b采用冒分十六进制表示，而最后32b地址则使用IPv4的点分十进制表示，例如::192.168.0.1与::FFFF:192.168.0
-     * .1就是两个典型的例子，注意在前96b中，压缩0位的方法依旧适用
+     * IPv6地址验证
      * <p>
-     * {@link java.net.InterfaceAddress#getAddress()}
+     * IPv6的地址长度为128位，是IPv4地址长度的4倍。有3种表示方法：
+     * 1. 冒分十六进制表示法：X:X:X:X:X:X:X:X
+     * 2. 0位压缩表示法：将连续的0压缩为"::"（只能出现一次）
+     * 3. 内嵌IPv4地址表示法：X:X:X:X:X:X:d.d.d.d
      *
-     * @param ip ip地址
-     * @return 是否ipv6地址
+     * @param ip IP地址
+     * @return 如果是IPv6地址返回true
      */
     public static boolean isIpV6(String ip) {
-        if (ip == null || !ip.contains(":")) {
+        if (ip == null || ip.isEmpty()) {
             return false;
         }
-
-        //0:0:0:0:0:0:0:0 → ::
-        if ("::".equals(ip)) {
-            return true;
-        }
-
-        // 0 位压缩表示法
-        if (ip.contains("::")) {
-            String[] sections = ip.split(":");
-            for (String section : sections) {
-                try {
-                    if (section.isEmpty() || section.contains(".") && isIpV4(section)) {
-                        continue;
-                    }
-
-                    if (Integer.parseInt(section, 16) < 0) {
-                        return false;
-                    }
-
-                } catch (Exception e) {
-                    return false;
-                }
-            }
-            return true;
-        }
-
-        /**
-         *   三、内嵌IPv4地址表示法
-         *         为了实现IPv4 - IPv6互通，IPv4地址会嵌入IPv6地址中，此时地址常表示为：X:
-         *         X:
-         *         X:
-         *         X:
-         *         X:
-         *         X:
-         *         d.d.d.d，前96b采用冒分十六进制表示，而最后32b地址则使用IPv4的点分十进制表示，例如:: 192.168 .0 .1 与::FFFF:192.168 .0 .1 就是两个典型的例子，注意在前96b中，
-         *         压缩0位的方法依旧适用 '
-         */
-        String[] sections = ip.split(":");
-        boolean hasIpV4 = ip.contains(".");
-        if ((hasIpV4 && sections.length != 7)
-                || sections.length != 8) {
+        // 快速检查是否包含冒号
+        if (!ip.contains(WindConstants.COLON)) {
             return false;
         }
-
-        for (String section : sections) {
-            try {
-                if (section.contains(".") && isIpV4(section)) {
-                    continue;
-                }
-                if (Integer.parseInt(section, 16) < 0) {
-                    return false;
-                }
-            } catch (Exception e) {
-                return false;
-            }
+        // 特殊地址：全0地址
+        if (DOUBLE_COLON.equals(ip)) {
+            return true;
         }
-        return true;
+        // 检查0位压缩表示法
+        if (ip.contains(DOUBLE_COLON)) {
+            return validateZeroCompressedIpV6(ip);
+        }
+
+        // 检查标准IPv6或内嵌IPv4的IPv6
+        return validateStandardOrEmbeddedIpV6(ip);
     }
 
-
+    /**
+     * IPv4地址验证
+     *
+     * @param ip IP地址
+     * @return 如果是IPv4地址返回true
+     */
     public static boolean isIpV4(String ip) {
-        if (ip == null || !ip.contains(".")) {
+        if (ip == null || ip.isEmpty()) {
             return false;
         }
 
-        String[] sections = ip.split("\\.");
-        if (sections.length != 4) {
+        String[] sections = ip.split("\\.", -1); // 使用-1保留尾部的空字符串
+        if (sections.length != IPV4_SECTION_COUNT) {
             return false;
         }
+
         for (String section : sections) {
-            try {
-                if (Integer.parseInt(section) < 0) {
-                    return false;
-                }
-            } catch (Exception e) {
+            if (!isValidIpV4Section(section)) {
                 return false;
             }
         }
@@ -150,48 +107,49 @@ public final class IpAddressUtils {
     }
 
     /**
-     * 直接根据第一个网卡地址作为其内网 ipv4 地址，避免返回 127.0.0.1
+     * 获取本机IPv4地址
+     * 直接根据第一个非回环网卡地址作为内网IPv4地址，避免返回127.0.0.1
      *
-     * @return 本机 host
+     * @return 本机IPv4地址，获取失败返回未知地址
      */
     public static String getLocalIpv4() {
         InetAddress address = findFirstNonLoopbackAddress(Inet4Address.class::isInstance);
-        return address == null ? WindConstants.UNKNOWN : address.getHostAddress();
+        return address != null ? address.getHostAddress() : WindConstants.UNKNOWN;
     }
 
     /**
-     * 直接根据第一个网卡地址作为其内网 ipv6 地址
+     * 获取本机IPv6地址
      *
-     * @return 本机 host
+     * @return 本机IPv6地址，获取失败返回未知地址
      */
     public static String getLocalIpv6() {
         InetAddress address = findFirstNonLoopbackAddress(Inet6Address.class::isInstance);
-        return address == null ? WindConstants.UNKNOWN : address.getHostAddress();
+        return address != null ? address.getHostAddress() : WindConstants.UNKNOWN;
     }
 
     /**
-     * 从缓存中获取 本机 ip 地址
+     * 从缓存中获取本机IPv4地址
      *
-     * @return 本机 host
+     * @return 本机IPv4地址
      */
     public static String getLocalIpv4WithCache() {
         return HOST_IP_V4;
     }
 
     /**
-     * 从缓存中获取 本机 ip 地址
+     * 从缓存中获取本机IPv6地址
      *
-     * @return 本机 host
+     * @return 本机IPv6地址
      */
     public static String getLocalIpv6WithCache() {
         return HOST_IP_V6;
     }
 
     /**
-     * 获取本机第一个非回环地址
+     * 查找第一个非回环网络地址
      *
-     * @param predicate 判断地址是否为所需的
-     * @return 本机 host
+     * @param predicate 地址类型判断条件
+     * @return 符合条件的网络地址，未找到返回null
      */
     @Nullable
     private static InetAddress findFirstNonLoopbackAddress(Predicate<InetAddress> predicate) {
@@ -214,4 +172,77 @@ public final class IpAddressUtils {
         }
         return null;
     }
+
+    /**
+     * 验证IPv4地址段是否为有效的十进制数
+     */
+    private static boolean isValidIpV4Section(String section) {
+        try {
+            int value = Integer.parseInt(section);
+            return value >= 0 && value <= 255;
+        } catch (NumberFormatException ignore) {
+            return false;
+        }
+    }
+
+    /**
+     * 验证0位压缩的IPv6地址
+     */
+    private static boolean validateZeroCompressedIpV6(String ip) {
+        // 检查是否包含多个双冒号
+        if (ip.indexOf(DOUBLE_COLON) != ip.lastIndexOf(DOUBLE_COLON)) {
+            return false;
+        }
+        // 使用 -1 保留尾部的空字符串
+        String[] sections = ip.split(WindConstants.COLON, -1);
+        for (String section : sections) {
+            if (section.isEmpty() || (section.contains(WindConstants.DOT) && isIpV4(section))) {
+                continue;
+            }
+            if (!isValidHexSection(section)) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    /**
+     * 验证标准IPv6或内嵌IPv4的IPv6地址
+     */
+    private static boolean validateStandardOrEmbeddedIpV6(String ip) {
+        String[] sections = ip.split(WindConstants.COLON);
+        boolean hasEmbeddedIpV4 = ip.contains(WindConstants.DOT);
+        // 检查段数是否合法
+        if ((hasEmbeddedIpV4 && sections.length != IPV6_MIN_SECTION_COUNT) || (!hasEmbeddedIpV4 && sections.length != IPV6_STANDARD_SECTION_COUNT)) {
+            return false;
+        }
+
+        for (String section : sections) {
+            if (section.contains(WindConstants.DOT) && isIpV4(section)) {
+                continue;
+            }
+            if (!isValidHexSection(section)) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    /**
+     * 验证IPv6地址段是否为有效的十六进制数
+     */
+    private static boolean isValidHexSection(String section) {
+        if (section.isEmpty()) {
+            // 允许空段（在压缩表示中）
+            return true;
+        }
+        try {
+            // 检查是否为有效的 16 进制数且在 0 ~ FFFF 范围内
+            int value = Integer.parseInt(section, 16);
+            return value >= 0 && value <= 0xFFFF;
+        } catch (NumberFormatException ignore) {
+            return false;
+        }
+    }
+
 }

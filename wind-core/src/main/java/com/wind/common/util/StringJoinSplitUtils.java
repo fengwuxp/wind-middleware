@@ -8,6 +8,7 @@ import org.springframework.util.StringUtils;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.Function;
@@ -54,17 +55,17 @@ public final class StringJoinSplitUtils {
         if (enums == null) {
             return null;
         }
-        return join(enums.stream().map(Enum::name).collect(Collectors.toList()));
+        return join(enums.stream().map(Enum::name).toList());
     }
 
     @NonNull
     public static String joinEnums(@NonNull Enum<?>... enums) {
-        return join(Arrays.asList(enums));
+        return join(List.of(enums));
     }
 
     @NonNull
     public static String join(@NonNull Object... objects) {
-        return join(Arrays.asList(objects));
+        return join(List.of(objects));
     }
 
     @Nullable

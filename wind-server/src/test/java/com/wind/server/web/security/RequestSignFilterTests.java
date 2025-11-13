@@ -37,7 +37,7 @@ class RequestSignFilterTests {
     @BeforeEach
     void setup() {
         System.setProperty(WindConstants.SPRING_PROFILES_ACTIVE, WindConstants.DEV);
-        signFilter = new RequestSignFilter((accessId, secretVersion) -> secretAccount, Collections.emptyList(), true);
+        signFilter = new RequestSignFilter((accessId, secretVersion) -> secretAccount, Collections.emptyList());
     }
 
     @Test

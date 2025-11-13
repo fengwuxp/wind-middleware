@@ -38,13 +38,14 @@ import java.util.function.BiFunction;
  * 接口请求验签
  * 参见：https://www.yuque.com/suiyuerufeng-akjad/wind/zl1ygpq3pitl00qp
  *
- * @param ignoreRequestMatchers 忽略接口验签的请求匹配器
- * @param enable                是否启用
+ * @param headerNames              请求头名称配置
+ * @param apiSecretAccountProvider 获取访问标识和秘钥版本号的提供者
+ * @param ignoreRequestMatchers    忽略接口验签的请求匹配器
  * @author wuxp
  */
 @Slf4j
-public record RequestSignFilter(SignatureHttpHeaderNames headerNames, ApiSecretAccountProvider apiSecretAccountProvider, Collection<RequestMatcher> ignoreRequestMatchers,
-                                boolean enable) implements Filter, Ordered {
+public record RequestSignFilter(SignatureHttpHeaderNames headerNames, ApiSecretAccountProvider apiSecretAccountProvider,
+                                Collection<RequestMatcher> ignoreRequestMatchers) implements Filter, Ordered {
 
     /**
      * 签名时间戳 5 分钟内有效
@@ -53,20 +54,23 @@ public record RequestSignFilter(SignatureHttpHeaderNames headerNames, ApiSecretA
 
     private static final String SIGAN_VERIFY_ERROR_MESSAGE = "sign verify error";
 
-    public RequestSignFilter(ApiSecretAccountProvider accountProvider, Collection<RequestMatcher> ignoreRequestMatchers, boolean enable) {
-        this(new SignatureHttpHeaderNames(), accountProvider, ignoreRequestMatchers, enable);
+    public RequestSignFilter(ApiSecretAccountProvider accountProvider, Collection<RequestMatcher> ignoreRequestMatchers) {
+        this(new SignatureHttpHeaderNames(), accountProvider, ignoreRequestMatchers);
     }
 
-    public RequestSignFilter(String headerPrefix, ApiSecretAccountProvider accountProvider, Collection<RequestMatcher> ignoreRequestMatchers,
-                             boolean enable) {
-        this(new SignatureHttpHeaderNames(headerPrefix), accountProvider, ignoreRequestMatchers, enable);
+    public RequestSignFilter(String headerPrefix, ApiSecretAccountProvider accountProvider, Collection<RequestMatcher> ignoreRequestMatchers) {
+        this(new SignatureHttpHeaderNames(headerPrefix), accountProvider, ignoreRequestMatchers);
+    }
+
+    @Deprecated
+    public RequestSignFilter(String headerPrefix, ApiSecretAccountProvider accountProvider, Collection<RequestMatcher> ignoreRequestMatchers, boolean enable) {
+        this(new SignatureHttpHeaderNames(headerPrefix), accountProvider, ignoreRequestMatchers);
     }
 
     @Override
     public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse, FilterChain chain) throws IOException, ServletException {
         HttpServletRequest request = (HttpServletRequest) servletRequest;
-        if (!enable || ignoreCheckSignature(request)) {
-            log.debug("request no signature required, enable = {}", false);
+        if (ignoreApiSignature(request)) {
             chain.doFilter(servletRequest, servletResponse);
             return;
         }
@@ -117,7 +121,7 @@ public record RequestSignFilter(SignatureHttpHeaderNames headerNames, ApiSecretA
         HttpResponseMessageUtils.writeJson(response, RestfulApiRespFactory.badRequest(SpringI18nMessageUtils.getMessage(message)));
     }
 
-    private boolean ignoreCheckSignature(HttpServletRequest request) {
+    private boolean ignoreApiSignature(HttpServletRequest request) {
         if (HttpMethod.OPTIONS.matches(request.getMethod())) {
             // 跳过预检查请求
             return true;

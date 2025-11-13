@@ -375,16 +375,16 @@ public final class ExecutorServiceUtils {
         }
 
         private <T> Callable<T> wrap(Callable<T> original) {
+            final AtomicReference<T> resultRef = new AtomicReference<>();
+            Runnable runnable = taskDecorator.decorate(() -> {
+                try {
+                    resultRef.set(original.call());
+                } catch (Exception ex) {
+                    throw new BaseException(DefaultExceptionCode.COMMON_ERROR, "trace wrap execute task exception", ex);
+                }
+            });
             return () -> {
-                final AtomicReference<T> resultRef = new AtomicReference<>();
-                Runnable decorated = taskDecorator.decorate(() -> {
-                    try {
-                        resultRef.set(original.call());
-                    } catch (Exception ex) {
-                        throw new BaseException(DefaultExceptionCode.COMMON_ERROR, "trace wrap execute task exception", ex);
-                    }
-                });
-                decorated.run();
+                runnable.run();
                 return resultRef.get();
             };
         }

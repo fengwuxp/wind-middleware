@@ -1,8 +1,6 @@
 package com.wind.common.limit;
 
-import com.wind.common.WindConstants;
 
-import jakarta.validation.constraints.Null;
 import java.time.Duration;
 
 /**
@@ -14,29 +12,21 @@ import java.time.Duration;
 @FunctionalInterface
 public interface WindExecutionLimiter {
 
+    /**
+     * Acquires a permit from this if it can be acquired immediately without delay.
+     *
+     * @return {@code true} if the permit was acquired, {@code false} otherwise
+     */
     default boolean tryAcquire() {
-        return tryAcquire(WindConstants.UNKNOWN);
-    }
-
-    default boolean tryAcquire(Duration maxWait) {
-        return tryAcquire(WindConstants.UNKNOWN, maxWait);
-    }
-
-    default boolean tryAcquire(String resourceKey) {
-        return tryAcquire(resourceKey, new Object[0]);
-    }
-
-    default boolean tryAcquire(String resourceKey, Object... args) {
-        return tryAcquire(resourceKey, null, args);
+        return tryAcquire(Duration.ZERO);
     }
 
     /**
      * Acquires a permit from this if it can be acquired immediately without delay.
      *
-     * @param resourceKey 资源标识
-     * @param maxWait     最大等待时长，为空表示不等待
-     * @param args        参与限流参数
+     * @param maxWait 最大等待时长，为空表示不等待
      * @return {@code true} if the permit was acquired, {@code false} otherwise
      */
-    boolean tryAcquire(String resourceKey, @Null Duration maxWait, Object... args);
+    boolean tryAcquire(Duration maxWait);
+
 }

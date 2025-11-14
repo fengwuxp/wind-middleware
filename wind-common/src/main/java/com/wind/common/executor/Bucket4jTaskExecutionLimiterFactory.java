@@ -8,6 +8,7 @@ import com.wind.common.limit.WindExecutionLimiter;
 import io.github.bucket4j.Bandwidth;
 import io.github.bucket4j.Bucket;
 import lombok.extern.slf4j.Slf4j;
+import org.jetbrains.annotations.NotNull;
 
 import java.time.Duration;
 import java.util.concurrent.atomic.AtomicReference;
@@ -26,14 +27,17 @@ public final class Bucket4jTaskExecutionLimiterFactory {
      * 本地限流缓存器
      *
      * @key 需要限流的资源名称
-     * @value 限流器
+     * @value {@link Bucket}
      */
-    private static final Cache<@org.jetbrains.annotations.NotNull String, Bucket> BUCKET_CACHES = Caffeine.newBuilder()
-            .expireAfterAccess(Duration.ofMinutes(3))
+    private static final Cache<@NotNull String, Bucket> BUCKET_CACHES = Caffeine.newBuilder()
+            .expireAfterAccess(Duration.ofMinutes(5))
             .maximumSize(256)
             .build();
 
-    static final AtomicReference<BiFunction<String, Bandwidth, Bucket>> BUCKET_FACTORY = new AtomicReference<>((resourceKey, limit) ->
+    /**
+     * Bucket 工厂
+     */
+    private static final AtomicReference<BiFunction<String, Bandwidth, Bucket>> BUCKET_FACTORY = new AtomicReference<>((resourceKey, limit) ->
             BUCKET_CACHES.get(resourceKey, k -> Bucket.builder().addLimit(limit).build()));
 
     private Bucket4jTaskExecutionLimiterFactory() {
@@ -151,16 +155,15 @@ public final class Bucket4jTaskExecutionLimiterFactory {
 
     private static WindExecutionLimiter factory(String resourceKey, Bandwidth limit) {
         Bucket bucket = BUCKET_FACTORY.get().apply(resourceKey, limit);
-        return maxWait -> {
+        return (permits, maxWait) -> {
             if (maxWait == null || maxWait.isZero()) {
-                return bucket.tryConsume(1);
-            } else {
-                try {
-                    return bucket.asBlocking().tryConsume(1, maxWait);
-                } catch (InterruptedException exception) {
-                    Thread.currentThread().interrupt();
-                    throw new BaseException(DefaultExceptionCode.COMMON_ERROR, "limit rate task is interrupted, resourceK key = " + resourceKey, exception);
-                }
+                return bucket.tryConsume(permits);
+            }
+            try {
+                return bucket.asBlocking().tryConsume(permits, maxWait);
+            } catch (InterruptedException exception) {
+                Thread.currentThread().interrupt();
+                throw new BaseException(DefaultExceptionCode.COMMON_ERROR, "limit rate task is interrupted, resourceK key = " + resourceKey, exception);
             }
         };
     }

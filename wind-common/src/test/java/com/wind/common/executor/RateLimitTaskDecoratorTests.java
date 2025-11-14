@@ -4,6 +4,7 @@ import com.wind.common.exception.BaseException;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
+import org.springframework.core.task.TaskDecorator;
 
 import java.time.Duration;
 
@@ -17,13 +18,13 @@ class RateLimitTaskDecoratorTests {
 
 
     @BeforeAll
-    static void after() {
+    static void before() {
         RateLimitTaskDecorator.setThrowExceptionWithLimit(true);
     }
 
     @Test
     void testToken1Qps() {
-        RateLimitTaskDecorator decorator = RateLimitTaskDecorator.token("test.token", 1, 1);
+        TaskDecorator decorator = RateLimitTaskDecorator.token("test.token", 1, 1);
         for (int i = 0; i < 5; i++) {
             Runnable runnable = decorator.decorate(() -> System.out.println("执行任务"));
             if (i > 0) {
@@ -37,7 +38,7 @@ class RateLimitTaskDecoratorTests {
 
     @Test
     void testLeaky1Qps() {
-        RateLimitTaskDecorator decorator = RateLimitTaskDecorator.leaky("test.leaky", 1, Duration.ofMillis(1));
+        TaskDecorator decorator = RateLimitTaskDecorator.leaky("test.leaky", 1, Duration.ofMillis(1));
         for (int i = 0; i < 5; i++) {
             Runnable runnable = decorator.decorate(() -> System.out.println("执行任务"));
             if (i > 0) {

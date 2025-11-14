@@ -14,17 +14,17 @@ import static org.awaitility.Awaitility.await;
  * @author wuxp
  * @date 2025-11-14 09:22
  **/
-class RateLimitTaskDecoratorTests {
+class RateLimiterTaskDecoratorTests {
 
 
     @BeforeAll
     static void before() {
-        RateLimitTaskDecorator.setThrowExceptionWithLimit(true);
+        RateLimiterTaskDecorator.setThrowExceptionWithLimit(true);
     }
 
     @Test
     void testToken1Qps() {
-        TaskDecorator decorator = RateLimitTaskDecorator.token("test.token", 1, 1);
+        TaskDecorator decorator = RateLimiterTaskDecorator.token("test.token", 1, 1);
         for (int i = 0; i < 5; i++) {
             Runnable runnable = decorator.decorate(() -> System.out.println("执行任务"));
             if (i > 0) {
@@ -38,7 +38,7 @@ class RateLimitTaskDecoratorTests {
 
     @Test
     void testLeaky1Qps() {
-        TaskDecorator decorator = RateLimitTaskDecorator.leaky("test.leaky", 1, Duration.ofMillis(1));
+        TaskDecorator decorator = RateLimiterTaskDecorator.leaky("test.leaky", 1, Duration.ofMillis(1));
         for (int i = 0; i < 5; i++) {
             Runnable runnable = decorator.decorate(() -> System.out.println("执行任务"));
             if (i > 0) {

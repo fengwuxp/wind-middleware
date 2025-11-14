@@ -17,7 +17,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
  * @date 2025-06-10 09:48
  **/
 @Slf4j
-public record RateLimitTaskDecorator(String resourceKey, WindExecutionLimiter limiter, Duration maxWait) implements TaskDecorator {
+public record RateLimiterTaskDecorator(String resourceKey, WindExecutionLimiter limiter, Duration maxWait) implements TaskDecorator {
 
     /**
      * 是否抛出限流异常
@@ -33,11 +33,11 @@ public record RateLimitTaskDecorator(String resourceKey, WindExecutionLimiter li
      * @param maxWait        最大等待时间
      * @return 限流任务装饰器
      */
-    public static RateLimitTaskDecorator leaky(String resourceKey, int tokenPerSecond, Duration maxWait) {
-        return new RateLimitTaskDecorator(resourceKey, Bucket4jTaskExecutionLimiterFactory.leakyBucketWithSeconds(resourceKey, tokenPerSecond), maxWait);
+    public static RateLimiterTaskDecorator leaky(String resourceKey, int tokenPerSecond, Duration maxWait) {
+        return new RateLimiterTaskDecorator(resourceKey, Bucket4jTaskExecutionLimiterFactory.leakyBucketWithSeconds(resourceKey, tokenPerSecond), maxWait);
     }
 
-    public static RateLimitTaskDecorator leaky(String taskName, int tokenPerSecond) {
+    public static RateLimiterTaskDecorator leaky(String taskName, int tokenPerSecond) {
         return leaky(taskName, tokenPerSecond, Duration.ofMillis(500));
     }
 
@@ -50,11 +50,11 @@ public record RateLimitTaskDecorator(String resourceKey, WindExecutionLimiter li
      * @param maxWait        最大等待时间
      * @return 限流任务装饰器
      */
-    public static RateLimitTaskDecorator token(String resourceKey, int capacity, int tokenPerSecond, Duration maxWait) {
-        return new RateLimitTaskDecorator(resourceKey, Bucket4jTaskExecutionLimiterFactory.tokenBucket(resourceKey, capacity, tokenPerSecond), maxWait);
+    public static RateLimiterTaskDecorator token(String resourceKey, int capacity, int tokenPerSecond, Duration maxWait) {
+        return new RateLimiterTaskDecorator(resourceKey, Bucket4jTaskExecutionLimiterFactory.tokenBucket(resourceKey, capacity, tokenPerSecond), maxWait);
     }
 
-    public static RateLimitTaskDecorator token(String taskName, int capacity, int tokenPerSecond) {
+    public static RateLimiterTaskDecorator token(String taskName, int capacity, int tokenPerSecond) {
         return token(taskName, capacity, tokenPerSecond, Duration.ofMillis(500));
     }
 

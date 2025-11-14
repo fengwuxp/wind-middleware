@@ -22,7 +22,7 @@ import java.util.concurrent.atomic.AtomicInteger;
  * @author wuxp
  * @date 2025-11-14 11:12
  **/
-class ConcurrentTaskDecoratorTests {
+class ConcurrencyLimiterTaskDecoratorTests {
 
     private final int maxConcurrent = 2;
 
@@ -30,7 +30,7 @@ class ConcurrentTaskDecoratorTests {
 
     @BeforeAll
     static void before() {
-        RateLimitTaskDecorator.setThrowExceptionWithLimit(true);
+        RateLimiterTaskDecorator.setThrowExceptionWithLimit(true);
     }
 
     @BeforeEach
@@ -47,7 +47,7 @@ class ConcurrentTaskDecoratorTests {
     void testWithConcurrencyTaskBasic() throws Exception {
         String resourceKey = randomResourceKey();
         Duration maxWait = Duration.ofMillis(10);
-        TaskDecorator decorator = ConcurrentTaskDecorator.withConcurrency(resourceKey, maxWait, maxConcurrent);
+        TaskDecorator decorator = ConcurrencyLimiterTaskDecorator.withConcurrency(resourceKey, maxWait, maxConcurrent);
         Runnable task = decorator.decorate(() -> {
             try {
                 // 模拟任务执行
@@ -82,7 +82,7 @@ class ConcurrentTaskDecoratorTests {
     void testWithConcurrencyTaskMultipleThreads() throws Exception {
         String resourceKey = randomResourceKey();
         Duration maxWait = Duration.ofMillis(10);
-        TaskDecorator decorator = ConcurrentTaskDecorator.withConcurrency(resourceKey, maxWait, maxConcurrent);
+        TaskDecorator decorator = ConcurrencyLimiterTaskDecorator.withConcurrency(resourceKey, maxWait, maxConcurrent);
         int totalThreads = 5;
         CountDownLatch latch = new CountDownLatch(totalThreads);
         AtomicInteger successCount = new AtomicInteger(0);
@@ -118,7 +118,7 @@ class ConcurrentTaskDecoratorTests {
         String resourceKey = randomResourceKey();
         Duration maxWait = Duration.ofSeconds(1);
         int tokenPerSecond = 1;
-        TaskDecorator composite = ConcurrentTaskDecorator.concurrentWithToken(resourceKey, maxWait, maxConcurrent, tokenPerSecond);
+        TaskDecorator composite = ConcurrencyLimiterTaskDecorator.concurrentWithToken(resourceKey, maxWait, maxConcurrent, tokenPerSecond);
         AtomicInteger counter = new AtomicInteger(0);
         Runnable task = composite.decorate(() -> {
             try {
@@ -141,7 +141,7 @@ class ConcurrentTaskDecoratorTests {
         String resourceKey = randomResourceKey();
         Duration maxWait = Duration.ofMillis(10);
         int tokenPerSecond = 4;
-        TaskDecorator composite = ConcurrentTaskDecorator.concurrentWithToken(resourceKey, maxWait, maxConcurrent, tokenPerSecond);
+        TaskDecorator composite = ConcurrencyLimiterTaskDecorator.concurrentWithToken(resourceKey, maxWait, maxConcurrent, tokenPerSecond);
         AtomicInteger counter = new AtomicInteger(0);
         Runnable task = composite.decorate(() -> {
             try {
@@ -169,7 +169,7 @@ class ConcurrentTaskDecoratorTests {
         Duration maxWait = Duration.ofMillis(10);
         int tokenPerSecond = 4;
 
-        TaskDecorator composite = ConcurrentTaskDecorator.concurrentWithLeaky(resourceKey, maxWait, maxConcurrent, tokenPerSecond);
+        TaskDecorator composite = ConcurrencyLimiterTaskDecorator.concurrentWithLeaky(resourceKey, maxWait, maxConcurrent, tokenPerSecond);
         AtomicInteger counter = new AtomicInteger(0);
         Runnable task = composite.decorate(() -> {
             try {

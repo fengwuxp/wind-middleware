@@ -3,7 +3,7 @@ package com.wind.common.spring;
 import com.wind.common.exception.AssertUtils;
 import com.wind.common.spring.event.SpringTransactionEvent;
 import com.wind.common.util.ExecutorServiceUtils;
-import com.wind.trace.thread.TraceContextTask;
+import com.wind.trace.task.ContextPropagationTaskDecorator;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.transaction.support.TransactionSynchronization;
@@ -54,7 +54,7 @@ public final class SpringEventPublishUtils {
      * @param event 事件对象
      */
     public static void publishAsync(Object event) {
-        EXECUTOR.execute(TraceContextTask.of().decorate(() -> publishEvent(event)));
+        EXECUTOR.execute(ContextPropagationTaskDecorator.of().decorate(() -> publishEvent(event)));
     }
 
     /**

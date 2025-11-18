@@ -2,6 +2,7 @@ package com.wind.elasticjob.job;
 
 import com.wind.common.WindConstants;
 
+import com.wind.elasticjob.enums.ElasticJobListenerType;
 import jakarta.validation.constraints.NotNull;
 import java.util.Collections;
 import java.util.List;
@@ -65,5 +66,13 @@ public interface WindElasticJob {
      */
     default boolean isMisFire() {
         return true;
+    }
+
+    /**
+     * @return 作业监听器类型
+     */
+    @NotNull
+    default ElasticJobListenerType getElasticJobListenerType() {
+        return ElasticJobListenerType.LOG_TRACE;
     }
 }

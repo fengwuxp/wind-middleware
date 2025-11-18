@@ -1,4 +1,4 @@
-package com.wind.trace.thread;
+package com.wind.trace.task;
 
 import com.wind.common.exception.AssertUtils;
 import com.wind.trace.WindTracer;
@@ -16,16 +16,15 @@ import java.util.Map;
  * @date 2023-12-29 09:55
  **/
 @Slf4j
-@Deprecated
-public abstract class TraceContextTask implements TaskDecorator {
+public abstract class ContextPropagationTaskDecorator implements TaskDecorator {
 
     private final boolean printExceptionLog;
 
-    protected TraceContextTask(boolean printExceptionLog) {
+    protected ContextPropagationTaskDecorator(boolean printExceptionLog) {
         this.printExceptionLog = printExceptionLog;
     }
 
-    protected TraceContextTask() {
+    protected ContextPropagationTaskDecorator() {
         // 默认不输出异常日志，由任务处理者输出
         this(false);
     }
@@ -36,7 +35,7 @@ public abstract class TraceContextTask implements TaskDecorator {
         AssertUtils.notNull(task, "argument task must not null");
         // 获取当前线程的上下文
         Map<String, Object> middlewareContext = WindTracer.TRACER.getContextVariables();
-        Map<String, Object> businessContextVariables = copyContextVariables();
+        Map<String, Object> businessContext = snapshotContextVariables();
         return () -> {
             try {
                 if (log.isDebugEnabled()) {
@@ -44,7 +43,7 @@ public abstract class TraceContextTask implements TaskDecorator {
                 }
                 // 线程切换，复制上下文 ，traceId 也在 contextVariables 中
                 WindTracer.TRACER.trace(null, middlewareContext);
-                traceContextVariables(businessContextVariables);
+                restoreContextVariables(businessContext);
                 task.run();
             } catch (Throwable throwable) {
                 if (printExceptionLog) {
@@ -63,22 +62,22 @@ public abstract class TraceContextTask implements TaskDecorator {
     }
 
     /**
-     * 复制当前线程的上下文
+     * 快照当前线程的上下文
      *
      * @return 上下文变量
      */
-    protected Map<String, Object> copyContextVariables() {
+    protected Map<String, Object> snapshotContextVariables() {
         return Collections.emptyMap();
     }
 
     /**
-     * 线程切换，复制上下文 ，traceId 也在 contextVariables 中
+     * 线程切换，恢复上下文 ，traceId 也在 contextVariables 中
      *
-     * @param contextVariables 上下文
+     * @param contextVariables copy 的上下文
      */
-    protected void traceContextVariables(Map<String, Object> contextVariables) {
+    protected void restoreContextVariables(Map<String, Object> contextVariables) {
         if (log.isDebugEnabled()) {
-            log.debug("task decorate, trace contextVariables = {}", contextVariables);
+            log.debug("task decorate, restore contextVariables = {}", contextVariables);
         }
     }
 
@@ -90,7 +89,7 @@ public abstract class TraceContextTask implements TaskDecorator {
     }
 
     public static TaskDecorator of() {
-        return new TraceContextTask() {
+        return new ContextPropagationTaskDecorator() {
         };
     }
 }

@@ -3,9 +3,11 @@ package com.wind.common.util;
 import com.wind.common.exception.AssertUtils;
 import com.wind.common.exception.BaseException;
 import com.wind.common.exception.DefaultExceptionCode;
-import com.wind.trace.thread.TraceContextTask;
+import com.wind.trace.task.WindTaskDecorators;
 import jakarta.validation.constraints.NotBlank;
 import lombok.extern.slf4j.Slf4j;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.VisibleForTesting;
 import org.slf4j.MDC;
 import org.springframework.core.task.TaskDecorator;
 import org.springframework.lang.NonNull;
@@ -25,6 +27,7 @@ import java.util.concurrent.RejectedExecutionHandler;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
+import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.atomic.AtomicReference;
 
 /**
@@ -36,9 +39,12 @@ import java.util.concurrent.atomic.AtomicReference;
 @Slf4j
 public final class ExecutorServiceUtils {
 
+    @VisibleForTesting
+    static final String VIRTUAL_THREAD_MDC_KEY = "virtualThreadId";
+
     private static final int DEFAULT_WORK_QUEUE_SIZE = 256;
 
-    private static final AtomicReference<TaskDecorator> TASK_DECORATOR = new AtomicReference<>(TraceContextTask.of());
+    private static final AtomicReference<TaskDecorator> TASK_DECORATOR = new AtomicReference<>(WindTaskDecorators.CONTEXT_PROPAGATION);
 
     private ExecutorServiceUtils() {
         throw new AssertionError();
@@ -219,12 +225,12 @@ public final class ExecutorServiceUtils {
         }
 
         /**
-         * 创建线程池
+         * 创建线程池，不使用 {@link TaskDecorator} 装饰任务
          *
-         * @return 线程池 （ThreadPoolExecutor）
+         * @return 线程池
          */
-        public ExecutorService buildExecutor() {
-            ExecutorService result = createExecutor();
+        public ExecutorService nativeBuild() {
+            ExecutorService result = createRawExecutor();
             if (shutdownOnJvmExit) {
                 registerShutdownHook(threadNamePrefix, result);
             }
@@ -242,22 +248,35 @@ public final class ExecutorServiceUtils {
 
         /**
          * 创建执行任务时自动通过 {@link TaskDecorator} 装饰任务的线程池
+         * 如果 useVirtualThreads=true，会自动把 virtual-thread 的上下文 decorator 合并进去
          *
          * @param decorator 任务装饰器
          * @return 线程池
          */
-        public ExecutorService buildWithDecorator(TaskDecorator decorator) {
+        @NotNull
+        public ExecutorService buildWithDecorator(@NotNull TaskDecorator decorator) {
+            TaskDecorator finalDecorator = decorator;
             if (useVirtualThreads) {
-                // 虚拟线程
-                decorator = VirtualThreadMdcTaskDecorator.composite(threadNamePrefix, decorator);
+                // 这里把 VirtualThreadMdcTaskDecorator 放在最外层，确保 MDC/ScopedValue 在执行期间可见
+                finalDecorator = VirtualThreadMdcTaskDecorator.composite(threadNamePrefix, finalDecorator);
             }
-            return new DecoratingExecutorServiceWrapper(buildExecutor(), decorator);
+            ExecutorService result = new DecoratingExecutorServiceWrapper(createRawExecutor(), finalDecorator);
+            if (shutdownOnJvmExit) {
+                registerShutdownHook(threadNamePrefix, result);
+            }
+            return result;
         }
 
-        private ExecutorService createExecutor() {
+        /**
+         * 创建原生线程池执行器
+         *
+         * @return 线程池
+         */
+        @NotNull
+        private ExecutorService createRawExecutor() {
             if (useVirtualThreads) {
-                ExecutorService executorService = Executors.newThreadPerTaskExecutor(Thread.ofVirtual().name(threadNamePrefix, 0).factory());
-                return new DecoratingExecutorServiceWrapper(executorService, VirtualThreadMdcTaskDecorator.composite(threadNamePrefix, TASK_DECORATOR.get()));
+                // 原生虚拟线程 executor（无任何额外包装）
+                return Executors.newThreadPerTaskExecutor(Thread.ofVirtual().name(threadNamePrefix, 0).factory());
             }
             return new ThreadPoolExecutor(corePoolSize, maximumPoolSize, keepAlive.getSeconds(), TimeUnit.SECONDS, workQueue,
                     new CustomizableThreadFactory(threadNamePrefix), rejectedExecutionHandler);
@@ -390,27 +409,35 @@ public final class ExecutorServiceUtils {
         }
     }
 
-    private record VirtualThreadMdcTaskDecorator(String virtualThreadName) implements TaskDecorator {
+    private record VirtualThreadMdcTaskDecorator(String prefix) implements TaskDecorator {
 
-        private static final String VIRTUAL_THREAD_NAME = "virtualThreadName";
+        private static final AtomicLong VT_ID = new AtomicLong(1);
 
-        public static TaskDecorator composite(String virtualThreadName, TaskDecorator decorator) {
-            VirtualThreadMdcTaskDecorator virtual = new VirtualThreadMdcTaskDecorator(virtualThreadName);
-            return runnable -> virtual.decorate(decorator.decorate(runnable));
+        public static TaskDecorator of(String prefix) {
+            return new VirtualThreadMdcTaskDecorator(prefix);
+        }
+
+        /**
+         * 组合：把 virtual thread decorator 放在最外层
+         */
+        public static TaskDecorator composite(String prefix, TaskDecorator delegate) {
+            TaskDecorator decorator = VirtualThreadMdcTaskDecorator.of(prefix);
+            return runnable -> decorator.decorate(delegate.decorate(runnable));
         }
 
         @Override
-        @NonNull
+        @NotNull
         public Runnable decorate(@NonNull Runnable runnable) {
-            // 放入 MDC，线程上下文中 TODO 待优化
-            MDC.put(VIRTUAL_THREAD_NAME, virtualThreadName);
+            String id = prefix + "-" + VT_ID.getAndIncrement();
             return () -> {
+                MDC.put(VIRTUAL_THREAD_MDC_KEY, id);
                 try {
                     runnable.run();
                 } finally {
-                    MDC.remove(VIRTUAL_THREAD_NAME);
+                    MDC.remove(VIRTUAL_THREAD_MDC_KEY);
                 }
             };
         }
     }
+
 }

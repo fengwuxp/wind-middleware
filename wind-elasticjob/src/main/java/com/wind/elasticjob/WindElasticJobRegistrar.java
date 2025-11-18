@@ -75,7 +75,7 @@ public class WindElasticJobRegistrar {
                 .jobShardingStrategyType(ElasticJobShardingStrategyType.ROUND_ROBIN.name())
                 .jobErrorHandlerType(ElasticJobErrorHandlerType.LOG.name())
                 // 统一开启任务的日志 trace
-                .jobListenerTypes(ElasticJobListenerType.LOG_TRACE.getTypeName())
+                .jobListenerTypes(job.getElasticJobListenerType().getTypeName())
                 .cron(job.getCron())
                 // 作业启动时是否覆盖本地配置到注册中心
                 .overwrite(job.isOverwrite())

@@ -1,6 +1,7 @@
 package com.wind.trace.thread;
 
 import com.wind.trace.WindTracer;
+import com.wind.trace.task.ContextPropagationTaskDecorator;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -74,7 +75,7 @@ class WindThreadTracerTests {
         Assertions.assertEquals(traceId, MDC.get(TRACE_ID_NAME));
         CountDownLatch downLatch = new CountDownLatch(1);
         try (ExecutorService executorService = Executors.newSingleThreadExecutor()) {
-            executorService.execute(TraceContextTask.of().decorate(() -> {
+            executorService.execute(ContextPropagationTaskDecorator.of().decorate(() -> {
                 try {
                     String actual = WindTracer.TRACER.getTraceId();
                     Assertions.assertEquals(traceId, actual);

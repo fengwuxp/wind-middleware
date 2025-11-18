@@ -12,6 +12,8 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
 
+import static com.wind.common.util.ExecutorServiceUtils.VIRTUAL_THREAD_MDC_KEY;
+
 /**
  * @author wuxp
  * @date 2025-06-30 09:16
@@ -22,11 +24,11 @@ class ExecutorServiceUtilsTests {
     void testVirtual() throws Exception {
         try (ExecutorService executor = ExecutorServiceUtils.virtual("example")) {
             Future<?> future = executor.submit((Callable<Object>) () -> {
-                Assertions.assertEquals("example", MDC.get("virtualThreadName"));
+                Assertions.assertEquals("example-1", MDC.get(VIRTUAL_THREAD_MDC_KEY));
                 return 1;
             });
             Assertions.assertEquals(1, future.get());
-            Assertions.assertNull(MDC.get("virtualThreadName"));
+            Assertions.assertNull(MDC.get(VIRTUAL_THREAD_MDC_KEY));
         }
     }
 
@@ -38,7 +40,7 @@ class ExecutorServiceUtilsTests {
         Future<?> f1 = traceExecutor.submit(() -> {
             Assertions.assertEquals(traceId, WindTracer.TRACER.getTraceId());
         });
-        Future<?> f2 = ExecutorServiceUtils.named("test-").buildExecutor().submit(() -> {
+        Future<?> f2 = ExecutorServiceUtils.named("test-").nativeBuild().submit(() -> {
             Assertions.assertNotEquals(traceId, WindTracer.TRACER.getTraceId());
         });
         for (Future<?> future : Arrays.asList(f1, f2)) {

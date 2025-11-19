@@ -1,4 +1,4 @@
-package com.wind.logging.logback.kafaka.delivery;
+package com.wind.logging.logback.kafka.delivery;
 
 import org.apache.kafka.clients.producer.Producer;
 import org.apache.kafka.clients.producer.ProducerRecord;

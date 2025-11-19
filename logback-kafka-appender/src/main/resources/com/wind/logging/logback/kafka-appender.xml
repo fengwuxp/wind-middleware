@@ -1,17 +1,16 @@
-<?xml version="1.0" encoding="UTF-8"?>
-
-<!--
-Default logback configuration provided for import
--->
 <included>
+
+    <!-- spring property -->
     <springProperty name="KAFKA_SERVERS" scope="context" source="spring.kafka.log.bootstrap-servers"/>
     <springProperty name="KAFKA_TOPIC" scope="context" source="spring.kafka.log.topic"/>
-    <springProperty name="KAFKA_RETRIES" scope="context" source="spring.kafka.log.retries" defaultValue="1"/>
+    <springProperty name="KAFKA_RETRIES" scope="context" source="spring.kafka.log.retries" defaultValue="3"/>
     <springProperty name="KAFKA_BATCH_SIZE" scope="context" source="spring.kafka.log.batch-size" defaultValue="16384"/>
     <springProperty name="KAFKA_BUFFER_MEMORY" scope="context" source="spring.kafka.log.buffer-memory" defaultValue="33554432"/>
     <springProperty name="KAFKA_MAX_REQUEST_SIZE" scope="context" source="spring.kafka.log.properties.max-request-size" defaultValue="2097152"/>
-    <!--  kafka -->
-    <appender name="KAFKA" class="com.wind.logging.logback.kafaka.KafkaAppender">
+
+    <!-- Kafka Appender -->
+    <appender name="KAFKA" class="com.wind.logging.logback.kafka.KafkaAppender">
+        <!-- JSON encoder -->
         <encoder class="net.logstash.logback.encoder.LoggingEventCompositeJsonEncoder">
             <providers class="net.logstash.logback.composite.loggingevent.LoggingEventJsonProviders">
                 <pattern>
@@ -39,14 +38,33 @@ Default logback configuration provided for import
                 </pattern>
             </providers>
         </encoder>
+
+        <!-- 基础配置 -->
         <topic>${KAFKA_TOPIC}</topic>
+
+        <!-- kafka producer configs -->
         <producerConfig>bootstrap.servers=${KAFKA_SERVERS}</producerConfig>
+        <producerConfig>acks=1</producerConfig>
+        <producerConfig>compression.type=zstd</producerConfig>
+        <producerConfig>linger.ms=10</producerConfig>
+        <producerConfig>delivery.timeout.ms=120000</producerConfig>
+
+        <!-- retry/buffer/size -->
         <producerConfig>retries=${KAFKA_RETRIES}</producerConfig>
-        <producerConfig>batch-size=${KAFKA_BATCH_SIZE}</producerConfig>
-        <producerConfig>buffer-memory=${KAFKA_BUFFER_MEMORY}</producerConfig>
-        <producerConfig>properties.max.request.size==${KAFKA_MAX_REQUEST_SIZE}</producerConfig>
+        <producerConfig>batch.size=${KAFKA_BATCH_SIZE}</producerConfig>
+        <producerConfig>buffer.memory=${KAFKA_BUFFER_MEMORY}</producerConfig>
+
+        <!-- serializer -->
+        <producerConfig>key.serializer=org.apache.kafka.common.serialization.StringSerializer</producerConfig>
+        <producerConfig>value.serializer=org.apache.kafka.common.serialization.StringSerializer</producerConfig>
+
+        <producerConfig>properties.max.request.size=${KAFKA_MAX_REQUEST_SIZE}</producerConfig>
     </appender>
+
+    <!-- Async Disruptor -->
     <appender name="DISRUPTOR_KAFKA" class="net.logstash.logback.appender.LoggingEventAsyncDisruptorAppender">
+        <ringBufferSize>8192</ringBufferSize>
         <appender-ref ref="KAFKA"/>
     </appender>
+
 </included>

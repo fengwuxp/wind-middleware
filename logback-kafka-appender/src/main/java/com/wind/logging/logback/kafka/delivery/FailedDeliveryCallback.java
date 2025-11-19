@@ -1,4 +1,4 @@
-package com.wind.logging.logback.kafaka.delivery;
+package com.wind.logging.logback.kafka.delivery;
 
 /**
  * @since 0.0.1

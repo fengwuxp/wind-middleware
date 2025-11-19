@@ -1,12 +1,12 @@
-package com.wind.logging.logback.kafaka;
+package com.wind.logging.logback.kafka;
 
 import ch.qos.logback.core.UnsynchronizedAppenderBase;
 import ch.qos.logback.core.encoder.Encoder;
 import ch.qos.logback.core.spi.AppenderAttachable;
-import com.wind.logging.logback.kafaka.delivery.AsynchronousDeliveryStrategy;
-import com.wind.logging.logback.kafaka.delivery.DeliveryStrategy;
-import com.wind.logging.logback.kafaka.keying.KeyingStrategy;
-import com.wind.logging.logback.kafaka.keying.NoKeyKeyingStrategy;
+import com.wind.logging.logback.kafka.delivery.AsynchronousDeliveryStrategy;
+import com.wind.logging.logback.kafka.delivery.DeliveryStrategy;
+import com.wind.logging.logback.kafka.keying.KeyingStrategy;
+import com.wind.logging.logback.kafka.keying.NoKeyKeyingStrategy;
 
 import java.util.HashMap;
 import java.util.Map;

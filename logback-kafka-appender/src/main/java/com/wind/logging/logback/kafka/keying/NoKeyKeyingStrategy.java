@@ -1,4 +1,4 @@
-package com.wind.logging.logback.kafaka.keying;
+package com.wind.logging.logback.kafka.keying;
 
 /**
  * Evenly distributes all written log messages over all available kafka partitions.

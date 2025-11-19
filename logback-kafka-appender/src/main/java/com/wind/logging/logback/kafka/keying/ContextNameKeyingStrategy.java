@@ -1,4 +1,4 @@
-package com.wind.logging.logback.kafaka.keying;
+package com.wind.logging.logback.kafka.keying;
 
 import ch.qos.logback.classic.spi.ILoggingEvent;
 import ch.qos.logback.core.Context;

@@ -1,10 +1,12 @@
 <included>
-
     <!-- spring property -->
-    <springProperty name="KAFKA_SERVERS" scope="context" source="spring.kafka.log.bootstrap-servers"/>
     <springProperty name="KAFKA_TOPIC" scope="context" source="spring.kafka.log.topic"/>
+    <springProperty name="KAFKA_SERVERS" scope="context" source="spring.kafka.log.bootstrap-servers"/>
+    <springProperty name="KAFKA_ACKS" scope="context" source="spring.kafka.log.acks" defaultValue="all"/>
     <springProperty name="KAFKA_RETRIES" scope="context" source="spring.kafka.log.retries" defaultValue="3"/>
-    <springProperty name="KAFKA_BATCH_SIZE" scope="context" source="spring.kafka.log.batch-size" defaultValue="16384"/>
+    <springProperty name="KAFKA_COMPRESSION_TYPE" scope="context" source="spring.kafka.log.compression.type" defaultValue="zstd"/>
+    <springProperty name="KAFKA_BATCH_SIZE" scope="context" source="spring.kafka.log.batch-size" defaultValue="32768"/>
+    <springProperty name="KAFKA_LINGER_MS" scope="context" source="spring.kafka.log.linger.ms" defaultValue="10"/>
     <springProperty name="KAFKA_BUFFER_MEMORY" scope="context" source="spring.kafka.log.buffer-memory" defaultValue="33554432"/>
     <springProperty name="KAFKA_MAX_REQUEST_SIZE" scope="context" source="spring.kafka.log.properties.max-request-size" defaultValue="2097152"/>
 
@@ -39,26 +41,20 @@
             </providers>
         </encoder>
 
-        <!-- 基础配置 -->
+        <!-- topic -->
         <topic>${KAFKA_TOPIC}</topic>
-
         <!-- kafka producer configs -->
         <producerConfig>bootstrap.servers=${KAFKA_SERVERS}</producerConfig>
-        <producerConfig>acks=1</producerConfig>
-        <producerConfig>compression.type=zstd</producerConfig>
-        <producerConfig>linger.ms=10</producerConfig>
+        <producerConfig>acks=${KAFKA_ACKS}</producerConfig>
+        <producerConfig>enable.idempotence=true</producerConfig>
+        <producerConfig>compression.type=${KAFKA_COMPRESSION_TYPE}</producerConfig>
+        <producerConfig>linger.ms=${KAFKA_LINGER_MS}</producerConfig>
         <producerConfig>delivery.timeout.ms=120000</producerConfig>
-
+        <producerConfig>max.request.size=${KAFKA_MAX_REQUEST_SIZE}</producerConfig>
         <!-- retry/buffer/size -->
         <producerConfig>retries=${KAFKA_RETRIES}</producerConfig>
         <producerConfig>batch.size=${KAFKA_BATCH_SIZE}</producerConfig>
         <producerConfig>buffer.memory=${KAFKA_BUFFER_MEMORY}</producerConfig>
-
-        <!-- serializer -->
-        <producerConfig>key.serializer=org.apache.kafka.common.serialization.StringSerializer</producerConfig>
-        <producerConfig>value.serializer=org.apache.kafka.common.serialization.StringSerializer</producerConfig>
-
-        <producerConfig>properties.max.request.size=${KAFKA_MAX_REQUEST_SIZE}</producerConfig>
     </appender>
 
     <!-- Async Disruptor -->
@@ -66,5 +62,4 @@
         <ringBufferSize>8192</ringBufferSize>
         <appender-ref ref="KAFKA"/>
     </appender>
-
 </included>

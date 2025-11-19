@@ -411,7 +411,7 @@ public final class ExecutorServiceUtils {
 
     private record VirtualThreadMdcTaskDecorator(String prefix) implements TaskDecorator {
 
-        private static final AtomicLong VT_ID = new AtomicLong(1);
+        private static final AtomicLong VIRTUAL_THREAD_ID = new AtomicLong(0);
 
         public static TaskDecorator of(String prefix) {
             return new VirtualThreadMdcTaskDecorator(prefix);
@@ -428,7 +428,7 @@ public final class ExecutorServiceUtils {
         @Override
         @NotNull
         public Runnable decorate(@NonNull Runnable runnable) {
-            String id = prefix + "-" + VT_ID.getAndIncrement();
+            String id = prefix + "-" + VIRTUAL_THREAD_ID.getAndIncrement();
             return () -> {
                 MDC.put(VIRTUAL_THREAD_MDC_KEY, id);
                 try {

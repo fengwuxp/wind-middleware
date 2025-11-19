@@ -30,4 +30,13 @@ public enum WindTaskDecorators implements TaskDecorator {
     public Runnable decorate(@NonNull Runnable runnable) {
         return decorator.decorate(runnable);
     }
+
+    /**
+     * 执行任务
+     *
+     * @param runnable 任务
+     */
+    public void execute(@NonNull Runnable runnable) {
+        decorate(runnable).run();
+    }
 }

@@ -69,7 +69,7 @@ public class DefaultGlobalExceptionHandler {
         return RestfulApiRespFactory.badRequest(constraintViolations.stream().map(constraintViolation -> {
             String message = constraintViolation.getMessage();
             String propertyPath = constraintViolation.getPropertyPath().toString();
-            return MessageFormat.format("{0}：{1}", propertyPath, message);
+            return MessageFormat.format("{0}: {1}", propertyPath, message);
         }).collect(Collectors.joining("、")));
 
     }
@@ -135,9 +135,9 @@ public class DefaultGlobalExceptionHandler {
     @ResponseBody
     public ApiResp<Void> duplicateKeyException(Exception exception) {
         if (GlobalExceptionLogDecisionMaker.requiresPrintErrorLog(exception)) {
-            log.error("唯一键冲突", exception);
+            log.error("数据唯一键冲突", exception);
         }
-        return RestfulApiRespFactory.error(SpringI18nMessageUtils.getMessage(DB_DUPLICATE_KEY_I18N_KEY, "数据已存在"));
+        return RestfulApiRespFactory.error(SpringI18nMessageUtils.getMessage(DB_DUPLICATE_KEY_I18N_KEY, "数据已存在，无法重复操作"));
     }
 
     /**
@@ -147,9 +147,9 @@ public class DefaultGlobalExceptionHandler {
     @ResponseBody
     public ApiResp<Void> dataAccessException(Exception exception) {
         if (GlobalExceptionLogDecisionMaker.requiresPrintErrorLog(exception)) {
-            log.error("数据操作异常", exception);
+            log.error("Data Access Exception, message = {} ", exception.getMessage(), exception);
         }
-        return RestfulApiRespFactory.error(SpringI18nMessageUtils.getMessage(DB_ACCESS_DATA_I18N_KEY, "数据操作失败"));
+        return RestfulApiRespFactory.error(SpringI18nMessageUtils.getMessage(DB_ACCESS_DATA_I18N_KEY, "数据处理异常，请稍后再试"));
     }
 
     /**
@@ -190,7 +190,7 @@ public class DefaultGlobalExceptionHandler {
             InvocationTargetException invocationTargetException = (InvocationTargetException) th.getUndeclaredThrowable();
             throwable = invocationTargetException.getTargetException();
         }
-        return RestfulApiRespFactory.error(throwable.getMessage());
+        return RestfulApiRespFactory.withThrowable(throwable);
     }
 
 }

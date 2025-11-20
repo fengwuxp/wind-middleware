@@ -5,7 +5,7 @@ import com.alibaba.fastjson2.JSONArray;
 import com.wind.common.exception.BaseException;
 import com.wind.mask.MaskRuleGroup;
 import com.wind.mask.masker.StringRangMasker;
-import com.wind.trace.thread.WindThreadTracer;
+import com.wind.trace.WindTracer;
 import lombok.Data;
 import lombok.experimental.FieldNameConstants;
 import lombok.extern.slf4j.Slf4j;
@@ -28,12 +28,12 @@ class MaskingMessageConverterTests {
     private static final Logger LOG = LoggerFactory.getLogger(MaskingMessageConverterTests.class);
 
     static {
-        WindThreadTracer.TRACER.trace();
+        WindTracer.TRACER.trace();
     }
 
     @AfterEach
     void after() {
-        WindThreadTracer.TRACER.clear();
+        WindTracer.TRACER.clear();
     }
 
     @Test

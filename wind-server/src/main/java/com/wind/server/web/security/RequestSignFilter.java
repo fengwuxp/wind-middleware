@@ -62,11 +62,6 @@ public record RequestSignFilter(SignatureHttpHeaderNames headerNames, ApiSecretA
         this(new SignatureHttpHeaderNames(headerPrefix), accountProvider, ignoreRequestMatchers);
     }
 
-    @Deprecated
-    public RequestSignFilter(String headerPrefix, ApiSecretAccountProvider accountProvider, Collection<RequestMatcher> ignoreRequestMatchers, boolean enable) {
-        this(new SignatureHttpHeaderNames(headerPrefix), accountProvider, ignoreRequestMatchers);
-    }
-
     @Override
     public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse, FilterChain chain) throws IOException, ServletException {
         HttpServletRequest request = (HttpServletRequest) servletRequest;

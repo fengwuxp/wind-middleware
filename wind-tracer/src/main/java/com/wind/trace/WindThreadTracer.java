@@ -1,11 +1,10 @@
-package com.wind.trace.thread;
+package com.wind.trace;
 
 
 import com.wind.common.exception.AssertUtils;
 import com.wind.common.util.IpAddressUtils;
 import com.wind.core.WritableContextVariables;
 import com.wind.sequence.SequenceGenerator;
-import com.wind.trace.WindTracer;
 import jakarta.validation.constraints.NotNull;
 import org.slf4j.MDC;
 
@@ -23,7 +22,7 @@ import static com.wind.common.WindConstants.TRACE_ID_NAME;
  * @author wuxp
  * @date 2023-12-29 09:57
  **/
-public final class WindThreadTracer implements WindTracer {
+final class WindThreadTracer implements WindTracer {
 
     /**
      * traceId 生成器

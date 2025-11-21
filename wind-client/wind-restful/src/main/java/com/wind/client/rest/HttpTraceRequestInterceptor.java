@@ -10,7 +10,6 @@ import org.springframework.lang.NonNull;
 import org.springframework.util.StringUtils;
 
 import java.io.IOException;
-import java.util.Collections;
 
 /**
  * 从上下文中设置 traceId 到 http 请求头中
@@ -18,13 +17,7 @@ import java.util.Collections;
  * @author wuxp
  * @date 2024-01-30 15:37
  **/
-public class HttpTraceRequestInterceptor implements ClientHttpRequestInterceptor {
-
-    private final String traceHeaderName;
-
-    public HttpTraceRequestInterceptor(String traceHeaderName) {
-        this.traceHeaderName = traceHeaderName;
-    }
+public record HttpTraceRequestInterceptor(String traceHeaderName) implements ClientHttpRequestInterceptor {
 
     public HttpTraceRequestInterceptor() {
         this(WindConstants.WIND_TRANCE_ID_HEADER_NAME);
@@ -34,8 +27,8 @@ public class HttpTraceRequestInterceptor implements ClientHttpRequestInterceptor
     @NonNull
     public ClientHttpResponse intercept(@NonNull HttpRequest request, @NonNull byte[] body, @NonNull ClientHttpRequestExecution execution) throws IOException {
         String traceId = WindTracer.TRACER.getTraceId();
-        if (StringUtils.hasText(traceId)) {
-            request.getHeaders().computeIfAbsent(traceHeaderName, k -> Collections.singletonList(traceId));
+        if (StringUtils.hasText(traceId) && !request.getHeaders().containsKey(traceHeaderName)) {
+            request.getHeaders().add(traceHeaderName, traceId);
         }
         return execution.execute(request, body);
     }

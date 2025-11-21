@@ -2,6 +2,7 @@ package com.wind.common.util;
 
 import com.esotericsoftware.kryo.KryoException;
 import com.google.common.collect.ImmutableMap;
+import com.wind.common.exception.BaseException;
 import lombok.Data;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -39,8 +40,8 @@ class WindDeepCopyUtilsTests {
 
     @Test
     void testDeepCopyImmutableMapWitException() {
-        KryoException exception = Assertions.assertThrows(KryoException.class, () -> WindDeepCopyUtils.copy(ImmutableMap.of("a", "2")));
-        Assertions.assertEquals("Class cannot be created (missing no-arg constructor): com.google.common.collect.SingletonImmutableBiMap", exception.getMessage());
+        BaseException exception = Assertions.assertThrows(BaseException.class, () -> WindDeepCopyUtils.copy(ImmutableMap.of("a", "2")));
+        Assertions.assertEquals("kryo decode exception", exception.getMessage());
     }
 
     @Test

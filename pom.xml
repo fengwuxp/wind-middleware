@@ -97,7 +97,6 @@
         <jetbrains-annotations.version>26.0.2</jetbrains-annotations.version>
         <error_prone_annotations.version>2.42.0</error_prone_annotations.version>
         <podam.version>8.0.2.RELEASE</podam.version>
-        <junit-platform-surefire-provider.version>1.3.2</junit-platform-surefire-provider.version>
     </properties>
 
     <dependencies>

@@ -89,8 +89,8 @@ public final class KryoSerializationUtils {
         try (ByteArrayInputStream bais = new ByteArrayInputStream(bytes)) {
             input.setInputStream(bais);
             return kryo.readClassAndObject(input);
-        } catch (Exception e) {
-            throw new BaseException(DefaultExceptionCode.COMMON_ERROR, "kryo decode error", e);
+        } catch (Exception exception) {
+            throw new BaseException(DefaultExceptionCode.COMMON_ERROR, "kryo decode exception", exception);
         } finally {
             input.reset();
             kryoPool.free(kryo);

@@ -28,7 +28,7 @@ class JdbcSequenceRepositoryTests extends AbstractJdbcTest {
     @Test
     void testSequence() {
         SequenceGenerator sequenceGenerator = jdbcSequenceRepository.getSequence("test");
-        for (int i = 1; i < RandomUtils.nextInt(1, 500); i++) {
+        for (int i = 1; i < RandomUtils.secure().randomInt(1, 500); i++) {
             Assertions.assertEquals(i + "", sequenceGenerator.next());
         }
     }

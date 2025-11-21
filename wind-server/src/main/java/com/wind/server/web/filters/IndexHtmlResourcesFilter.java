@@ -5,6 +5,11 @@ import com.github.benmanes.caffeine.cache.Caffeine;
 import com.google.common.collect.ImmutableSet;
 import com.wind.common.exception.AssertUtils;
 import com.wind.common.util.StringJoinSplitUtils;
+import jakarta.annotation.Nonnull;
+import jakarta.servlet.FilterChain;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.AllArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.core.io.ByteArrayResource;
@@ -12,19 +17,16 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.util.AntPathMatcher;
+import org.springframework.http.server.PathContainer;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.ObjectUtils;
-import org.springframework.util.PathMatcher;
 import org.springframework.web.filter.OncePerRequestFilter;
+import org.springframework.web.util.pattern.PathPattern;
+import org.springframework.web.util.pattern.PathPatternParser;
 
-import jakarta.annotation.Nonnull;
-import jakarta.servlet.FilterChain;
-import jakarta.servlet.ServletException;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.time.Duration;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
@@ -62,8 +64,6 @@ public class IndexHtmlResourcesFilter extends OncePerRequestFilter {
      */
     private static final Map<String, String> STATIC_RESOURCES = new ConcurrentHashMap<>();
 
-    private static final PathMatcher PATH_MATCHER = new AntPathMatcher();
-
     /**
      * 忽略 swagger、webjars 下的静态资源
      */
@@ -85,8 +85,11 @@ public class IndexHtmlResourcesFilter extends OncePerRequestFilter {
         STATIC_RESOURCES.put(".ttc", "font/ttc");
     }
 
-    private static final Cache<@NotNull String, HttpHeaders> HEADER_CACHES =
-            Caffeine.newBuilder().expireAfterWrite(Duration.ofDays(1)).maximumSize(200).build();
+    private static final List<PathPattern> IGNORE_PATTERNS_PATH = IGNORE_PATTERNS.stream()
+            .map(PathPatternParser.defaultInstance::parse)
+            .toList();
+
+    private static final Cache<@NotNull String, HttpHeaders> HEADER_CACHES = Caffeine.newBuilder().expireAfterWrite(Duration.ofDays(1)).maximumSize(200).build();
 
     /**
      * 前端路由前缀，仅支持 browser 模式下的路由
@@ -107,13 +110,13 @@ public class IndexHtmlResourcesFilter extends OncePerRequestFilter {
     protected void doFilterInternal(@Nonnull HttpServletRequest request, @Nonnull HttpServletResponse response, @Nonnull FilterChain chain) throws ServletException, IOException {
         if (Objects.equals(request.getMethod(), HttpMethod.GET.name())) {
             String requestUri = request.getRequestURI();
-            if (IGNORE_PATTERNS.stream().anyMatch(pattern -> PATH_MATCHER.match(pattern, requestUri))) {
+            PathContainer pathContainer = PathContainer.parsePath(requestUri);
+            if (IGNORE_PATTERNS_PATH.stream().anyMatch(pattern -> pattern.matches(pathContainer))) {
                 // 忽略
                 chain.doFilter(request, response);
                 return;
             }
-            boolean requestIndexHtml =
-                    matchesMediaType(request.getHeader(HttpHeaders.ACCEPT)) && (INDEX_HTML_PATHS.contains(requestUri) || requestUri.startsWith(routePrefix));
+            boolean requestIndexHtml = matchesMediaType(request.getHeader(HttpHeaders.ACCEPT)) && (INDEX_HTML_PATHS.contains(requestUri) || requestUri.startsWith(routePrefix));
             if (requestIndexHtml) {
                 // 写回 index.html
                 response.getOutputStream().write(resourceLoader.apply(INDEX_HTML_NAME));
@@ -143,6 +146,7 @@ public class IndexHtmlResourcesFilter extends OncePerRequestFilter {
             }
         });
     }
+
 
     private boolean matchesMediaType(String mediaType) {
         return StringJoinSplitUtils.split(mediaType).stream().map(MediaType::parseMediaType).anyMatch(media -> media.includes(MediaType.TEXT_HTML));

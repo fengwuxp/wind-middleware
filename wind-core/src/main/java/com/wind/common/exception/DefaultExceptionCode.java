@@ -19,7 +19,7 @@ public enum DefaultExceptionCode implements ExceptionCode {
 
     FORBIDDEN("403", "无权限访问该资源"),
 
-    PAYLOAD_TOO_LARGE("413", "传内容超出大小限制"),
+    PAYLOAD_TOO_LARGE("413", "上传内容超出大小限制"),
 
     TO_MANY_REQUESTS("429", "请求过于频繁，请稍后再试"),
 

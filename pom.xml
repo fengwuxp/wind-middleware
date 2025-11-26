@@ -8,7 +8,7 @@
         <!-- https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-dependencies -->
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-dependencies</artifactId>
-        <version>3.5.9</version>
+        <version>4.0.0</version>
     </parent>
 
     <groupId>com.wind.middleware</groupId>
@@ -112,7 +112,6 @@
         <dependency>
             <groupId>org.jspecify</groupId>
             <artifactId>jspecify</artifactId>
-            <version>1.0.0</version>
         </dependency>
         <dependency>
             <groupId>jakarta.validation</groupId>
@@ -769,24 +768,6 @@
                             points to the JaCoCo agent, later passed as a JVM argument to the test runner -->
                             <argLine>${jacoco-coverage-agent}</argLine>
                             <testFailureIgnore>${test.ignore.failure}</testFailureIgnore>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-enforcer-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <goals>
-                            <goal>enforce</goal>
-                        </goals>
-                        <configuration>
-                            <rules>
-                                <requireProperty>
-                                    <property>revision</property>
-                                </requireProperty>
-                            </rules>
                         </configuration>
                     </execution>
                 </executions>

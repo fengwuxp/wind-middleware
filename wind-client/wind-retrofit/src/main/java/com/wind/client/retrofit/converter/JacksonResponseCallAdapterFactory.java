@@ -1,8 +1,5 @@
 package com.wind.client.retrofit.converter;
 
-import com.fasterxml.jackson.databind.JavaType;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.ObjectReader;
 import com.wind.common.exception.BaseException;
 import com.wind.common.exception.DefaultExceptionCode;
 import lombok.AllArgsConstructor;
@@ -13,6 +10,9 @@ import retrofit2.Call;
 import retrofit2.CallAdapter;
 import retrofit2.Response;
 import retrofit2.Retrofit;
+import tools.jackson.databind.JavaType;
+import tools.jackson.databind.ObjectReader;
+import tools.jackson.databind.json.JsonMapper;
 
 import java.io.IOException;
 import java.lang.annotation.Annotation;
@@ -27,15 +27,15 @@ import java.util.function.Function;
 @Slf4j
 public class JacksonResponseCallAdapterFactory extends CallAdapter.Factory {
 
-    private final ObjectMapper objectMapper;
+    private final JsonMapper jsonMapper;
 
     private final Class<?> responseType;
 
     @SuppressWarnings("rawtypes")
     private final Function responseExtractor;
 
-    public JacksonResponseCallAdapterFactory(ObjectMapper objectMapper) {
-        this(objectMapper, null, o -> o);
+    public JacksonResponseCallAdapterFactory(JsonMapper jsonMapper) {
+        this(jsonMapper, null, o -> o);
     }
 
     @Override
@@ -70,8 +70,8 @@ public class JacksonResponseCallAdapterFactory extends CallAdapter.Factory {
 
         @SuppressWarnings("unchecked")
         private Object parseErrorResp(ResponseBody errorBody) throws IOException {
-            JavaType javaType = objectMapper.getTypeFactory().constructType(responseType);
-            ObjectReader reader = objectMapper.readerFor(javaType);
+            JavaType javaType = jsonMapper.getTypeFactory().constructType(responseType);
+            ObjectReader reader = jsonMapper.readerFor(javaType);
             try (errorBody) {
                 Object resp = reader.readValue(errorBody.charStream());
                 return responseExtractor.apply(resp);

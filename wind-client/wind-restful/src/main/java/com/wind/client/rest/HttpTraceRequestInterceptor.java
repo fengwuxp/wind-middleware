@@ -6,7 +6,7 @@ import org.springframework.http.HttpRequest;
 import org.springframework.http.client.ClientHttpRequestExecution;
 import org.springframework.http.client.ClientHttpRequestInterceptor;
 import org.springframework.http.client.ClientHttpResponse;
-import org.springframework.lang.NonNull;
+import org.jspecify.annotations.NonNull;
 import org.springframework.util.StringUtils;
 
 import java.io.IOException;
@@ -25,9 +25,9 @@ public record HttpTraceRequestInterceptor(String traceHeaderName) implements Cli
 
     @Override
     @NonNull
-    public ClientHttpResponse intercept(@NonNull HttpRequest request, @NonNull byte[] body, @NonNull ClientHttpRequestExecution execution) throws IOException {
+    public ClientHttpResponse intercept(@NonNull HttpRequest request, byte @NonNull [] body, @NonNull ClientHttpRequestExecution execution) throws IOException {
         String traceId = WindTracer.TRACER.getTraceId();
-        if (StringUtils.hasText(traceId) && !request.getHeaders().containsKey(traceHeaderName)) {
+        if (StringUtils.hasText(traceId) && !request.getHeaders().containsHeader(traceHeaderName)) {
             request.getHeaders().add(traceHeaderName, traceId);
         }
         return execution.execute(request, body);

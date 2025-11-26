@@ -8,9 +8,9 @@ import com.alibaba.nacos.api.exception.NacosException;
 import com.wind.common.exception.AssertUtils;
 import com.wind.configcenter.core.ConfigFunctionEvaluator;
 import com.wind.configcenter.core.ConfigRepository;
-import jakarta.annotation.Nonnull;
+import org.jspecify.annotations.NonNull;
 import org.springframework.beans.factory.BeanCreationException;
-import org.springframework.boot.ConfigurableBootstrapContext;
+import org.springframework.boot.bootstrap.ConfigurableBootstrapContext;
 import org.springframework.boot.context.event.ApplicationEnvironmentPreparedEvent;
 import org.springframework.boot.context.properties.bind.Binder;
 import org.springframework.cloud.bootstrap.BootstrapApplicationListener;
@@ -33,7 +33,7 @@ import static org.springframework.core.env.StandardEnvironment.SYSTEM_PROPERTIES
  * @author wuxp
  * @date 2023-10-18 13:16
  **/
-public class WindNacosBootstrapRegistryInitializer implements ApplicationListener<ApplicationEnvironmentPreparedEvent>, Ordered {
+public class WindNacosBootstrapRegistryInitializer implements ApplicationListener<@NonNull ApplicationEnvironmentPreparedEvent>, Ordered {
 
     public static final String NACOS_CONFIG_PREFIX = "spring.cloud.nacos.config";
 
@@ -44,7 +44,7 @@ public class WindNacosBootstrapRegistryInitializer implements ApplicationListene
     static final AtomicReference<ConfigRepository> CONFIG_REPOSITORY = new AtomicReference<>();
 
     @Override
-    public void onApplicationEvent(@Nonnull ApplicationEnvironmentPreparedEvent event) {
+    public void onApplicationEvent(@NonNull ApplicationEnvironmentPreparedEvent event) {
         if (CONFIG_SERVICE.get() == null) {
             LOGGER.info("init nacos bean on bootstrap");
             NacosConfigProperties properties = createNacosProperties(event.getEnvironment());

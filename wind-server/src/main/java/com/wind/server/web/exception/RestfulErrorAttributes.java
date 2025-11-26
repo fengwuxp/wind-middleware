@@ -5,17 +5,16 @@ import com.wind.common.WindConstants;
 import com.wind.common.exception.ExceptionCode;
 import com.wind.server.web.restful.RestfulApiRespFactory;
 import com.wind.server.web.supports.ApiResp;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 import org.springframework.boot.web.error.ErrorAttributeOptions;
-import org.springframework.boot.web.servlet.error.DefaultErrorAttributes;
-import org.springframework.boot.web.servlet.error.ErrorAttributes;
-import org.springframework.lang.Nullable;
+import org.springframework.boot.webmvc.error.DefaultErrorAttributes;
+import org.springframework.boot.webmvc.error.ErrorAttributes;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.HandlerExceptionResolver;
 import org.springframework.web.servlet.ModelAndView;
-
-import jakarta.annotation.Nonnull;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
 
 import java.io.Serial;
 import java.util.Map;
@@ -45,13 +44,13 @@ public record RestfulErrorAttributes(DefaultErrorAttributes attributes) implemen
     };
 
     @Override
-    public Throwable getError(WebRequest webRequest) {
+    public Throwable getError(@NonNull WebRequest webRequest) {
         return attributes.getError(webRequest);
     }
 
     @Override
     @SuppressWarnings("unchecked")
-    public Map<String, Object> getErrorAttributes(WebRequest webRequest, ErrorAttributeOptions options) {
+    public Map<String, Object> getErrorAttributes(@NonNull WebRequest webRequest, @NonNull ErrorAttributeOptions options) {
         Map<String, Object> result = attributes.getErrorAttributes(webRequest, options);
         String message = (String) result.remove("message");
         ApiResp<Map<String, Object>> resp = RestfulApiRespFactory.error(result, WRAPPER_SPRING_HANDLE_ERROR, message == null ? WindConstants.UNKNOWN : message);
@@ -60,8 +59,7 @@ public record RestfulErrorAttributes(DefaultErrorAttributes attributes) implemen
 
     @Nullable
     @Override
-    public ModelAndView resolveException(@Nonnull HttpServletRequest request, @Nonnull HttpServletResponse response, @Nullable Object handler,
-                                         @Nonnull Exception ex) {
+    public ModelAndView resolveException(@NonNull HttpServletRequest request, @NonNull HttpServletResponse response, @Nullable Object handler, @NonNull Exception ex) {
         return attributes.resolveException(request, response, handler, ex);
     }
 }

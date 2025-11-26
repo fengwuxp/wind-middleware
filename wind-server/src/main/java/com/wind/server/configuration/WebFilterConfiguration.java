@@ -6,10 +6,11 @@ import com.wind.server.web.filters.IndexHtmlResourcesFilter;
 import com.wind.server.web.filters.WindWebFilterOrdered;
 import com.wind.web.trace.TraceFilter;
 import jakarta.servlet.DispatcherType;
+import org.jspecify.annotations.NonNull;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.boot.servlet.filter.OrderedRequestContextFilter;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
-import org.springframework.boot.web.servlet.filter.OrderedRequestContextFilter;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -41,9 +42,9 @@ public class WebFilterConfiguration {
 
     @Bean
     @ConditionalOnProperty(prefix = TRACE_FILTER_EXPRESSION, name = ENABLED_NAME, havingValue = TRUE, matchIfMissing = true)
-    public FilterRegistrationBean<OrderedRequestContextFilter> orderedRequestContextFilter(RequestContextFilter requestContextFilter) {
+    public FilterRegistrationBean<@NonNull OrderedRequestContextFilter> orderedRequestContextFilter(RequestContextFilter requestContextFilter) {
         // 设置 OrderedRequestContextFilter 在 TraceFilter 之前
-        FilterRegistrationBean<OrderedRequestContextFilter> result = new FilterRegistrationBean<>();
+        FilterRegistrationBean<@NonNull OrderedRequestContextFilter> result = new FilterRegistrationBean<>();
         OrderedRequestContextFilter filter = (OrderedRequestContextFilter) requestContextFilter;
         filter.setOrder(WindWebFilterOrdered.REQUEST_CONTEXT.getOrder());
         result.setFilter(filter);
@@ -56,8 +57,8 @@ public class WebFilterConfiguration {
 
     @Bean
     @ConditionalOnProperty(prefix = TRACE_FILTER_EXPRESSION, name = ENABLED_NAME, havingValue = TRUE, matchIfMissing = true)
-    public FilterRegistrationBean<TraceFilter> traceFilter() {
-        FilterRegistrationBean<TraceFilter> result = new FilterRegistrationBean<>();
+    public FilterRegistrationBean<@NonNull TraceFilter> traceFilter() {
+        FilterRegistrationBean<@NonNull TraceFilter> result = new FilterRegistrationBean<>();
         result.setFilter(new TraceFilter());
         result.setOrder(WindWebFilterOrdered.TRACE_FILTER.getOrder());
         // 支持异步请求
@@ -71,8 +72,8 @@ public class WebFilterConfiguration {
     @Bean
     @ConditionalOnProperty(prefix = INDEX_HTML_FILTER_EXPRESSION, name = ENABLED_NAME, havingValue = TRUE)
     @ConditionalOnBean(name = INDEX_HTML_RESOURCE_LOADER_BEAN_NAME)
-    public FilterRegistrationBean<IndexHtmlResourcesFilter> webIndexHtmlResourcesFilter(ApplicationContext context) {
-        FilterRegistrationBean<IndexHtmlResourcesFilter> result = new FilterRegistrationBean<>();
+    public FilterRegistrationBean<@NonNull IndexHtmlResourcesFilter> webIndexHtmlResourcesFilter(ApplicationContext context) {
+        FilterRegistrationBean<@NonNull IndexHtmlResourcesFilter> result = new FilterRegistrationBean<>();
         result.setFilter(new IndexHtmlResourcesFilter(context.getBean(INDEX_HTML_RESOURCE_LOADER_BEAN_NAME, Function.class)));
         result.setOrder(WindWebFilterOrdered.INDEX_HTML_RESOURCES_FILTER.getOrder());
         return result;
@@ -81,8 +82,8 @@ public class WebFilterConfiguration {
     @Bean
     @ConditionalOnProperty(prefix = HTTP_REQUEST_IDEMPOTENT_FILTER_EXPRESSION, name = ENABLED_NAME, havingValue = FALSE)
     @ConditionalOnBean(WindIdempotentKeyStorage.class)
-    public FilterRegistrationBean<HttpRequestIdempotentFilter> httpRequestIdempotentFilter(ApplicationContext context) {
-        FilterRegistrationBean<HttpRequestIdempotentFilter> result = new FilterRegistrationBean<>();
+    public FilterRegistrationBean<@NonNull HttpRequestIdempotentFilter> httpRequestIdempotentFilter() {
+        FilterRegistrationBean<@NonNull HttpRequestIdempotentFilter> result = new FilterRegistrationBean<>();
         result.setFilter(new HttpRequestIdempotentFilter());
         result.setOrder(WindWebFilterOrdered.HTTP_REQEUST_IDEMPOTENT_FILTER.getOrder());
         return result;

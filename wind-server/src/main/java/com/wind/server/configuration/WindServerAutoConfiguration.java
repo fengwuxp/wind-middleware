@@ -12,11 +12,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.aop.aspectj.AspectJExpressionPointcut;
 import org.springframework.aop.support.DefaultBeanFactoryPointcutAdvisor;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
-import org.springframework.boot.web.servlet.error.DefaultErrorAttributes;
+import org.springframework.boot.webmvc.error.DefaultErrorAttributes;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -98,7 +97,7 @@ public class WindServerAutoConfiguration {
 
     @Bean
     @ConditionalOnBean(WindControllerMethodInterceptor.class)
-    @ConditionalOnExpression("#{environment['wind.server.controller-method-aspect.expression']!=null}")
+    @ConditionalOnProperty(prefix = CONTROLLER_METHOD_ASPECT_NAME, name = "expression")
     public DefaultBeanFactoryPointcutAdvisor windControllerMethodAspectPointcutAdvisor(WindControllerMethodInterceptor advice,
                                                                                        WindServerProperties properties) {
         String expression = properties.getControllerMethodAspect().getExpression();

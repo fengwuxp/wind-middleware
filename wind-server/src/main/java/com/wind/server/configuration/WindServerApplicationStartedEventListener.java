@@ -12,8 +12,9 @@ import com.wind.server.web.restful.RestfulApiRespFactory;
 import com.wind.web.util.HttpServletRequestUtils;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
+import org.jspecify.annotations.NonNull;
 import org.springframework.boot.context.event.ApplicationStartedEvent;
-import org.springframework.boot.web.context.ConfigurableWebServerApplicationContext;
+import org.springframework.boot.web.server.context.ConfigurableWebServerApplicationContext;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.MessageSource;
@@ -35,7 +36,7 @@ import java.util.concurrent.atomic.AtomicReference;
  * @date 2025-10-13 13:46
  **/
 @Slf4j
-public class WindServerApplicationStartedEventListener implements ApplicationListener<ApplicationStartedEvent> {
+public class WindServerApplicationStartedEventListener implements ApplicationListener<@NonNull ApplicationStartedEvent> {
 
     @Override
     public void onApplicationEvent(ApplicationStartedEvent event) {
@@ -54,7 +55,7 @@ public class WindServerApplicationStartedEventListener implements ApplicationLis
 
     /**
      * spring i18n 国际化支持 初始化器
-     * {@link  org.springframework.boot.autoconfigure.web.servlet.WebMvcAutoConfiguration.EnableWebMvcConfiguration#localeResolver()}
+     * {@link  org.springframework.boot.webmvc.autoconfigure.WebMvcAutoConfiguration.EnableWebMvcConfiguration#localeResolver()}
      *
      * @author wuxp
      * @date 2023-10-10 18:38

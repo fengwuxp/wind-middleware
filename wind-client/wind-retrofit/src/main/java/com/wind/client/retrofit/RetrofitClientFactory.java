@@ -1,19 +1,12 @@
 package com.wind.client.retrofit;
 
-import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateDeserializer;
-import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateTimeDeserializer;
-import com.fasterxml.jackson.datatype.jsr310.deser.LocalTimeDeserializer;
-import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateSerializer;
-import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
-import com.fasterxml.jackson.datatype.jsr310.ser.LocalTimeSerializer;
+
 import com.wind.api.core.ApiResponse;
 import com.wind.api.core.ImmutableApiResponse;
 import com.wind.api.core.signature.ApiSecretAccount;
 import com.wind.client.retrofit.converter.JacksonConverterFactory;
 import com.wind.client.retrofit.converter.JacksonResponseCallAdapterFactory;
+import com.wind.common.annotations.VisibleForTesting;
 import com.wind.common.exception.ApiClientException;
 import com.wind.common.exception.AssertUtils;
 import lombok.extern.slf4j.Slf4j;
@@ -21,8 +14,18 @@ import okhttp3.Interceptor;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import org.jspecify.annotations.NonNull;
-import org.springframework.lang.Nullable;
+import org.jspecify.annotations.Nullable;
 import retrofit2.Retrofit;
+import tools.jackson.databind.DeserializationFeature;
+import tools.jackson.databind.JacksonModule;
+import tools.jackson.databind.ext.javatime.deser.LocalDateDeserializer;
+import tools.jackson.databind.ext.javatime.deser.LocalDateTimeDeserializer;
+import tools.jackson.databind.ext.javatime.deser.LocalTimeDeserializer;
+import tools.jackson.databind.ext.javatime.ser.LocalDateSerializer;
+import tools.jackson.databind.ext.javatime.ser.LocalDateTimeSerializer;
+import tools.jackson.databind.ext.javatime.ser.LocalTimeSerializer;
+import tools.jackson.databind.json.JsonMapper;
+import tools.jackson.databind.module.SimpleModule;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -33,7 +36,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
 import java.util.concurrent.TimeUnit;
-import java.util.function.Function;
+import java.util.function.UnaryOperator;
 
 import static com.wind.common.WindDateFormatPatterns.HH_MM_SS;
 import static com.wind.common.WindDateFormatPatterns.YYYY_MM_DD;
@@ -85,11 +88,11 @@ public record RetrofitClientFactory(Retrofit retrofit) {
         private ApiSecretAccount account;
 
         /**
-         * 自定义的 ObjectMapper
+         * 自定义的 JsonMapper
          *
-         * @see #buildObjectMapper()
+         * @see #buildJsonMapper()
          */
-        private ObjectMapper objectMapper;
+        private JsonMapper jsonMapper;
 
         /**
          * 自定义的拦截器，当自定义了 {@link #httpClient}，则不会处理该字段
@@ -126,7 +129,7 @@ public record RetrofitClientFactory(Retrofit retrofit) {
         /**
          * 响应结果提取器，默认为 {@link ImmutableApiResponse}
          */
-        private Function<Object, Object> responseExtractor = RetrofitClientFactoryBuilder::defaultResponseExtractor;
+        private UnaryOperator<Object> responseExtractor = RetrofitClientFactoryBuilder::defaultResponseExtractor;
 
         public RetrofitClientFactoryBuilder baseUrl(String baseUrl) {
             this.baseUrl = baseUrl;
@@ -148,9 +151,8 @@ public record RetrofitClientFactory(Retrofit retrofit) {
             return this;
         }
 
-
-        public RetrofitClientFactoryBuilder objectMapper(ObjectMapper objectMapper) {
-            this.objectMapper = objectMapper;
+        public RetrofitClientFactoryBuilder jsonMapper(JsonMapper objectMapper) {
+            this.jsonMapper = objectMapper;
             return this;
         }
 
@@ -174,7 +176,7 @@ public record RetrofitClientFactory(Retrofit retrofit) {
             return this;
         }
 
-        public RetrofitClientFactoryBuilder responseExtractor(Function<Object, Object> responseExtractor) {
+        public RetrofitClientFactoryBuilder responseExtractor(UnaryOperator<Object> responseExtractor) {
             this.responseExtractor = responseExtractor;
             return this;
         }
@@ -189,8 +191,8 @@ public record RetrofitClientFactory(Retrofit retrofit) {
             Retrofit retrofit = new Retrofit.Builder()
                     .baseUrl(baseUrl)
                     .client(httpClient)
-                    .addCallAdapterFactory(new JacksonResponseCallAdapterFactory(objectMapper))
-                    .addConverterFactory(new JacksonConverterFactory(objectMapper))
+                    .addCallAdapterFactory(new JacksonResponseCallAdapterFactory(jsonMapper))
+                    .addConverterFactory(new JacksonConverterFactory(jsonMapper))
                     .build();
             return new RetrofitClientFactory(retrofit);
         }
@@ -205,8 +207,8 @@ public record RetrofitClientFactory(Retrofit retrofit) {
             Retrofit retrofit = new Retrofit.Builder()
                     .baseUrl(baseUrl)
                     .client(httpClient)
-                    .addCallAdapterFactory(new JacksonResponseCallAdapterFactory(objectMapper, ImmutableApiResponse.class, responseExtractor))
-                    .addConverterFactory(new JacksonConverterFactory(objectMapper, ImmutableApiResponse.class, responseExtractor))
+                    .addCallAdapterFactory(new JacksonResponseCallAdapterFactory(jsonMapper, ImmutableApiResponse.class, responseExtractor))
+                    .addConverterFactory(new JacksonConverterFactory(jsonMapper, ImmutableApiResponse.class, responseExtractor))
                     .build();
 
             return new RetrofitClientFactory(retrofit);
@@ -234,8 +236,8 @@ public record RetrofitClientFactory(Retrofit retrofit) {
                 }
                 httpClient = builder.build();
             }
-            if (objectMapper == null) {
-                objectMapper = buildObjectMapper();
+            if (jsonMapper == null) {
+                jsonMapper = buildJsonMapper();
             }
         }
 
@@ -249,17 +251,18 @@ public record RetrofitClientFactory(Retrofit retrofit) {
         }
 
         @NonNull
-        private static ObjectMapper buildObjectMapper() {
-            ObjectMapper result = new ObjectMapper();
-            // 配置忽略未知属性
-            result.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-            result.registerModule(buildJavaTimeModule());
-            return result;
+        @VisibleForTesting
+        static JsonMapper buildJsonMapper() {
+            return JsonMapper.builder()
+                    // 配置忽略未知属性
+                    .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
+                    .addModule(buildJavaTimeModule())
+                    .build();
         }
 
         @NonNull
-        private static JavaTimeModule buildJavaTimeModule() {
-            JavaTimeModule result = new JavaTimeModule();
+        private static JacksonModule buildJavaTimeModule() {
+            SimpleModule result = new SimpleModule();
             result.addSerializer(LocalDateTime.class, new LocalDateTimeSerializer(DateTimeFormatter.ofPattern(YYYY_MM_DD_HH_MM_SS)));
             result.addSerializer(LocalDate.class, new LocalDateSerializer(DateTimeFormatter.ofPattern(YYYY_MM_DD)));
             result.addSerializer(LocalTime.class, new LocalTimeSerializer(DateTimeFormatter.ofPattern(HH_MM_SS)));

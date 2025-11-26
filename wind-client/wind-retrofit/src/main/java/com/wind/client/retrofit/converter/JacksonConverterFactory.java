@@ -1,8 +1,6 @@
 package com.wind.client.retrofit.converter;
 
-import com.fasterxml.jackson.databind.JavaType;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.ObjectWriter;
+
 import com.wind.common.WindConstants;
 import lombok.AllArgsConstructor;
 import okhttp3.MediaType;
@@ -12,6 +10,9 @@ import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 import retrofit2.Converter;
 import retrofit2.Retrofit;
+import tools.jackson.databind.JavaType;
+import tools.jackson.databind.ObjectWriter;
+import tools.jackson.databind.json.JsonMapper;
 
 import java.io.IOException;
 import java.lang.annotation.Annotation;
@@ -29,15 +30,15 @@ import java.util.stream.Collectors;
 @AllArgsConstructor
 public class JacksonConverterFactory extends Converter.Factory {
 
-    private final ObjectMapper objectMapper;
+    private final JsonMapper jsonMapper;
 
     private final Class<?> responseType;
 
     @SuppressWarnings("rawtypes")
     private final Function responseExtractor;
 
-    public JacksonConverterFactory(ObjectMapper objectMapper) {
-        this(objectMapper, null, o -> o);
+    public JacksonConverterFactory(JsonMapper jsonMapper) {
+        this(jsonMapper, null, o -> o);
     }
 
     @Override
@@ -46,8 +47,8 @@ public class JacksonConverterFactory extends Converter.Factory {
             @NonNull Annotation @NonNull [] parameterAnnotations,
             @NonNull Annotation @NonNull [] methodAnnotations,
             @NonNull Retrofit retrofit) {
-        JavaType javaType = objectMapper.getTypeFactory().constructType(type);
-        ObjectWriter writer = objectMapper.writerFor(javaType);
+        JavaType javaType = jsonMapper.getTypeFactory().constructType(type);
+        ObjectWriter writer = jsonMapper.writerFor(javaType);
         return new JacksonRequestBodyConverter<>(writer);
     }
 
@@ -89,31 +90,25 @@ public class JacksonConverterFactory extends Converter.Factory {
         @Override
         @SuppressWarnings("unchecked")
         public T convert(ResponseBody value) throws IOException {
-            Object result = objectMapper.readValue(value.bytes(), resolveResponseType());
+            Object result = jsonMapper.readValue(value.bytes(), resolveResponseType());
             return (T) responseExtractor.apply(result);
         }
 
         private JavaType resolveResponseType() {
-            JavaType javaType = objectMapper.getTypeFactory().constructType(type);
+            JavaType javaType = jsonMapper.getTypeFactory().constructType(type);
             if (responseType == null) {
                 return javaType;
             }
-            return objectMapper.getTypeFactory().constructParametricType(responseType, javaType);
+            return jsonMapper.getTypeFactory().constructParametricType(responseType, javaType);
         }
     }
 
-    static final class JacksonRequestBodyConverter<T> implements Converter<T, RequestBody> {
+    record JacksonRequestBodyConverter<T>(ObjectWriter adapter) implements Converter<T, RequestBody> {
 
         private static final MediaType MEDIA_TYPE = MediaType.get("application/json; charset=UTF-8");
 
-        private final ObjectWriter adapter;
-
-        JacksonRequestBodyConverter(ObjectWriter adapter) {
-            this.adapter = adapter;
-        }
-
         @Override
-        public RequestBody convert(@NonNull T value) throws IOException {
+        public RequestBody convert(@NonNull T value) {
             byte[] bytes = adapter.writeValueAsBytes(value);
             return RequestBody.create(bytes, MEDIA_TYPE);
         }

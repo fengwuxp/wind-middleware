@@ -1,7 +1,7 @@
 package com.wind.middleware.idempotent;
 
 
-import jakarta.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 
 /**
  * 幂等值包装类

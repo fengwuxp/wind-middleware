@@ -4,7 +4,7 @@ package com.wind.common.query.supports;
 import com.wind.common.exception.AssertUtils;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
-import org.springframework.lang.NonNull;
+import org.jspecify.annotations.NonNull;
 
 import java.beans.Transient;
 import java.util.concurrent.atomic.AtomicInteger;

@@ -5,9 +5,8 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.constraints.NotEmpty;
 import org.apache.tomcat.util.http.parser.AcceptLanguage;
-import org.jetbrains.annotations.NotNull;
-import org.springframework.lang.NonNull;
-import org.springframework.lang.Nullable;
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 import org.springframework.web.servlet.LocaleResolver;
@@ -29,7 +28,7 @@ public class WindAcceptI18nHeaderLocaleResolver implements LocaleResolver {
 
     private final List<String> headerNames;
 
-    public WindAcceptI18nHeaderLocaleResolver(@NotEmpty List<String> headerNames, @NotNull Locale defaultLocale) {
+    public WindAcceptI18nHeaderLocaleResolver(@NotEmpty List<String> headerNames, @NonNull Locale defaultLocale) {
         AssertUtils.notNull(defaultLocale, "argument defaultLocale must not null");
         AssertUtils.notEmpty(headerNames, "argument headerNames must not empty");
         this.headerNames = headerNames;
@@ -46,12 +45,12 @@ public class WindAcceptI18nHeaderLocaleResolver implements LocaleResolver {
 
     @Override
     @NonNull
-    public Locale resolveLocale(@NotNull HttpServletRequest request) {
+    public Locale resolveLocale(@NonNull HttpServletRequest request) {
         return parseLocale(getLanguageHeader(request));
     }
 
     @Override
-    public void setLocale(@NotNull HttpServletRequest request, @Nullable HttpServletResponse response, @Nullable Locale locale) {
+    public void setLocale(@NonNull HttpServletRequest request, @Nullable HttpServletResponse response, @Nullable Locale locale) {
         throw new UnsupportedOperationException(
                 "Cannot change HTTP Accept-Language header - use a different locale resolution strategy");
     }

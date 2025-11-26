@@ -7,10 +7,10 @@ import com.wind.security.captcha.email.EmailCaptchaProperties;
 import com.wind.security.captcha.mobile.MobilePhoneCaptchaProperties;
 import com.wind.security.captcha.picture.PictureCaptchaProperties;
 import com.wind.security.captcha.qrcode.QrCodeCaptchaProperties;
+import org.jspecify.annotations.Nullable;
 import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
-import jakarta.annotation.Nullable;
 import java.util.Objects;
 
 /**
@@ -84,8 +84,7 @@ public class CaptchaProperties {
      * @param type 验证码类型
      * @return 流控配置，null 表示不限制
      */
-    @Nullable
-    public Captcha.CaptchaFlowControl getFlowControl(Captcha.CaptchaType type) {
+    public Captcha.@Nullable CaptchaFlowControl getFlowControl(Captcha.CaptchaType type) {
         if (Objects.equals(SimpleCaptchaType.MOBILE_PHONE, type)) {
             return mobilePhone.getFlowControl();
         }

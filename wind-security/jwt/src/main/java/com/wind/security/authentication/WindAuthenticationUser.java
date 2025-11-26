@@ -2,7 +2,7 @@ package com.wind.security.authentication;
 
 import com.wind.common.exception.AssertUtils;
 import jakarta.validation.constraints.NotNull;
-import org.springframework.lang.Nullable;
+import org.jspecify.annotations.Nullable;
 
 import java.beans.Transient;
 import java.io.Serial;

@@ -3,12 +3,11 @@ package com.wind.server.i18n;
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
 import com.wind.common.WindConstants;
-import jakarta.annotation.Nonnull;
+import org.jspecify.annotations.NonNull;
 import lombok.extern.slf4j.Slf4j;
-import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.Nullable;
 import org.springframework.context.support.AbstractResourceBasedMessageSource;
 import org.springframework.core.env.PropertyResolver;
-import org.springframework.lang.Nullable;
 
 import java.text.MessageFormat;
 import java.util.Locale;
@@ -25,7 +24,7 @@ public class WindI18nMessageSource extends AbstractResourceBasedMessageSource {
 
     private final Map<Locale, PropertyResolver> localPropertyResolvers;
 
-    private final Cache<@NotNull CacheKey, MessageFormat> messageFormates;
+    private final Cache<@NonNull CacheKey, MessageFormat> messageFormates;
 
     public WindI18nMessageSource(WindI18nMessageSupplier supplier, WindMessageSourceProperties properties) {
         this.localPropertyResolvers = supplier.get();
@@ -41,7 +40,7 @@ public class WindI18nMessageSource extends AbstractResourceBasedMessageSource {
      * returning the value found in the bundle as-is (without MessageFormat parsing).
      */
     @Override
-    protected String resolveCodeWithoutArguments(@Nonnull String code, @Nonnull Locale locale) {
+    protected String resolveCodeWithoutArguments(@NonNull String code, @NonNull Locale locale) {
         PropertyResolver resolver = localPropertyResolvers.get(locale);
         if (resolver == null) {
             return null;
@@ -55,7 +54,7 @@ public class WindI18nMessageSource extends AbstractResourceBasedMessageSource {
      */
     @Override
     @Nullable
-    protected MessageFormat resolveCode(@Nonnull String code, @Nonnull Locale locale) {
+    protected MessageFormat resolveCode(@NonNull String code, @NonNull Locale locale) {
         CacheKey key = new CacheKey(code, locale);
         return messageFormates.get(key, this::buildMessageFormat);
     }

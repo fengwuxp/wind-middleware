@@ -8,7 +8,7 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
-import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.NonNull;
 import org.springframework.util.StringUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
 
@@ -29,7 +29,7 @@ import static com.wind.common.WindHttpConstants.HTTP_REQUEST_IDEMPOTENT_RESULT_A
 public class HttpRequestIdempotentFilter extends OncePerRequestFilter {
 
     @Override
-    protected void doFilterInternal(@NotNull HttpServletRequest request, @NotNull HttpServletResponse response, @NotNull FilterChain chain) throws ServletException,
+    protected void doFilterInternal(@NonNull HttpServletRequest request, @NonNull HttpServletResponse response, @NonNull FilterChain chain) throws ServletException,
             IOException {
         String idempotentKey = request.getHeader(HTTP_REQUEST_IDEMPOTENT_HEADER_NAME);
         if (StringUtils.hasText(idempotentKey)) {

@@ -4,11 +4,9 @@ import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
 import com.wind.common.exception.AssertUtils;
 import com.wind.common.exception.BaseException;
-import jakarta.validation.constraints.NotBlank;
 import lombok.extern.slf4j.Slf4j;
-import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.NonNull;
 import org.springframework.core.task.TaskDecorator;
-import org.springframework.lang.NonNull;
 
 import java.time.Duration;
 import java.util.concurrent.Semaphore;
@@ -41,7 +39,7 @@ public final class ConcurrencyLimiterTaskDecorator implements TaskDecorator {
      * @key 资源标识
      * @value Semaphore
      */
-    private static final Cache<@NotNull String, Semaphore> SEMAPHORE_CACHE = Caffeine.newBuilder()
+    private static final Cache<@NonNull String, Semaphore> SEMAPHORE_CACHE = Caffeine.newBuilder()
             .expireAfterAccess(Duration.ofMinutes(5))
             .maximumSize(256)
             .build();
@@ -66,7 +64,7 @@ public final class ConcurrencyLimiterTaskDecorator implements TaskDecorator {
      * @param maxConcurrent 最大并发数
      * @return 并发任务装饰器
      */
-    public static ConcurrencyLimiterTaskDecorator withConcurrency(@NotBlank String resourceKey, @NotNull Duration maxWait, int maxConcurrent) {
+    public static ConcurrencyLimiterTaskDecorator withConcurrency(@NonNull String resourceKey, @NonNull Duration maxWait, int maxConcurrent) {
         AssertUtils.notNull(resourceKey, "argument resourceKey must not null");
         AssertUtils.notNull(resourceKey, "argument maxWait must not null");
         AssertUtils.isTrue(maxConcurrent > 0, "argument maxConcurrent must greater than 0");
@@ -82,7 +80,7 @@ public final class ConcurrencyLimiterTaskDecorator implements TaskDecorator {
      * @param tokenPerSecond 限流桶每秒填充数
      * @return 并发任务装饰器
      */
-    public static TaskDecorator concurrentWithToken(@NotBlank String resourceKey, @NotNull Duration maxWait, int maxConcurrent, int tokenPerSecond) {
+    public static TaskDecorator concurrentWithToken(@NonNull String resourceKey, @NonNull Duration maxWait, int maxConcurrent, int tokenPerSecond) {
         TaskDecorator concurrent = withConcurrency(resourceKey, maxWait, maxConcurrent);
         TaskDecorator token = RateLimiterTaskDecorator.token(resourceKey, tokenPerSecond, tokenPerSecond, maxWait);
         return runnable -> concurrent.decorate(token.decorate(runnable));
@@ -97,7 +95,7 @@ public final class ConcurrencyLimiterTaskDecorator implements TaskDecorator {
      * @param tokenPerSecond 限流桶每秒填充数
      * @return 并发任务装饰器
      */
-    public static TaskDecorator concurrentWithLeaky(@NotBlank String resourceKey, @NotNull Duration maxWait, int maxConcurrent, int tokenPerSecond) {
+    public static TaskDecorator concurrentWithLeaky(@NonNull String resourceKey, @NonNull Duration maxWait, int maxConcurrent, int tokenPerSecond) {
         TaskDecorator concurrent = withConcurrency(resourceKey, maxWait, maxConcurrent);
         TaskDecorator leaky = RateLimiterTaskDecorator.leaky(resourceKey, tokenPerSecond, maxWait);
         return runnable -> concurrent.decorate(leaky.decorate(runnable));
@@ -113,8 +111,8 @@ public final class ConcurrencyLimiterTaskDecorator implements TaskDecorator {
     }
 
     @Override
-    @NotNull
-    public Runnable decorate(@NotNull Runnable runnable) {
+    @NonNull
+    public Runnable decorate(@NonNull Runnable runnable) {
         return () -> {
             if (!tryAcquire()) {
                 throw BaseException.common("resource key  = %s concurrent limit exceeded".formatted(resourceKey));

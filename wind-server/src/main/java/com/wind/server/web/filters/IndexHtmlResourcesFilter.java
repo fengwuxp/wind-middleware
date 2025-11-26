@@ -5,13 +5,12 @@ import com.github.benmanes.caffeine.cache.Caffeine;
 import com.google.common.collect.ImmutableSet;
 import com.wind.common.exception.AssertUtils;
 import com.wind.common.util.StringJoinSplitUtils;
-import jakarta.annotation.Nonnull;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.AllArgsConstructor;
-import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.NonNull;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -89,7 +88,7 @@ public class IndexHtmlResourcesFilter extends OncePerRequestFilter {
             .map(PathPatternParser.defaultInstance::parse)
             .toList();
 
-    private static final Cache<@NotNull String, HttpHeaders> HEADER_CACHES = Caffeine.newBuilder().expireAfterWrite(Duration.ofDays(1)).maximumSize(200).build();
+    private static final Cache<@NonNull String, HttpHeaders> HEADER_CACHES = Caffeine.newBuilder().expireAfterWrite(Duration.ofDays(1)).maximumSize(200).build();
 
     /**
      * 前端路由前缀，仅支持 browser 模式下的路由
@@ -107,7 +106,7 @@ public class IndexHtmlResourcesFilter extends OncePerRequestFilter {
     }
 
     @Override
-    protected void doFilterInternal(@Nonnull HttpServletRequest request, @Nonnull HttpServletResponse response, @Nonnull FilterChain chain) throws ServletException, IOException {
+    protected void doFilterInternal(@NonNull HttpServletRequest request, @NonNull HttpServletResponse response, @NonNull FilterChain chain) throws ServletException, IOException {
         if (Objects.equals(request.getMethod(), HttpMethod.GET.name())) {
             String requestUri = request.getRequestURI();
             PathContainer pathContainer = PathContainer.parsePath(requestUri);
@@ -135,7 +134,7 @@ public class IndexHtmlResourcesFilter extends OncePerRequestFilter {
         chain.doFilter(request, response);
     }
 
-    private void writeHeaders(@Nonnull HttpServletResponse response, String requestUri) {
+    private void writeHeaders(@NonNull HttpServletResponse response, String requestUri) {
         HttpHeaders headers = HEADER_CACHES.getIfPresent(requestUri);
         if (headers == null) {
             return;
@@ -159,24 +158,24 @@ public class IndexHtmlResourcesFilter extends OncePerRequestFilter {
      * @param delegate 委托的资源加载器
      * @return 资源加载器
      */
-    public static Function<String, byte[]> cacheWrapper(Function<String, ResponseEntity<ByteArrayResource>> delegate) {
+    public static Function<String, byte[]> cacheWrapper(Function<String, ResponseEntity<@NonNull ByteArrayResource>> delegate) {
         return new CacheResourcesLoader(delegate);
     }
 
     @AllArgsConstructor
     private static class CacheResourcesLoader implements Function<String, byte[]> {
 
-        private final Function<String, ResponseEntity<ByteArrayResource>> delegate;
+        private final Function<String, ResponseEntity<@NonNull ByteArrayResource>> delegate;
 
         /**
          * 资源缓存
          */
-        private final Cache<@NotNull String, byte[]> resourcesCaches = Caffeine.newBuilder().expireAfterWrite(Duration.ofDays(1)).maximumSize(200).build();
+        private final Cache<@NonNull String, byte[]> resourcesCaches = Caffeine.newBuilder().expireAfterWrite(Duration.ofDays(1)).maximumSize(200).build();
 
         @Override
         public byte[] apply(String resourcePath) {
             return resourcesCaches.get(resourcePath, key -> {
-                ResponseEntity<ByteArrayResource> resp = delegate.apply(resourcePath);
+                ResponseEntity<@NonNull ByteArrayResource> resp = delegate.apply(resourcePath);
                 HEADER_CACHES.put(key, resp.getHeaders());
                 AssertUtils.isTrue(resp.hasBody(), () -> String.format("load resource： %s failure", key));
                 ByteArrayResource result = resp.getBody();

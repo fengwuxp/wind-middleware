@@ -5,7 +5,7 @@ import com.wind.common.exception.BaseException;
 import com.wind.common.exception.ExceptionLogLevel;
 import com.wind.web.util.HttpServletRequestUtils;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.lang.Nullable;
+import org.jspecify.annotations.Nullable;
 import org.springframework.util.ClassUtils;
 
 import java.util.Objects;

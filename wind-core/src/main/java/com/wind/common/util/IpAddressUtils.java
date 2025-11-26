@@ -3,7 +3,7 @@ package com.wind.common.util;
 
 import com.wind.common.WindConstants;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.lang.Nullable;
+import org.jspecify.annotations.Nullable;
 
 import java.net.Inet4Address;
 import java.net.Inet6Address;

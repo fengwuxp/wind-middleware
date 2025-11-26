@@ -1,6 +1,6 @@
 package com.wind.middleware.idempotent;
 
-import jakarta.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -26,7 +26,7 @@ class WindIdempotentExecuteUtilsTests {
     }
 
     @AfterEach
-    void after(){
+    void after() {
         clear();
     }
 
@@ -42,10 +42,12 @@ class WindIdempotentExecuteUtilsTests {
     @Test
     void testExecuteWithReturnVoid() {
         String idempotentKey = "test";
-        WindIdempotentExecuteUtils.execute(idempotentKey, () -> {});
+        WindIdempotentExecuteUtils.execute(idempotentKey, () -> {
+        });
         Assertions.assertTrue(KEY_SATES.get(idempotentKey));
         Assertions.assertNull(STORAGE_CACHE.get(idempotentKey));
-        WindIdempotentExecuteUtils.execute(idempotentKey, () -> {});
+        WindIdempotentExecuteUtils.execute(idempotentKey, () -> {
+        });
         Assertions.assertNull(STORAGE_CACHE.get(idempotentKey));
     }
 
@@ -74,7 +76,7 @@ class WindIdempotentExecuteUtilsTests {
         });
     }
 
-    static void clear(){
+    static void clear() {
         KEY_SATES.clear();
         STORAGE_CACHE.clear();
     }

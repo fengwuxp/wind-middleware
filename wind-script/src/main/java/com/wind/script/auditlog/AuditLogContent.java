@@ -2,7 +2,7 @@ package com.wind.script.auditlog;
 
 import lombok.Builder;
 import lombok.Getter;
-import org.springframework.lang.Nullable;
+import org.jspecify.annotations.Nullable;
 
 import java.util.Map;
 

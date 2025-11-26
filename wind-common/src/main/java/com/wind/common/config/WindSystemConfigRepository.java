@@ -8,7 +8,7 @@ import com.wind.common.exception.AssertUtils;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.core.convert.support.DefaultConversionService;
-import org.springframework.lang.Nullable;
+import org.jspecify.annotations.Nullable;
 import org.springframework.scheduling.concurrent.CustomizableThreadFactory;
 
 import java.time.Duration;

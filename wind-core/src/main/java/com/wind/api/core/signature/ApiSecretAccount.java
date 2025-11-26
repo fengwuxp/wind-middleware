@@ -1,6 +1,6 @@
 package com.wind.api.core.signature;
 
-import org.springframework.lang.Nullable;
+import org.jspecify.annotations.Nullable;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;

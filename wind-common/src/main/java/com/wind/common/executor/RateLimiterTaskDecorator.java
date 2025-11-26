@@ -5,7 +5,7 @@ import com.wind.common.exception.DefaultExceptionCode;
 import com.wind.common.limit.WindExecutionLimiter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.task.TaskDecorator;
-import org.springframework.lang.NonNull;
+import org.jspecify.annotations.NonNull;
 
 import java.time.Duration;
 import java.util.concurrent.atomic.AtomicBoolean;

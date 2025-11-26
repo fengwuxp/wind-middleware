@@ -4,7 +4,7 @@ import com.wind.common.WindConstants;
 import com.wind.common.annotations.VisibleForTesting;
 import com.wind.common.util.WindReflectUtils;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.lang.Nullable;
+import org.jspecify.annotations.Nullable;
 import org.springframework.util.ClassUtils;
 
 import java.lang.reflect.Field;

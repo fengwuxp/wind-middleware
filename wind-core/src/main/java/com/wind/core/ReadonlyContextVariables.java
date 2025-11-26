@@ -3,7 +3,7 @@ package com.wind.core;
 import com.wind.common.exception.AssertUtils;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
-import org.springframework.lang.Nullable;
+import org.jspecify.annotations.Nullable;
 
 import java.util.Collections;
 import java.util.Map;

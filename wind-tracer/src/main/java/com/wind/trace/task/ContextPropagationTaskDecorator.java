@@ -4,7 +4,7 @@ import com.wind.common.exception.AssertUtils;
 import com.wind.trace.WindTracer;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.task.TaskDecorator;
-import org.springframework.lang.NonNull;
+import org.jspecify.annotations.NonNull;
 
 import java.util.Collections;
 import java.util.Map;

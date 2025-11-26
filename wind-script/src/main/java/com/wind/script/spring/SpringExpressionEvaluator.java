@@ -5,6 +5,8 @@ import com.github.benmanes.caffeine.cache.Caffeine;
 import com.wind.common.WindConstants;
 import com.wind.common.exception.AssertUtils;
 import lombok.extern.slf4j.Slf4j;
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 import org.springframework.expression.EvaluationContext;
 import org.springframework.expression.Expression;
 import org.springframework.expression.ExpressionParser;
@@ -12,9 +14,7 @@ import org.springframework.expression.ParserContext;
 import org.springframework.expression.common.TemplateParserContext;
 import org.springframework.expression.spel.standard.SpelExpressionParser;
 import org.springframework.expression.spel.support.StandardEvaluationContext;
-import org.springframework.lang.Nullable;
 
-import jakarta.annotation.Nonnull;
 import java.util.Collections;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
@@ -43,7 +43,7 @@ public record SpringExpressionEvaluator(@Nullable ParserContext context) {
      * @key 表达式内容
      * @value 解析后的表达执行对象
      */
-    private static final Cache<String, Expression> EXPRESSION_CACHES = Caffeine.newBuilder()
+    private static final Cache<@NonNull String, Expression> EXPRESSION_CACHES = Caffeine.newBuilder()
             // 设置最后一次写入或访问后经过固定时间过期
             .expireAfterWrite(1, TimeUnit.DAYS)
             // 初始的缓存空间大小
@@ -129,7 +129,7 @@ public record SpringExpressionEvaluator(@Nullable ParserContext context) {
         }
     }
 
-    @Nonnull
+    @NonNull
     private static EvaluationContext createEvaluationContext(Map<String, Object> variables) {
         StandardEvaluationContext result = new StandardEvaluationContext();
         variables.forEach(result::setVariable);

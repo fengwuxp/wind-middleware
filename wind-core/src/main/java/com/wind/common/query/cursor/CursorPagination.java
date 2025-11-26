@@ -2,7 +2,7 @@ package com.wind.common.query.cursor;
 
 import com.wind.common.query.WindPagination;
 import com.wind.common.query.supports.QueryOrderField;
-import jakarta.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import org.springframework.util.CollectionUtils;
 
 import java.beans.Transient;

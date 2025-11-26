@@ -3,7 +3,7 @@ package com.wind.server.web.download;
 import com.wind.web.download.WindDownload;
 import com.wind.web.download.WindFileMediaType;
 import jakarta.servlet.http.HttpServletResponse;
-import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.NonNull;
 import org.springframework.core.MethodParameter;
 import org.springframework.core.annotation.AnnotationUtils;
 import org.springframework.http.HttpHeaders;
@@ -23,16 +23,16 @@ import java.util.Objects;
  * @author wuxp
  * @date 2025-06-20 17:01
  **/
-public class DownloadFileResponseHeaderAdvice implements ResponseBodyAdvice<Object> {
+public class DownloadFileResponseHeaderAdvice implements ResponseBodyAdvice<@NonNull Object> {
 
     @Override
-    public boolean supports(MethodParameter returnType, @NotNull Class converterType) {
+    public boolean supports(MethodParameter returnType, @NonNull Class converterType) {
         return returnType.hasMethodAnnotation(WindDownload.class);
     }
 
     @Override
-    public Object beforeBodyWrite(Object body, MethodParameter returnType, @NotNull MediaType selectedContentType,
-                                  @NotNull Class selectedConverterType, @NotNull ServerHttpRequest request, @NotNull ServerHttpResponse response) {
+    public Object beforeBodyWrite(Object body, MethodParameter returnType, @NonNull MediaType selectedContentType,
+                                  @NonNull Class selectedConverterType, @NonNull ServerHttpRequest request, @NonNull ServerHttpResponse response) {
         WindDownload annotation = AnnotationUtils.findAnnotation(Objects.requireNonNull(returnType.getMethod()), WindDownload.class);
         if (annotation == null) {
             return body;

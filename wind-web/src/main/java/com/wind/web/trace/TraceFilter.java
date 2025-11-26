@@ -8,7 +8,7 @@ import com.wind.server.web.restful.RestfulApiRespFactory;
 import com.wind.trace.WindTracer;
 import com.wind.web.exception.GlobalExceptionLogDecisionMaker;
 import com.wind.web.util.HttpResponseMessageUtils;
-import jakarta.annotation.Nonnull;
+import org.jspecify.annotations.NonNull;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -64,7 +64,7 @@ public class TraceFilter extends OncePerRequestFilter {
     }
 
     @Override
-    protected void doFilterInternal(@Nonnull HttpServletRequest request, @Nonnull HttpServletResponse response, @Nonnull FilterChain chain) {
+    protected void doFilterInternal(@NonNull HttpServletRequest request, @NonNull HttpServletResponse response, @NonNull FilterChain chain) {
         try {
             if (!ServiceInfoUtils.isOnline()) {
                 // 线下环境增加服务端 ip 返回

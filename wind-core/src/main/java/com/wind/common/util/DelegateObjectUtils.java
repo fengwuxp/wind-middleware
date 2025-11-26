@@ -2,7 +2,7 @@ package com.wind.common.util;
 
 import com.wind.common.exception.AssertUtils;
 import jakarta.validation.constraints.NotNull;
-import org.springframework.lang.Nullable;
+import org.jspecify.annotations.Nullable;
 import org.springframework.util.ReflectionUtils;
 
 import java.lang.reflect.Method;

@@ -6,7 +6,7 @@ import com.wind.common.exception.AssertUtils;
 import jakarta.validation.constraints.NotNull;
 import lombok.Builder;
 import lombok.experimental.FieldNameConstants;
-import org.springframework.lang.Nullable;
+import org.jspecify.annotations.Nullable;
 import org.springframework.util.DigestUtils;
 import org.springframework.util.ObjectUtils;
 import org.springframework.util.StringUtils;

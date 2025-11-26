@@ -11,8 +11,8 @@ import org.springframework.http.MediaType;
 import org.springframework.http.client.ClientHttpRequestExecution;
 import org.springframework.http.client.ClientHttpRequestInterceptor;
 import org.springframework.http.client.ClientHttpResponse;
-import org.springframework.lang.NonNull;
-import org.springframework.lang.Nullable;
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 import org.springframework.util.StringUtils;
 
 import java.io.IOException;
@@ -45,7 +45,7 @@ public class ApiSignatureRequestInterceptor implements ClientHttpRequestIntercep
 
     @Override
     @NonNull
-    public ClientHttpResponse intercept(@NonNull HttpRequest request, @NonNull byte[] body, @NonNull ClientHttpRequestExecution execution) throws IOException {
+    public ClientHttpResponse intercept(@NonNull HttpRequest request, byte @NonNull [] body, @NonNull ClientHttpRequestExecution execution) throws IOException {
         ApiSecretAccount account = accountProvider.apply(request);
         AssertUtils.notNull(account, "ApiSecretAccount must not null");
         ApiSignatureRequest.ApiSignatureRequestBuilder builder = ApiSignatureRequest.builder();

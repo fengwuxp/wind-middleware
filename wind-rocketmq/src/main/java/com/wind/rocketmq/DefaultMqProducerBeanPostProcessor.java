@@ -5,7 +5,7 @@ import org.apache.rocketmq.client.hook.SendMessageHook;
 import org.apache.rocketmq.client.producer.DefaultMQProducer;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.config.BeanPostProcessor;
-import org.springframework.lang.NonNull;
+import org.jspecify.annotations.NonNull;
 
 import java.util.concurrent.atomic.AtomicReference;
 

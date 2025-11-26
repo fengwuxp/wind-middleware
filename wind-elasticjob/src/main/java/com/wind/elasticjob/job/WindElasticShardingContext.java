@@ -3,7 +3,7 @@ package com.wind.elasticjob.job;
 import com.alibaba.fastjson2.JSON;
 import com.alibaba.fastjson2.TypeReference;
 import com.wind.common.exception.AssertUtils;
-import jakarta.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import jakarta.validation.constraints.Null;
 import org.apache.shardingsphere.elasticjob.api.ShardingContext;
 import org.springframework.util.StringUtils;

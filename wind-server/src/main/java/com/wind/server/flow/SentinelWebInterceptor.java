@@ -6,6 +6,7 @@ import com.alibaba.csp.sentinel.Tracer;
 import com.alibaba.csp.sentinel.context.ContextUtil;
 import com.alibaba.csp.sentinel.metric.extension.MetricExtensionProvider;
 import com.alibaba.csp.sentinel.slots.block.BlockException;
+import com.wind.common.annotations.VisibleForTesting;
 import com.wind.common.exception.DefaultExceptionCode;
 import com.wind.common.i18n.SpringI18nMessageUtils;
 import com.wind.sentinel.SentinelResource;
@@ -18,8 +19,7 @@ import io.micrometer.core.instrument.Tags;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.VisibleForTesting;
+import org.jspecify.annotations.NonNull;
 import org.springframework.util.ObjectUtils;
 import org.springframework.web.servlet.HandlerInterceptor;
 
@@ -65,7 +65,7 @@ public record SentinelWebInterceptor(Function<HttpServletRequest, SentinelResour
     }
 
     @Override
-    public boolean preHandle(@NotNull HttpServletRequest request, @NotNull HttpServletResponse response, @NotNull Object handler) {
+    public boolean preHandle(@NonNull HttpServletRequest request, @NonNull HttpServletResponse response, @NonNull Object handler) {
         SentinelResource resource = resourceProvider.apply(request);
         if (resource == null || ObjectUtils.isEmpty(resource.getName())) {
             log.debug("no resource found in request, request uri = {}", request.getRequestURI());
@@ -89,8 +89,7 @@ public record SentinelWebInterceptor(Function<HttpServletRequest, SentinelResour
     }
 
     @Override
-    public void afterCompletion(@NotNull HttpServletRequest request, @NotNull HttpServletResponse response, @NotNull Object handler,
-                                Exception exception) {
+    public void afterCompletion(@NonNull HttpServletRequest request, @NonNull HttpServletResponse response, @NonNull Object handler, Exception exception) {
         Entry entry = HttpServletRequestUtils.getRequestAttribute(entryAttributeName, request);
         if (entry == null) {
             // should not happen

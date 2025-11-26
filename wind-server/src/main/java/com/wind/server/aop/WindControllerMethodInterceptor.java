@@ -5,7 +5,7 @@ import com.wind.common.WindHttpConstants;
 import com.wind.context.injection.MethodParameterInjector;
 import com.wind.script.auditlog.ScriptAuditLogRecorder;
 import com.wind.web.util.HttpServletRequestUtils;
-import jakarta.annotation.Nonnull;
+import org.jspecify.annotations.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.aopalliance.intercept.MethodInterceptor;
 import org.aopalliance.intercept.MethodInvocation;
@@ -26,7 +26,7 @@ import static com.wind.common.WindHttpConstants.HTTP_REQUEST_IDEMPOTENT_RESULT_A
 public record WindControllerMethodInterceptor(ScriptAuditLogRecorder auditLogRecorder, MethodParameterInjector methodParameterInjector) implements MethodInterceptor {
 
     @Override
-    public Object invoke(@Nonnull MethodInvocation invocation) throws Throwable {
+    public Object invoke(@NonNull MethodInvocation invocation) throws Throwable {
         // 参数注入
         methodParameterInjector.inject(invocation.getMethod(), invocation.getArguments());
         if (log.isDebugEnabled()) {

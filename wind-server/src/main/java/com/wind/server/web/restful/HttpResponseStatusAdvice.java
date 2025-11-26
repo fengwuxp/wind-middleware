@@ -2,6 +2,7 @@ package com.wind.server.web.restful;
 
 
 import com.wind.server.web.supports.ApiResp;
+import org.jspecify.annotations.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.core.MethodParameter;
@@ -11,7 +12,6 @@ import org.springframework.http.server.ServerHttpResponse;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseBodyAdvice;
 
-import jakarta.annotation.Nonnull;
 import java.util.Objects;
 
 import static com.wind.common.WindConstants.ENABLED_NAME;
@@ -28,17 +28,16 @@ import static com.wind.common.WindConstants.WIND_SERVER_HTTP_RESPONSE_STATUS_ADV
 @Slf4j
 @ConditionalOnProperty(prefix = WIND_SERVER_HTTP_RESPONSE_STATUS_ADVICE, value = ENABLED_NAME, havingValue = TRUE, matchIfMissing = true)
 @RestControllerAdvice()
-public class HttpResponseStatusAdvice implements ResponseBodyAdvice<Object> {
+public class HttpResponseStatusAdvice implements ResponseBodyAdvice<@NonNull Object> {
 
     @Override
-    public boolean supports(MethodParameter returnType, @Nonnull Class converterType) {
+    public boolean supports(MethodParameter returnType, @NonNull Class converterType) {
         return Objects.requireNonNull(returnType.getMethod()).getReturnType().isAssignableFrom(ApiResp.class);
     }
 
     @Override
-    public Object beforeBodyWrite(Object body, @Nonnull MethodParameter returnType, @Nonnull MediaType selectedContentType,
-                                  @Nonnull Class selectedConverterType, @Nonnull ServerHttpRequest request,
-                                  @Nonnull ServerHttpResponse response) {
+    public Object beforeBodyWrite(Object body, @NonNull MethodParameter returnType, @NonNull MediaType selectedContentType,
+                                  @NonNull Class selectedConverterType, @NonNull ServerHttpRequest request, @NonNull ServerHttpResponse response) {
         if (body instanceof ApiResp<?> resp) {
             response.setStatusCode(resp.getHttpStatus());
         }

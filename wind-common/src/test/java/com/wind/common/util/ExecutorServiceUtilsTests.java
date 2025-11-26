@@ -24,7 +24,7 @@ class ExecutorServiceUtilsTests {
     void testVirtual() throws Exception {
         try (ExecutorService executor = ExecutorServiceUtils.virtual("example")) {
             Future<?> future = executor.submit((Callable<Object>) () -> {
-                Assertions.assertEquals("example-1", MDC.get(VIRTUAL_THREAD_MDC_KEY));
+                Assertions.assertEquals("example-0", MDC.get(VIRTUAL_THREAD_MDC_KEY));
                 return 1;
             });
             Assertions.assertEquals(1, future.get());

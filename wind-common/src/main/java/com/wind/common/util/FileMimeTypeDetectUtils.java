@@ -2,7 +2,7 @@ package com.wind.common.util;
 
 import com.wind.common.exception.BaseException;
 import com.wind.common.exception.DefaultExceptionCode;
-import jakarta.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.extern.slf4j.Slf4j;

@@ -3,7 +3,7 @@ package com.wind.trace.task;
 import com.wind.trace.WindTracer;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.task.TaskDecorator;
-import org.springframework.lang.NonNull;
+import org.jspecify.annotations.NonNull;
 
 /**
  * 仅 trace 任务，不做线程之间的上下文传递

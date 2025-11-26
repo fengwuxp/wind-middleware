@@ -3,6 +3,7 @@ package com.wind.server.web.restful;
 import com.wind.common.exception.BaseException;
 import com.wind.common.i18n.SpringI18nMessageUtils;
 import com.wind.server.web.supports.ApiResp;
+import org.jspecify.annotations.NonNull;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -26,7 +27,7 @@ class RestfulApiRespFactoryTests {
         SpringI18nMessageUtils.setI18nKeyMatcher(StringUtils::hasText);
         SpringI18nMessageUtils.setMessageSource(new AbstractMessageSource() {
             @Override
-            protected MessageFormat resolveCode(String code, Locale locale) {
+            protected MessageFormat resolveCode(@NonNull String code, @NonNull Locale locale) {
                 return new MessageFormat(Objects.equals(locale, Locale.CHINA) ? TEST_MESSAGE : "test");
             }
         });

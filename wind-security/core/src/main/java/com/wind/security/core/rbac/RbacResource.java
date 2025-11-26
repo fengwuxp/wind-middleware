@@ -1,13 +1,12 @@
 package com.wind.security.core.rbac;
 
 import com.wind.common.util.StringJoinSplitUtils;
+import org.jspecify.annotations.Nullable;
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import org.springframework.util.StringUtils;
-
-import jakarta.annotation.Nullable;
-import jakarta.validation.constraints.NotNull;
 
 import java.io.Serial;
 import java.io.Serializable;

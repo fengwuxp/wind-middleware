@@ -1,7 +1,7 @@
 package com.wind.common.config;
 
 import com.wind.common.WindConstants;
-import org.springframework.lang.Nullable;
+import org.jspecify.annotations.Nullable;
 
 /**
  * 系统配置

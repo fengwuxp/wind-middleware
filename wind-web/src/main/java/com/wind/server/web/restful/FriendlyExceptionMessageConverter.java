@@ -6,7 +6,7 @@ import com.wind.common.exception.ExceptionCode;
 import com.wind.common.i18n.SpringI18nMessageUtils;
 import com.wind.common.message.MessagePlaceholder;
 import com.wind.web.exception.GlobalExceptionLogDecisionMaker;
-import org.springframework.lang.Nullable;
+import org.jspecify.annotations.Nullable;
 
 import java.util.Objects;
 

@@ -8,7 +8,7 @@ import com.wind.common.limit.WindExecutionLimiter;
 import io.github.bucket4j.Bandwidth;
 import io.github.bucket4j.Bucket;
 import lombok.extern.slf4j.Slf4j;
-import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.NonNull;
 
 import java.time.Duration;
 import java.util.concurrent.atomic.AtomicReference;
@@ -29,7 +29,7 @@ public final class Bucket4jTaskExecutionLimiterFactory {
      * @key 需要限流的资源名称
      * @value {@link Bucket}
      */
-    private static final Cache<@NotNull String, Bucket> BUCKET_CACHES = Caffeine.newBuilder()
+    private static final Cache<@NonNull String, Bucket> BUCKET_CACHES = Caffeine.newBuilder()
             .expireAfterAccess(Duration.ofMinutes(5))
             .maximumSize(256)
             .build();

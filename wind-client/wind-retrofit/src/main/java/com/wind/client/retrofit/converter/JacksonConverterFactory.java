@@ -8,8 +8,8 @@ import lombok.AllArgsConstructor;
 import okhttp3.MediaType;
 import okhttp3.RequestBody;
 import okhttp3.ResponseBody;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 import retrofit2.Converter;
 import retrofit2.Retrofit;
 
@@ -42,10 +42,10 @@ public class JacksonConverterFactory extends Converter.Factory {
 
     @Override
     public Converter<?, RequestBody> requestBodyConverter(
-            @NotNull Type type,
-            @NotNull Annotation @NotNull [] parameterAnnotations,
-            @NotNull Annotation @NotNull [] methodAnnotations,
-            @NotNull Retrofit retrofit) {
+            @NonNull Type type,
+            @NonNull Annotation @NonNull [] parameterAnnotations,
+            @NonNull Annotation @NonNull [] methodAnnotations,
+            @NonNull Retrofit retrofit) {
         JavaType javaType = objectMapper.getTypeFactory().constructType(type);
         ObjectWriter writer = objectMapper.writerFor(javaType);
         return new JacksonRequestBodyConverter<>(writer);
@@ -54,7 +54,7 @@ public class JacksonConverterFactory extends Converter.Factory {
     @Override
     @SuppressWarnings({"rawtypes"})
     public @Nullable Converter<?, String> stringConverter(
-            @NotNull Type type, Annotation @NotNull [] annotations, @NotNull Retrofit retrofit) {
+            @NonNull Type type, Annotation @NonNull [] annotations, @NonNull Retrofit retrofit) {
         return (Converter<Object, String>) value -> {
             if (value instanceof Collection val) {
                 return joinAsQueryString(val);
@@ -74,7 +74,7 @@ public class JacksonConverterFactory extends Converter.Factory {
     }
 
     @Override
-    public Converter<ResponseBody, ?> responseBodyConverter(@NotNull Type type, Annotation @NotNull [] annotations, @NotNull Retrofit retrofit) {
+    public Converter<ResponseBody, ?> responseBodyConverter(@NonNull Type type, Annotation @NonNull [] annotations, @NonNull Retrofit retrofit) {
         return new JacksonResponseBodyConverter<>(type);
     }
 
@@ -113,7 +113,7 @@ public class JacksonConverterFactory extends Converter.Factory {
         }
 
         @Override
-        public RequestBody convert(@NotNull T value) throws IOException {
+        public RequestBody convert(@NonNull T value) throws IOException {
             byte[] bytes = adapter.writeValueAsBytes(value);
             return RequestBody.create(bytes, MEDIA_TYPE);
         }

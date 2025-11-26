@@ -3,7 +3,7 @@ package com.wind.common.util;
 import com.google.common.collect.ImmutableSet;
 import com.wind.common.WindConstants;
 import com.wind.common.spring.SpringApplicationContextUtils;
-import org.springframework.lang.Nullable;
+import org.jspecify.annotations.Nullable;
 import org.springframework.util.StringUtils;
 
 import java.util.Set;

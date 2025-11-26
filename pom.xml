@@ -42,7 +42,7 @@
     </modules>
 
     <properties>
-        <revision>1.0.2-jdk21-SNAPSHOT</revision>
+        <revision>1.1.0-jdk21-SNAPSHOT</revision>
         <!--   测试相关     -->
         <jacoco-coverage-agent/>
         <tests.fork.count/>
@@ -57,7 +57,8 @@
         <maven-source-plugin.attach>false</maven-source-plugin.attach>
 
         <maven-flatten-plugin.version>1.5.0</maven-flatten-plugin.version>
-        <maven-surefire-report-plugin.version>3.5.3</maven-surefire-report-plugin.version>
+        <maven-surefire-report-plugin.version>3.5.4</maven-surefire-report-plugin.version>
+        <maven-site-plugin.version>4.0.0-M16</maven-site-plugin.version>
         <jacoco-maven-plugin.version>0.8.13</jacoco-maven-plugin.version>
         <git-commit-id-plugin.version>4.9.10</git-commit-id-plugin.version>
 
@@ -94,7 +95,6 @@
         <googleauth.version>1.5.0</googleauth.version>
         <bucket4j.version>8.10.1</bucket4j.version>
         <json-path.version>2.9.0</json-path.version>
-        <jetbrains-annotations.version>26.0.2</jetbrains-annotations.version>
         <error_prone_annotations.version>2.42.0</error_prone_annotations.version>
         <podam.version>8.0.2.RELEASE</podam.version>
     </properties>
@@ -107,6 +107,11 @@
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-api</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.jspecify</groupId>
+            <artifactId>jspecify</artifactId>
+            <version>1.0.0</version>
         </dependency>
         <dependency>
             <groupId>jakarta.validation</groupId>
@@ -129,6 +134,11 @@
         <dependency>
             <groupId>org.mockito</groupId>
             <artifactId>mockito-junit-jupiter</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.junit.platform</groupId>
+            <artifactId>junit-platform-launcher</artifactId>
             <scope>test</scope>
         </dependency>
     </dependencies>
@@ -495,11 +505,6 @@
                 <artifactId>elasticjob-lite-lifecycle</artifactId>
                 <version>${elasticjob.version}</version>
             </dependency>
-            <dependency>
-                <groupId>org.jetbrains</groupId>
-                <artifactId>annotations</artifactId>
-                <version>${jetbrains-annotations.version}</version>
-            </dependency>
             <!-- https://mvnrepository.com/artifact/org.dromara.dynamictp/dynamic-tp-adapter-common -->
             <dependency>
                 <groupId>org.dromara.dynamictp</groupId>
@@ -613,6 +618,11 @@
                     <artifactId>maven-surefire-report-plugin</artifactId>
                     <version>${maven-surefire-report-plugin.version}</version>
                 </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-site-plugin</artifactId>
+                    <version>${maven-site-plugin.version}</version>
+                </plugin>
                 <!-- jacoco agent for code coverage -->
                 <plugin>
                     <groupId>org.jacoco</groupId>
@@ -722,6 +732,13 @@
                     </dependency>
                 </dependencies>
             </plugin>
+            <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-site-plugin</artifactId>
+            <configuration>
+                <outputDirectory>${project.build.directory}/surefire-reports</outputDirectory>
+            </configuration>
+        </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-report-plugin</artifactId>

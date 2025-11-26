@@ -1,16 +1,15 @@
 package com.wind.common.util;
 
+import com.wind.common.annotations.VisibleForTesting;
 import com.wind.common.exception.AssertUtils;
 import com.wind.common.exception.BaseException;
 import com.wind.common.exception.DefaultExceptionCode;
 import com.wind.trace.task.WindTaskDecorators;
 import jakarta.validation.constraints.NotBlank;
 import lombok.extern.slf4j.Slf4j;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.VisibleForTesting;
+import org.jspecify.annotations.NonNull;
 import org.slf4j.MDC;
 import org.springframework.core.task.TaskDecorator;
-import org.springframework.lang.NonNull;
 import org.springframework.scheduling.concurrent.CustomizableThreadFactory;
 
 import java.time.Duration;
@@ -253,8 +252,8 @@ public final class ExecutorServiceUtils {
          * @param decorator 任务装饰器
          * @return 线程池
          */
-        @NotNull
-        public ExecutorService buildWithDecorator(@NotNull TaskDecorator decorator) {
+        @NonNull
+        public ExecutorService buildWithDecorator(@NonNull TaskDecorator decorator) {
             TaskDecorator finalDecorator = decorator;
             if (useVirtualThreads) {
                 // 这里把 VirtualThreadMdcTaskDecorator 放在最外层，确保 MDC/ScopedValue 在执行期间可见
@@ -272,7 +271,7 @@ public final class ExecutorServiceUtils {
          *
          * @return 线程池
          */
-        @NotNull
+        @NonNull
         private ExecutorService createRawExecutor() {
             if (useVirtualThreads) {
                 // 原生虚拟线程 executor（无任何额外包装）
@@ -426,7 +425,7 @@ public final class ExecutorServiceUtils {
         }
 
         @Override
-        @NotNull
+        @NonNull
         public Runnable decorate(@NonNull Runnable runnable) {
             String id = prefix + "-" + VIRTUAL_THREAD_ID.getAndIncrement();
             return () -> {

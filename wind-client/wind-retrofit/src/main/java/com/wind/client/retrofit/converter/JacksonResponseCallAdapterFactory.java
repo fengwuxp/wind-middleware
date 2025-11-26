@@ -9,6 +9,7 @@ import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import okhttp3.ResponseBody;
 import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.NonNull;
 import retrofit2.Call;
 import retrofit2.CallAdapter;
 import retrofit2.Response;
@@ -39,7 +40,7 @@ public class JacksonResponseCallAdapterFactory extends CallAdapter.Factory {
     }
 
     @Override
-    public CallAdapter<?, ?> get(@NotNull Type returnType, @NotNull Annotation @NotNull [] annotations, @NotNull Retrofit retrofit) {
+    public CallAdapter<?, ?> get(@NotNull Type returnType, @NotNull Annotation @NonNull [] annotations, @NotNull Retrofit retrofit) {
         return new RespCallAdapter<>(returnType);
     }
 

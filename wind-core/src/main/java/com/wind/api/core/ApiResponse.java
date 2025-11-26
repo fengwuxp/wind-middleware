@@ -1,6 +1,6 @@
 package com.wind.api.core;
 
-import org.springframework.lang.Nullable;
+import org.jspecify.annotations.Nullable;
 
 import jakarta.validation.constraints.NotBlank;
 import java.io.Serializable;

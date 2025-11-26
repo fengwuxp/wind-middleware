@@ -1,6 +1,6 @@
 package com.wind.security.authentication;
 
-import org.springframework.lang.Nullable;
+import org.jspecify.annotations.Nullable;
 
 /**
  * 认证 token id 和用户关系的 map

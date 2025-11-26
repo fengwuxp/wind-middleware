@@ -14,7 +14,7 @@ import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
 import okio.Buffer;
-import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.NonNull;
 import org.springframework.util.StringUtils;
 
 import java.io.IOException;
@@ -45,9 +45,9 @@ public class OkHttpApiSignatureRequestInterceptor implements Interceptor {
         this.headerNames = new SignatureHttpHeaderNames(headerPrefix);
     }
 
-    @NotNull
+    @NonNull
     @Override
-    public Response intercept(@NotNull Interceptor.Chain chain) throws IOException {
+    public Response intercept(Interceptor.@NonNull Chain chain) throws IOException {
         Request request = chain.request();
         ApiSecretAccount account = accountProvider.apply(request);
         AssertUtils.notNull(account, "ApiSecretAccount must not null");

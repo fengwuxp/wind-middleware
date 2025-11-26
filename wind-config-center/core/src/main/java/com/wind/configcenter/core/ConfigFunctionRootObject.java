@@ -10,7 +10,7 @@ import com.wind.core.WindCredentialsProvider;
 import com.wind.security.crypto.symmetric.AesTextEncryptor;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
-import org.springframework.lang.Nullable;
+import org.jspecify.annotations.Nullable;
 import org.springframework.security.crypto.encrypt.TextEncryptor;
 import org.springframework.util.StringUtils;
 

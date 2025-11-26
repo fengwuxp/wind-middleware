@@ -7,7 +7,7 @@ import com.wind.common.query.supports.QueryOrderType;
 import com.wind.common.query.supports.QueryType;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
-import org.springframework.lang.Nullable;
+import org.jspecify.annotations.Nullable;
 
 import java.beans.Transient;
 import java.util.Objects;

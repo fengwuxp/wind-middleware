@@ -3,7 +3,7 @@ package com.wind.server.servlet;
 import com.wind.common.exception.BaseException;
 import com.wind.web.util.HttpQueryUtils;
 import org.springframework.http.MediaType;
-import org.springframework.lang.NonNull;
+import org.jspecify.annotations.NonNull;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.util.StreamUtils;

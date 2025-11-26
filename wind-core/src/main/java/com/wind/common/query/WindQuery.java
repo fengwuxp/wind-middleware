@@ -2,7 +2,7 @@ package com.wind.common.query;
 
 import com.wind.common.query.supports.QueryOrderType;
 import com.wind.common.query.supports.QueryType;
-import jakarta.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import jakarta.validation.constraints.NotNull;
 
 

@@ -3,7 +3,7 @@ package com.wind.server.web.security;
 import com.alibaba.fastjson2.JSON;
 import com.wind.common.WindConstants;
 import com.wind.common.util.StringJoinSplitUtils;
-import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.NonNull;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.mock.web.MockFilterChain;
@@ -32,7 +32,7 @@ class IpAccessControlFilterTests {
         Assertions.assertEquals(200, response.getStatus());
     }
 
-    @NotNull
+    @NonNull
     private static MockHttpServletRequest mockHttpRequest() {
         MockHttpServletRequest request = new MockHttpServletRequest();
         request.setAttribute(HTTP_REQUEST_IP_ATTRIBUTE_NAME, "192.168.0.102");
@@ -66,8 +66,7 @@ class IpAccessControlFilterTests {
         return new IpAccessControlFilter(getIpAccessControlConfig(whitelist, blacklist));
     }
 
-    @NotNull
-    private static IpAccessControlFilter.IpAccessControlConfig getIpAccessControlConfig(String whitelist, String blacklist) {
+    private static IpAccessControlFilter.@NonNull IpAccessControlConfig getIpAccessControlConfig(String whitelist, String blacklist) {
         return new IpAccessControlFilter.IpAccessControlConfig(StringJoinSplitUtils.split(whitelist), StringJoinSplitUtils.split(blacklist));
     }
 }

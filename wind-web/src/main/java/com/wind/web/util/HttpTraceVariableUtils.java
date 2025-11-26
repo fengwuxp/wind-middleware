@@ -1,8 +1,7 @@
 package com.wind.web.util;
 
 import com.wind.trace.WindTracer;
-
-import jakarta.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 
 import static com.wind.common.WindHttpConstants.HTTP_REQUEST_CLIENT_ID_HEADER_NAME;
 import static com.wind.common.WindHttpConstants.HTTP_REQUEST_IP_ATTRIBUTE_NAME;

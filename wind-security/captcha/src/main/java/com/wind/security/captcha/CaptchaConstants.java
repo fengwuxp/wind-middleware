@@ -1,6 +1,6 @@
 package com.wind.security.captcha;
 
-import org.springframework.lang.NonNull;
+import org.jspecify.annotations.NonNull;
 
 /**
  * 图片掩码相关常量

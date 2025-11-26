@@ -1,6 +1,6 @@
 package com.wind.common.util;
 
-import org.springframework.lang.Nullable;
+import org.jspecify.annotations.Nullable;
 
 /**
  * 深 copy 工具类

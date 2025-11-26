@@ -4,7 +4,7 @@ import com.alibaba.fastjson2.JSON;
 import com.wind.common.exception.AssertUtils;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-import org.springframework.lang.Nullable;
+import org.jspecify.annotations.Nullable;
 
 import jakarta.validation.constraints.NotNull;
 import java.util.Collections;

@@ -8,7 +8,7 @@ import org.springframework.boot.env.PropertiesPropertySourceLoader;
 import org.springframework.boot.env.PropertySourceLoader;
 import org.springframework.core.env.PropertySource;
 import org.springframework.core.io.ByteArrayResource;
-import org.springframework.lang.Nullable;
+import org.jspecify.annotations.Nullable;
 import org.springframework.util.StringUtils;
 
 import java.nio.charset.StandardCharsets;

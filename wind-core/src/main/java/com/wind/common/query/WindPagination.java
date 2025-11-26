@@ -1,7 +1,7 @@
 package com.wind.common.query;
 
 import jakarta.validation.constraints.NotNull;
-import org.springframework.lang.Nullable;
+import org.jspecify.annotations.Nullable;
 import org.springframework.util.CollectionUtils;
 
 import java.beans.Transient;

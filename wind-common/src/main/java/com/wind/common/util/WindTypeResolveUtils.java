@@ -1,7 +1,7 @@
 package com.wind.common.util;
 
 import com.wind.common.exception.AssertUtils;
-import jakarta.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import jakarta.validation.constraints.NotNull;
 import org.springframework.aop.support.AopUtils;
 import org.springframework.core.ResolvableType;
@@ -11,6 +11,7 @@ import java.util.Arrays;
 
 /**
  * wind 类型解析工具
+ *
  * @author wuxp
  * @date 2025-09-30 13:26
  **/

@@ -1,21 +1,16 @@
 package com.wind;
 
-/**
- * @author wuxp
- * @date 2024-03-31 10:42
- **/
-
 import com.wind.tools.h2.H2FunctionInitializer;
 import com.zaxxer.hikari.HikariDataSource;
 import lombok.AllArgsConstructor;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
-import org.springframework.boot.autoconfigure.AutoConfigureBefore;
 import org.springframework.boot.autoconfigure.ImportAutoConfiguration;
-import org.springframework.boot.autoconfigure.jdbc.DataSourceProperties;
-import org.springframework.boot.autoconfigure.jdbc.DataSourceTransactionManagerAutoConfiguration;
-import org.springframework.boot.autoconfigure.jdbc.JdbcTemplateAutoConfiguration;
-import org.springframework.boot.autoconfigure.sql.init.SqlInitializationAutoConfiguration;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
+import org.springframework.boot.jdbc.autoconfigure.ApplicationDataSourceScriptDatabaseInitializer;
+import org.springframework.boot.jdbc.autoconfigure.DataSourceProperties;
+import org.springframework.boot.jdbc.autoconfigure.DataSourceTransactionManagerAutoConfiguration;
+import org.springframework.boot.jdbc.autoconfigure.JdbcTemplateAutoConfiguration;
+import org.springframework.boot.sql.autoconfigure.init.SqlInitializationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.EnableAspectJAutoProxy;
@@ -38,8 +33,7 @@ import javax.sql.DataSource;
 @ImportAutoConfiguration(value = {
         AbstractJdbcTest.H2InitializationAutoConfiguration.class,
         DataSourceTransactionManagerAutoConfiguration.class,
-        JdbcTemplateAutoConfiguration.class,
-        SqlInitializationAutoConfiguration.class,
+        JdbcTemplateAutoConfiguration.class
 })
 @Transactional(rollbackFor = Exception.class)
 @TestPropertySource(locations = {"classpath:application-h2.properties", "classpath:application-test.properties"})
@@ -56,8 +50,7 @@ public abstract class AbstractJdbcTest {
      */
     @AllArgsConstructor
     @AutoConfiguration
-    @AutoConfigureBefore(SqlInitializationAutoConfiguration.class)
-    @EnableConfigurationProperties(DataSourceProperties.class)
+    @EnableConfigurationProperties({DataSourceProperties.class, SqlInitializationProperties.class})
     public static class H2InitializationAutoConfiguration {
 
         @Bean
@@ -65,6 +58,13 @@ public abstract class AbstractJdbcTest {
             properties.setType(HikariDataSource.class);
             DataSource result = properties.initializeDataSourceBuilder().build();
             H2FunctionInitializer.initialize(result);
+            return result;
+        }
+
+        @Bean
+        public ApplicationDataSourceScriptDatabaseInitializer applicationDataSourceScriptDatabaseInitializer(DataSource dataSource, SqlInitializationProperties properties) {
+            ApplicationDataSourceScriptDatabaseInitializer result = new ApplicationDataSourceScriptDatabaseInitializer(dataSource, properties);
+            result.initializeDatabase();
             return result;
         }
 

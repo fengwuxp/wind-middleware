@@ -9,7 +9,7 @@ import com.wind.script.spring.SpringExpressionEvaluator;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import org.springframework.core.annotation.AnnotatedElementUtils;
-import org.springframework.lang.Nullable;
+import org.jspecify.annotations.Nullable;
 import org.springframework.util.ClassUtils;
 import org.springframework.util.ConcurrentReferenceHashMap;
 import org.springframework.util.ObjectUtils;

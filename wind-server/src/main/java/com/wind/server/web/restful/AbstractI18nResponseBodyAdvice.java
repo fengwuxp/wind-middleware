@@ -6,8 +6,7 @@ import com.wind.common.query.supports.Pagination;
 import com.wind.common.util.WindReflectUtils;
 import com.wind.script.spring.SpringExpressionEvaluator;
 import com.wind.server.web.supports.ApiResp;
-import jakarta.annotation.Nonnull;
-import jakarta.validation.constraints.NotNull;
+import org.jspecify.annotations.NonNull;
 import org.springframework.core.MethodParameter;
 import org.springframework.expression.EvaluationContext;
 import org.springframework.expression.spel.support.StandardEvaluationContext;
@@ -29,7 +28,7 @@ import java.util.Objects;
  * @author wuxp
  * @date 2024-07-11 15:43
  **/
-public abstract class AbstractI18nResponseBodyAdvice implements ResponseBodyAdvice<Object> {
+public abstract class AbstractI18nResponseBodyAdvice implements ResponseBodyAdvice<@NonNull Object> {
 
     private static final Field[] EMPTY = new Field[0];
 
@@ -44,7 +43,7 @@ public abstract class AbstractI18nResponseBodyAdvice implements ResponseBodyAdvi
     }
 
     @Override
-    public boolean supports(@org.jetbrains.annotations.NotNull MethodParameter returnType, @Nonnull Class converterType) {
+    public boolean supports(@NonNull MethodParameter returnType, @NonNull Class converterType) {
         if (Objects.equals(defaultLocal.getLanguage(), SpringI18nMessageUtils.requireLocale().getLanguage())) {
             return false;
         }
@@ -52,16 +51,15 @@ public abstract class AbstractI18nResponseBodyAdvice implements ResponseBodyAdvi
     }
 
     @Override
-    public Object beforeBodyWrite(Object body, @Nonnull MethodParameter returnType, @Nonnull MediaType selectedContentType,
-                                  @Nonnull Class selectedConverterType, @Nonnull ServerHttpRequest request,
-                                  @Nonnull ServerHttpResponse response) {
+    public Object beforeBodyWrite(Object body, @NonNull MethodParameter returnType, @NonNull MediaType selectedContentType, @NonNull Class selectedConverterType,
+                                  @NonNull ServerHttpRequest request, @NonNull ServerHttpResponse response) {
         if (body instanceof ApiResp<?> resp) {
             handleReturnValueI18n(resp.getData());
         }
         return body;
     }
 
-    @NotNull
+    @NonNull
     protected abstract String getI18nMessage(String key);
 
     private void handleReturnValueI18n(Object result) {

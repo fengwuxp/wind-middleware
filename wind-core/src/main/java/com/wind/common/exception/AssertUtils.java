@@ -2,7 +2,7 @@ package com.wind.common.exception;
 
 
 import com.wind.common.message.MessagePlaceholder;
-import org.springframework.lang.Nullable;
+import org.jspecify.annotations.Nullable;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.ObjectUtils;
 import org.springframework.util.StringUtils;

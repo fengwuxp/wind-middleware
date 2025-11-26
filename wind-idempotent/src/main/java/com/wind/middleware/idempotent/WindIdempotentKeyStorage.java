@@ -1,6 +1,6 @@
 package com.wind.middleware.idempotent;
 
-import jakarta.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import jakarta.validation.constraints.NotBlank;
 
 /**

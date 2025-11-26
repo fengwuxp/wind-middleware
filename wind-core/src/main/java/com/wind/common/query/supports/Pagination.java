@@ -3,7 +3,7 @@ package com.wind.common.query.supports;
 
 import com.wind.common.query.WindPagination;
 import jakarta.validation.constraints.NotNull;
-import org.springframework.lang.Nullable;
+import org.jspecify.annotations.Nullable;
 import org.springframework.util.CollectionUtils;
 
 import java.beans.Transient;

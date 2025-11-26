@@ -1,7 +1,7 @@
 package com.wind.script.auditlog;
 
 
-import org.springframework.lang.Nullable;
+import org.jspecify.annotations.Nullable;
 
 /**
  * 操作日志记录者

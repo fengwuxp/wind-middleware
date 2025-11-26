@@ -6,8 +6,7 @@ import com.wind.web.util.HttpServletRequestUtils;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
-import org.jetbrains.annotations.NotNull;
-import org.springframework.lang.NonNull;
+import org.jspecify.annotations.NonNull;
 import org.springframework.security.web.util.matcher.IpAddressMatcher;
 import org.springframework.util.CollectionUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
@@ -78,11 +77,11 @@ public class IpAccessControlFilter extends OncePerRequestFilter {
         private final Collection<IpAddressMatcher> blacklist;
 
         public IpAccessControlConfig(Collection<String> whitelist, Collection<String> blacklist) {
-            this.whitelist = nullSafeGet(whitelist).stream().map(IpAddressMatcher::new).collect(Collectors.toList());
-            this.blacklist = nullSafeGet(blacklist).stream().map(IpAddressMatcher::new).collect(Collectors.toList());
+            this.whitelist = nullSafeGet(whitelist).stream().map(IpAddressMatcher::new).toList();
+            this.blacklist = nullSafeGet(blacklist).stream().map(IpAddressMatcher::new).toList();
         }
 
-        @NotNull
+        @NonNull
         private static Collection<String> nullSafeGet(Collection<String> ips) {
             return ips == null ? Collections.emptyList() : ips;
         }

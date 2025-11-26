@@ -4,7 +4,7 @@ import com.wind.common.exception.AssertUtils;
 import com.wind.common.util.WindReflectUtils;
 import com.wind.mask.annotation.Sensitive;
 import jakarta.validation.constraints.NotNull;
-import org.springframework.lang.Nullable;
+import org.jspecify.annotations.Nullable;
 
 import java.lang.reflect.Field;
 import java.util.Collection;

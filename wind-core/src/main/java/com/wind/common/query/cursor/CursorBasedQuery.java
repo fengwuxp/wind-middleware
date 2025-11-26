@@ -4,7 +4,7 @@ import com.wind.common.exception.BaseException;
 import com.wind.common.query.WindQuery;
 import com.wind.common.query.supports.QueryOrderField;
 import com.wind.common.query.supports.QueryOrderType;
-import jakarta.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 

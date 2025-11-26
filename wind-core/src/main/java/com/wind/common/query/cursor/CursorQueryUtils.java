@@ -8,7 +8,7 @@ import com.wind.common.exception.DefaultExceptionCode;
 import com.wind.common.query.supports.QueryOrderField;
 import com.wind.common.util.WindReflectUtils;
 import jakarta.validation.constraints.NotNull;
-import org.springframework.lang.Nullable;
+import org.jspecify.annotations.Nullable;
 import org.springframework.util.ClassUtils;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;

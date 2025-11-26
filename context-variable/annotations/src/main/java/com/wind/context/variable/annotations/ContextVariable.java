@@ -18,6 +18,8 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 @Retention(RUNTIME)
 public @interface ContextVariable {
 
+     String OVERRIDE_NAME = "override";
+
     /**
      * @return 上下文参数变量名称
      */

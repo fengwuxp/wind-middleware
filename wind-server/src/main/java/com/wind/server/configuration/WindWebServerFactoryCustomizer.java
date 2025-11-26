@@ -5,8 +5,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.coyote.ProtocolHandler;
 import org.apache.coyote.http11.AbstractHttp11Protocol;
 import org.apache.coyote.http11.Http11Nio2Protocol;
+import org.jspecify.annotations.NonNull;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
-import org.springframework.boot.web.embedded.tomcat.TomcatServletWebServerFactory;
+import org.springframework.boot.tomcat.servlet.TomcatServletWebServerFactory;
 import org.springframework.boot.web.server.WebServerFactoryCustomizer;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
@@ -27,7 +28,7 @@ public class WindWebServerFactoryCustomizer {
      */
     @Configuration
     @ConditionalOnProperty(prefix = "wind.server.tomcat.http1-nio2", name = WindConstants.ENABLED_NAME)
-    public static class TomcatEnableHttp1Ni2Customizer implements WebServerFactoryCustomizer<TomcatServletWebServerFactory> {
+    public static class TomcatEnableHttp1Ni2Customizer implements WebServerFactoryCustomizer<@NonNull TomcatServletWebServerFactory> {
 
         @Override
         public void customize(TomcatServletWebServerFactory factory) {

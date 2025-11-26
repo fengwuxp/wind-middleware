@@ -2,14 +2,14 @@ package com.wind.server.configcenter;
 
 import com.wind.configcenter.core.ConfigRepository;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.boot.ConfigurableBootstrapContext;
+import org.jspecify.annotations.NonNull;
+import org.springframework.boot.bootstrap.ConfigurableBootstrapContext;
 import org.springframework.boot.context.event.ApplicationEnvironmentPreparedEvent;
 import org.springframework.boot.context.properties.bind.Bindable;
 import org.springframework.boot.context.properties.bind.Binder;
 import org.springframework.context.ApplicationListener;
 import org.springframework.core.Ordered;
 import org.springframework.core.env.ConfigurableEnvironment;
-import org.springframework.lang.NonNull;
 
 import static com.wind.common.WindConstants.WIND_SERVER_CONFIG_CENTER_PROPERTIES_PREFIX;
 
@@ -20,7 +20,7 @@ import static com.wind.common.WindConstants.WIND_SERVER_CONFIG_CENTER_PROPERTIES
  * @date 2023-12-29 11:28
  **/
 @Slf4j
-public abstract class WindAbstractPropertySourceInitializer implements ApplicationListener<ApplicationEnvironmentPreparedEvent>, Ordered {
+public abstract class WindAbstractPropertySourceInitializer implements ApplicationListener<@NonNull ApplicationEnvironmentPreparedEvent>, Ordered {
 
     @Override
     public void onApplicationEvent(@NonNull ApplicationEnvironmentPreparedEvent event) {

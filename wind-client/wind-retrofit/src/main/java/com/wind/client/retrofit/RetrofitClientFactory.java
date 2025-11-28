@@ -20,7 +20,7 @@ import lombok.extern.slf4j.Slf4j;
 import okhttp3.Interceptor;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
-import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.NonNull;
 import org.springframework.lang.Nullable;
 import retrofit2.Retrofit;
 
@@ -248,7 +248,7 @@ public record RetrofitClientFactory(Retrofit retrofit) {
                     .retryOnConnectionFailure(true);
         }
 
-        @NotNull
+        @NonNull
         private static ObjectMapper buildObjectMapper() {
             ObjectMapper result = new ObjectMapper();
             // 配置忽略未知属性
@@ -257,7 +257,7 @@ public record RetrofitClientFactory(Retrofit retrofit) {
             return result;
         }
 
-        @NotNull
+        @NonNull
         private static JavaTimeModule buildJavaTimeModule() {
             JavaTimeModule result = new JavaTimeModule();
             result.addSerializer(LocalDateTime.class, new LocalDateTimeSerializer(DateTimeFormatter.ofPattern(YYYY_MM_DD_HH_MM_SS)));

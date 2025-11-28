@@ -8,7 +8,6 @@ import com.wind.common.exception.DefaultExceptionCode;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import okhttp3.ResponseBody;
-import org.jetbrains.annotations.NotNull;
 import org.jspecify.annotations.NonNull;
 import retrofit2.Call;
 import retrofit2.CallAdapter;
@@ -40,7 +39,7 @@ public class JacksonResponseCallAdapterFactory extends CallAdapter.Factory {
     }
 
     @Override
-    public CallAdapter<?, ?> get(@NotNull Type returnType, @NotNull Annotation @NonNull [] annotations, @NotNull Retrofit retrofit) {
+    public CallAdapter<?, ?> get(@NonNull Type returnType, @NonNull Annotation @NonNull [] annotations, @NonNull Retrofit retrofit) {
         return new RespCallAdapter<>(returnType);
     }
 
@@ -53,13 +52,13 @@ public class JacksonResponseCallAdapterFactory extends CallAdapter.Factory {
         }
 
         @Override
-        @NotNull
+        @NonNull
         public Type responseType() {
             return returnType;
         }
 
         @Override
-        @NotNull
+        @NonNull
         public Object adapt(Call<R> call) {
             try {
                 Response<R> response = call.execute();

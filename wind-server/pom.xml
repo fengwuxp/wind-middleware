@@ -87,13 +87,17 @@
             <optional>true</optional>
         </dependency>
         <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-configuration-processor</artifactId>
-            <optional>true</optional>
+            <groupId>com.wind.middleware</groupId>
+            <artifactId>wind-crypto</artifactId>
         </dependency>
         <dependency>
             <groupId>org.springframework.security</groupId>
             <artifactId>spring-security-core</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-configuration-processor</artifactId>
+            <optional>true</optional>
         </dependency>
         <dependency>
             <groupId>org.springframework.security</groupId>
@@ -113,10 +117,6 @@
                 </exclusion>
             </exclusions>
             <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>com.wind.security</groupId>
-            <artifactId>wind-security-crypto</artifactId>
         </dependency>
     </dependencies>
 

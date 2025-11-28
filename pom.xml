@@ -20,7 +20,6 @@
         <module>wind-server</module>
         <module>wind-core</module>
         <module>wind-common</module>
-        <module>wind-security</module>
         <module>wind-config-center</module>
         <module>wind-web</module>
         <module>wind-tracer</module>
@@ -39,6 +38,7 @@
         <module>wind-rocketmq</module>
         <module>wind-websocket</module>
         <module>wind-idempotent</module>
+        <module>wind-crypto</module>
     </modules>
 
     <properties>
@@ -270,6 +270,11 @@
             </dependency>
             <dependency>
                 <groupId>com.wind.middleware</groupId>
+                <artifactId>wind-crypto</artifactId>
+                <version>${revision}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.wind.middleware</groupId>
                 <artifactId>wind-common</artifactId>
                 <version>${revision}</version>
             </dependency>
@@ -291,36 +296,6 @@
             <dependency>
                 <groupId>com.wind.middleware</groupId>
                 <artifactId>wind-web</artifactId>
-                <version>${revision}</version>
-            </dependency>
-            <dependency>
-                <groupId>com.wind.security</groupId>
-                <artifactId>wind-security-core</artifactId>
-                <version>${revision}</version>
-            </dependency>
-            <dependency>
-                <groupId>com.wind.security</groupId>
-                <artifactId>wind-security-crypto</artifactId>
-                <version>${revision}</version>
-            </dependency>
-            <dependency>
-                <groupId>com.wind.security</groupId>
-                <artifactId>wind-security-captcha</artifactId>
-                <version>${revision}</version>
-            </dependency>
-            <dependency>
-                <groupId>com.wind.security</groupId>
-                <artifactId>wind-security-authentication</artifactId>
-                <version>${revision}</version>
-            </dependency>
-            <dependency>
-                <groupId>com.wind.security</groupId>
-                <artifactId>wind-security-jwt</artifactId>
-                <version>${revision}</version>
-            </dependency>
-            <dependency>
-                <groupId>com.wind.security</groupId>
-                <artifactId>wind-security-mfa</artifactId>
                 <version>${revision}</version>
             </dependency>
             <dependency>

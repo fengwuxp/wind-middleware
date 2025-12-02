@@ -59,6 +59,17 @@ public final class WindHttpConstants {
      */
     public static final String ALL_PATH_ANT_PATTERN = "/**";
 
+
+    /**
+     * 链路追踪 用户ID 属性名称
+     */
+    public static final String TRACE_USER_ID_ATTRIBUTE_NAME = "userId";
+
+    /**
+     * 链路追踪 租户名称属性名称
+     */
+    public static final String TRACE_TENANT_NAME_ATTRIBUTE_NAME = "tenant";
+
     /**
      * 请求异常日志输出标记
      */

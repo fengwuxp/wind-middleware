@@ -20,7 +20,7 @@ public abstract class AbstractPageQuery<OrderField extends QueryOrderField> impl
     /**
      * 避免查询页面数据过大，拖垮数据库
      */
-    private static final AtomicInteger MAX_QUERY_SIZE = new AtomicInteger(3000);
+    private static final AtomicInteger MAX_QUERY_SIZE = new AtomicInteger(8192);
 
     /**
      * 查询页码

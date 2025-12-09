@@ -39,12 +39,6 @@ public interface Pagination<T> extends WindPagination<T> {
     int getQuerySize();
 
     /**
-     * @return 当前查询类型
-     */
-    @NotNull
-    QueryType getQueryType();
-
-    /**
      * 为了节省传输内容，该方法不参与序列化
      *
      * @return 获取第一条数据

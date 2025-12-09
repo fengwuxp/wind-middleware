@@ -2,6 +2,7 @@ package com.wind.common.query.cursor;
 
 import com.wind.common.query.WindPagination;
 import com.wind.common.query.supports.QueryOrderField;
+import com.wind.common.query.supports.QueryType;
 import org.jspecify.annotations.Nullable;
 import org.springframework.util.CollectionUtils;
 
@@ -56,7 +57,7 @@ public interface CursorPagination<T> extends WindPagination<T> {
     }
 
     static <E> CursorPagination<E> empty() {
-        return of(-1L, Collections.emptyList(), 0, null, null);
+        return of(-1L, Collections.emptyList(), 0, QueryType.QUERY_RESET, null, null);
     }
 
     /**
@@ -90,10 +91,10 @@ public interface CursorPagination<T> extends WindPagination<T> {
             Collections.reverse(records);
         }
         String[] cursors = CursorQueryUtils.generateCursors(query, records);
-        return of(total, records, query.getQuerySize(), cursors[0], cursors[1]);
+        return of(total, records, query.getQuerySize(), query.getQueryType(), cursors[0], cursors[1]);
     }
 
-    static <E> CursorPagination<E> of(long total, List<E> records, int querySize, String prevCursor, String nextCursor) {
-        return new ImmutableCursorPagination<>(total, records, querySize, prevCursor, nextCursor);
+    static <E> CursorPagination<E> of(long total, List<E> records, int querySize, QueryType queryType, String prevCursor, String nextCursor) {
+        return new ImmutableCursorPagination<>(total, records, querySize, queryType, prevCursor, nextCursor);
     }
 }

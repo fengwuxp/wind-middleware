@@ -1,6 +1,7 @@
 package com.wind.common.query.cursor;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.wind.common.query.supports.QueryType;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -25,6 +26,8 @@ public final class ImmutableCursorPagination<T> implements CursorPagination<T> {
     private final List<T> records;
 
     private final int querySize;
+
+    private final QueryType queryType;
 
     private final String prevCursor;
 

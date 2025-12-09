@@ -10,7 +10,7 @@ import org.jspecify.annotations.Nullable;
  * @author wuxp
  * @date 2025-12-09 13:40
  **/
-public class DefaultCursorQueryOptions extends AbstractCursorQuery<DefaultCursorQueryOrderField> {
+public final class DefaultCursorQueryOptions extends AbstractCursorQuery<DefaultCursorQueryOrderField> {
 
     public static DefaultCursorQueryOptions next(String nextCursor) {
         return next(nextCursor, 20);

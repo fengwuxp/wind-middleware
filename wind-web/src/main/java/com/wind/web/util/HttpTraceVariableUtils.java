@@ -5,6 +5,7 @@ import org.jspecify.annotations.Nullable;
 
 import static com.wind.common.WindHttpConstants.HTTP_REQUEST_CLIENT_ID_HEADER_NAME;
 import static com.wind.common.WindHttpConstants.HTTP_REQUEST_IP_ATTRIBUTE_NAME;
+import static com.wind.common.WindHttpConstants.HTTP_USER_AGENT_HEADER_NAME;
 
 /**
  * http trace variable 变量获取
@@ -32,5 +33,13 @@ public final class HttpTraceVariableUtils {
     @Nullable
     public static String getRequestDeviceId() {
         return WindTracer.TRACER.getContextVariable(HTTP_REQUEST_CLIENT_ID_HEADER_NAME);
+    }
+
+    /**
+     * @return 获取请求客户端设备代理
+     */
+    @Nullable
+    public static String getRequestDeviceUserAgent() {
+        return WindTracer.TRACER.getContextVariable(HTTP_USER_AGENT_HEADER_NAME);
     }
 }

@@ -38,9 +38,14 @@ public final class WindHttpConstants {
     public static final String HTTP_USER_AGENT_HEADER_NAME = "User-Agent";
 
     /**
-     * http request Device-Id  header name
+     * http request client id header name
      */
     public static final String HTTP_REQUEST_CLIENT_ID_HEADER_NAME = "Wind-Device-Id";
+
+    /**
+     * http request client device type header name
+     */
+    public static final String HTTP_REQUEST_CLIENT_DEVICE_TYPE_HEADER_NAME = "Wind-Device-Type";
 
     /**
      * http request Idempotent header name

@@ -24,6 +24,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+
 /**
  * 反射工具类，JDK21+ 兼容
  * - 不再强制使用 setAccessible
@@ -49,6 +50,23 @@ public final class WindReflectUtils {
 
     private WindReflectUtils() {
         throw new AssertionError();
+    }
+
+    /**
+     * 创建实例
+     *
+     * @param className 类名称
+     * @return 类实例
+     */
+    @SuppressWarnings("unchecked")
+    @NotNull
+    public static <T> T newInstance(@NotNull String className) {
+        AssertUtils.hasText(className, "argument className must not empty");
+        try {
+            return newInstance((Class<T>) Class.forName(className));
+        } catch (ClassNotFoundException exception) {
+            throw new BaseException(DefaultExceptionCode.COMMON_FRIENDLY_ERROR, "class not found", exception);
+        }
     }
 
     /**
@@ -359,5 +377,4 @@ public final class WindReflectUtils {
             throw new BaseException(DefaultExceptionCode.COMMON_ERROR, "Cannot access method  = " + method.getDeclaringClass().getName() + "#" + method.getName(), e);
         }
     }
-
 }

@@ -76,6 +76,12 @@ public final class WindHttpConstants {
     public static final String TRACE_TENANT_NAME_ATTRIBUTE_NAME = "tenant";
 
     /**
+     * api token bearer prefix
+     * @see  <a href="https://datatracker.ietf.org/doc/html/rfc6750 "> The OAuth 2.0 Authorization Framework: Bearer Token Usage</a>
+     */
+    public static final String API_TOKEN_BEARER_PREFIX = "Bearer ";
+
+    /**
      * 请求异常日志输出标记
      */
     public static String getRequestExceptionLogOutputMarkerAttributeName(Throwable throwable) {

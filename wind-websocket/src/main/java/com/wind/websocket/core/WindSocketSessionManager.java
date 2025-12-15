@@ -3,6 +3,7 @@ package com.wind.websocket.core;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Null;
+
 import java.util.Map;
 
 /**
@@ -10,7 +11,9 @@ import java.util.Map;
  *
  * @author wuxp
  * @date 2025-05-30 10:41
+ * @see com.wind.websocket.core.WindSocketSessionRegistry
  **/
+@Deprecated(forRemoval = true)
 public interface WindSocketSessionManager extends WindSocketSessionStatusOperations {
 
     /**

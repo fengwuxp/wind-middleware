@@ -214,11 +214,11 @@ public class DefaultServiceCodeGenerator {
                 .filter(field -> UPDATE_REQUEST_IGNORE_FIELDS.contains(field.getName()))
                 // 创建、更新时间增加范围查询支持
                 .map(field -> Arrays.asList(
-                        field.rename("min" + field.getFirstUpCaseName(), "查询到最小" + field.getName()),
-                        field.rename("max" + field.getFirstUpCaseName(), "查询到最大" + field.getName())
+                        field.rename("min" + field.getFirstUpCaseName(), "查询到最小 " + field.getName()),
+                        field.rename("max" + field.getFirstUpCaseName(), "查询到最大 " + field.getName())
                 ))
                 .flatMap(Collection::stream)
-                .collect(Collectors.toList());
+                .toList();
         GenCodeInfo result = rebuildEntityByCreateRequest(entity).duplicate();
         List<GenCodeInfo.FieldInfo> fields = result.getFields();
         fields.addAll(dateFields);

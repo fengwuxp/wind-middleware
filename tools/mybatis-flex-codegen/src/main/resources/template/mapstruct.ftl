@@ -21,18 +21,18 @@ ${name}Converter INSTANCE = Mappers.getMapper(${name}Converter.class);
 /**
 * 创建请求 convert to ${comment}实体
 *
-* @param req 创建请求
+* @param request 创建请求
 * @return ${name} 实例
 */
-${name} convertTo${name}(Create${name}Request req);
+${name} convertTo${name}(Create${name}Request request);
 
 /**
 * 更新请求 convert to ${comment}实体
 *
-* @param req 更新请求
+* @param request 更新请求
 * @return ${name} 实例
 */
-${name} convertTo${name}(Update${name}Request req);
+${name} convertTo${name}(Update${name}Request request);
 
 
 /**

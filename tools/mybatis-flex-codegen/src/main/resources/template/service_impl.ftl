@@ -12,15 +12,14 @@ import ${basePackage}.model.request.Create${name}Request;
 import ${basePackage}.model.request.Update${name}Request;
 import com.mybatisflex.core.paginate.Page;
 import com.mybatisflex.core.query.QueryWrapper;
-import com.wind.common.query.supports.Pagination;
+import com.wind.common.query.WindPagination;
+import com.wind.common.query.WindQuery;
 
 import com.wind.common.exception.AssertUtils;
-import com.wind.common.query.supports.Pagination;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import jakarta.validation.constraints.NotEmpty;
-import jakarta.validation.constraints.NotNull;
+import import org.jspecify.annotations.NonNull;
 import java.util.Arrays;
 
 /**
@@ -37,7 +36,7 @@ public class ${javaClassName} implements ${name}Service {
 private final ${name}Mapper ${firstLowName}Mapper;
 
 @Override
-public Long create${name}(Create${name}Request request){
+public @NonNull Long create${name}(@NonNull Create${name}Request request){
 ${name} entity = ${name}Converter.INSTANCE.convertTo${name}(request);
 ${firstLowName}Mapper.insertSelective(entity);
 AssertUtils.notNull(entity.getId(), "创建${comment}失败");
@@ -46,7 +45,7 @@ return entity.getId();
 
 
 @Override
-public void update${name}(Update${name}Request request){
+public void update${name}(@NonNull Update${name}Request request){
 ${name} entity = find${name}(request.getId());
 <#if existsVersionField>
     if (request.getVersion() == null) {
@@ -59,7 +58,7 @@ AssertUtils.isTrue( ${firstLowName}Mapper.update(entity) == 1, "更新${comment}
 
 
 @Override
-public void delete${name}ByIds(@NotEmpty Long... ids){
+public void delete${name}ByIds(@NonNull Long... ids){
 AssertUtils.notEmpty(ids, "argument ids must not empty");
 <#if useLogicDeleted>
     QueryWrapper wrapper = QueryWrapper.create().where(${name}NameRefs.${firstLowName}.id.in(ids));
@@ -73,15 +72,14 @@ AssertUtils.notEmpty(ids, "argument ids must not empty");
 }
 
 @Override
-public ${name}DTO query${name}ById(@NotNull Long id){
+public @NonNull ${name}DTO query${name}ById(NonNull Long id){
 return ${name}Converter.INSTANCE.convertTo${name}DTO(find${name}(id));
 }
 
 @Override
-public Pagination
-<${name}DTO> query${name}s(${name}Query query){
+public @NonNull WindPagination<${name}DTO> query${name}s(@NonNull ${name}Query query, @NonNull WindQuery<? extends QueryOrderField> options){
     ${name}NameRefs ${firstLowName} = ${name}NameRefs.${firstLowName};
-    QueryWrapper queryWrapper = MybatisQueryHelper.from(query).select()
+    QueryWrapper queryWrapper = MybatisQueryHelper.from(options).select()
     .from(${firstLowName})
     <#if extraProps.query??>
     <#--字段-->
@@ -113,8 +111,11 @@ public Pagination
         </#list>
     </#if>
 
-    Page<${name}> result = ${firstLowName}Mapper.paginate(MybatisQueryHelper.of(query), queryWrapper);
-    return MybatisQueryHelper.convert(result, query,${name}Converter.INSTANCE::convertTo${name}DTO);
+    return MybatisQueryHelper.<${name}, ${name}DTO>query(queryWrapper)
+    .counter(${firstLowName}Mapper::selectCountByQuery)
+    .resultQueryFunc(${firstLowName}Mapper::selectListByQuery)
+    .converter(${name}Converter.INSTANCE::convertTo${name}DTO)
+    .query(options);
     }
 
 

@@ -10,6 +10,18 @@ import org.jspecify.annotations.Nullable;
  **/
 public final class DefaultPageQueryOptions extends AbstractPageQuery<DefaultOrderField> {
 
+    public static DefaultPageQueryOptions desc(DefaultOrderField field) {
+        return order(field, QueryOrderType.DESC);
+    }
+
+    public static DefaultPageQueryOptions asc(DefaultOrderField field) {
+        return order(field, QueryOrderType.ASC);
+    }
+
+    public static DefaultPageQueryOptions order(DefaultOrderField field, QueryOrderType orderType) {
+        return defaults(1, 20, field, orderType);
+    }
+
     public static DefaultPageQueryOptions defaults() {
         return new DefaultPageQueryOptions();
     }

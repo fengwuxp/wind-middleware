@@ -2,7 +2,8 @@ package ${basePackage}.controller;
 
 import com.wind.common.exception.BaseException;
 import com.wind.common.query.supports.AbstractPageQuery;
-import com.wind.common.query.supports.Pagination;
+import com.wind.common.query.WindPagination;
+import com.wind.common.query.supports.DefaultPageQueryOptions;
 import com.wind.common.query.supports.QueryOrderField;
 import com.wind.script.auditlog.AuditLog;
 import com.wind.server.web.restful.RestfulApiRespFactory;
@@ -77,9 +78,9 @@ public ApiResp
                 @GetMapping()
                 @Operation(summary = "查询分页数据")
                 public ApiResp
-                <Pagination
-                <${name}DTO>> query${name}s(${name}Query query) {
-                    return RestfulApiRespFactory.ok(${firstLowName}Service.query${name}s(query));
+                <WindPagination
+                <${name}DTO>> query${name}s(${name}Query query, DefaultPageQueryOptions options) {
+                    return RestfulApiRespFactory.ok(${firstLowName}Service.query${name}s(query, options));
                     }
 
                     }

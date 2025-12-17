@@ -25,8 +25,7 @@ import lombok.experimental.*;
 @EqualsAndHashCode<#if javaClassName?ends_with('Query')>(callSuper = true)</#if>
 @ToString<#if javaClassName?ends_with('Query')>(callSuper = true)</#if>
 @Accessors(chain = true)
-public class  ${javaClassName} <#if javaClassName?ends_with('Query')>extends AbstractPageQuery
-<DefaultOrderField></#if><#if javaClassName?ends_with('DTO')>implements java.io.Serializable</#if> {
+public class  ${javaClassName} <#if javaClassName?ends_with('DTO')>implements java.io.Serializable</#if> {
 
     <#if fields??>
     <#--字段-->

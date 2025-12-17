@@ -1,10 +1,9 @@
 package com.wind.websocket.chat;
 
-import jakarta.validation.constraints.NotBlank;
+import com.wind.websocket.core.WindSessionMessage;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
-import java.time.LocalDateTime;
-import java.time.ZoneOffset;
+
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -35,47 +34,13 @@ import java.util.Map;
  * @author wuxp
  * @date 2025-05-27 10:28
  **/
-public interface ChatMessage {
-
-    /**
-     * @return 消息 id
-     */
-    @NotBlank
-    String getId();
-
-    /**
-     * @return 发送者
-     */
-    @NotBlank
-    String getFromUserId();
-
-    /**
-     * 聊天会话 id
-     *
-     * @return 接收者
-     */
-    @NotBlank
-    String getSessionId();
+public interface WindChatMessage extends WindSessionMessage {
 
     /**
      * @return 消息内容，可能有多个条
      */
     @NotEmpty
     List<ChatMessageContent> getBody();
-
-    /**
-     * @return 发送时间戳
-     */
-    @NotNull
-    default Long getTimestamp() {
-        return getGmtCreate().toInstant(ZoneOffset.UTC).getEpochSecond();
-    }
-
-    /**
-     * @return 创建时间
-     */
-    @NotBlank
-    LocalDateTime getGmtCreate();
 
     /**
      * @return 消息序列号

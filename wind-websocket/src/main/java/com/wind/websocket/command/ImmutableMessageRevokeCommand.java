@@ -2,6 +2,8 @@ package com.wind.websocket.command;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.wind.websocket.core.WindSessionMessageActor;
+import com.wind.websocket.core.WindSessionMessage;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.experimental.FieldNameConstants;
@@ -19,7 +21,8 @@ import java.time.LocalDateTime;
  * @date 2025-12-12 10:53
  */
 @FieldNameConstants
-public record ImmutableMessageRevokeCommand(@NotBlank String messageId, @NotBlank String sessionId, @NotBlank String revokeUserId, @NotNull LocalDateTime revokeTime) {
+public record ImmutableMessageRevokeCommand(@NotBlank String messageId, @NotBlank String sessionId, @NotBlank String revokeUserId, @NotNull LocalDateTime revokeTime)
+        implements WindSessionMessage {
 
     @JsonCreator
     public ImmutableMessageRevokeCommand(
@@ -32,5 +35,25 @@ public record ImmutableMessageRevokeCommand(@NotBlank String messageId, @NotBlan
         this.sessionId = sessionId;
         this.revokeUserId = revokeUserId;
         this.revokeTime = revokeTime;
+    }
+
+    @Override
+    public String getId() {
+        return messageId;
+    }
+
+    @Override
+    public WindSessionMessageActor getSender() {
+        return WindSessionMessageActor.ofUser(revokeUserId);
+    }
+
+    @Override
+    public String getSessionId() {
+        return sessionId;
+    }
+
+    @Override
+    public LocalDateTime getGmtCreate() {
+        return revokeTime;
     }
 }

@@ -36,6 +36,18 @@ public record ChatMessageContent(ChatMessageContentType contentType, String cont
         this.variables = variables == null ? new HashMap<>() : new HashMap<>(variables);
     }
 
+    public static ChatMessageContent text(String content) {
+        return of(ChatMessageContentType.TEXT, content);
+    }
+
+    public static ChatMessageContent image(String content) {
+        return of(ChatMessageContentType.IMAGE, content);
+    }
+
+    public static ChatMessageContent file(String content) {
+        return of(ChatMessageContentType.FILE, content);
+    }
+
     public static ChatMessageContent of(ChatMessageContentType type, String content) {
         return of(type, content, Collections.emptyMap());
     }

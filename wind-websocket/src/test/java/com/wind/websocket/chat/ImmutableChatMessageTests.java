@@ -2,15 +2,29 @@ package com.wind.websocket.chat;
 
 
 import com.fasterxml.jackson.databind.json.JsonMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateDeserializer;
+import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateTimeDeserializer;
+import com.fasterxml.jackson.datatype.jsr310.deser.LocalTimeDeserializer;
+import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateSerializer;
+import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
+import com.fasterxml.jackson.datatype.jsr310.ser.LocalTimeSerializer;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
 import java.util.Collections;
+
+import static com.wind.common.WindDateFormatPatterns.HH_MM_SS;
+import static com.wind.common.WindDateFormatPatterns.YYYY_MM_DD;
+import static com.wind.common.WindDateFormatPatterns.YYYY_MM_DD_HH_MM_SS;
 
 /**
  * @author wuxp
@@ -24,7 +38,17 @@ class ImmutableChatMessageTests {
 
     @BeforeEach
     void setup() {
-        jsonMapper = JsonMapper.builder().build();
+        JavaTimeModule module = new JavaTimeModule();
+        module.addSerializer(LocalDateTime.class, new LocalDateTimeSerializer(DateTimeFormatter.ofPattern(YYYY_MM_DD_HH_MM_SS)));
+        module.addSerializer(LocalDate.class, new LocalDateSerializer(DateTimeFormatter.ofPattern(YYYY_MM_DD)));
+        module.addSerializer(LocalTime.class, new LocalTimeSerializer(DateTimeFormatter.ofPattern(HH_MM_SS)));
+        module.addDeserializer(LocalDateTime.class, new LocalDateTimeDeserializer(DateTimeFormatter.ofPattern(YYYY_MM_DD_HH_MM_SS)));
+        module.addDeserializer(LocalDate.class, new LocalDateDeserializer(DateTimeFormatter.ofPattern(YYYY_MM_DD)));
+        module.addDeserializer(LocalTime.class, new LocalTimeDeserializer(DateTimeFormatter.ofPattern(HH_MM_SS)));
+        jsonMapper = JsonMapper.builder()
+                .addModule(module)
+                .build();
+
     }
 
     @Test
@@ -54,7 +78,7 @@ class ImmutableChatMessageTests {
 
         // 断言字段值正确
         Assertions.assertEquals(message.getId(), deserialized.getId());
-        Assertions.assertEquals(message.getFromUserId(), deserialized.getFromUserId());
+        Assertions.assertEquals(message.getSenderId(), deserialized.getSenderId());
         Assertions.assertEquals(message.getSessionId(), deserialized.getSessionId());
         Assertions.assertEquals(message.getBody().size(), deserialized.getBody().size());
         Assertions.assertEquals(message.getBody().getFirst().content(), deserialized.getBody().getFirst().content());

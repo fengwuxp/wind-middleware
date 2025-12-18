@@ -3,7 +3,7 @@ package com.wind.server.configcenter;
 import com.wind.common.WindConstants;
 import com.wind.common.enums.ConfigFileType;
 import com.wind.common.enums.WindMiddlewareType;
-import com.wind.common.util.ClassDetectionUtils;
+import com.wind.common.util.WindClassUtils;
 import com.wind.configcenter.core.ConfigRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.util.StringUtils;
@@ -73,17 +73,17 @@ public final class WindDynamicTpConfigDescriptorDetector {
 
     private static String getWebServerType() {
         // TODO 待完善
-        boolean isDynamicWebServer = ClassDetectionUtils.isPresent("org.dromara.dynamictp.starter.adapter.webserver.AbstractWebServerDtpAdapter");
+        boolean isDynamicWebServer = WindClassUtils.isPresent("org.dromara.dynamictp.starter.adapter.webserver.AbstractWebServerDtpAdapter");
         if (!isDynamicWebServer) {
             return WindConstants.EMPTY;
         }
-        if (ClassDetectionUtils.isPresent("org.apache.catalina.Container")) {
+        if (WindClassUtils.isPresent("org.apache.catalina.Container")) {
             return "tomcat";
         }
-        if (ClassDetectionUtils.isPresent("io.undertow.Undertow")) {
+        if (WindClassUtils.isPresent("io.undertow.Undertow")) {
             return "undertow";
         }
-        if (ClassDetectionUtils.isPresent("org.eclipse.jetty.server")) {
+        if (WindClassUtils.isPresent("org.eclipse.jetty.server")) {
             return "jetty";
         }
         return WindConstants.EMPTY;
@@ -91,18 +91,18 @@ public final class WindDynamicTpConfigDescriptorDetector {
 
     private static String getMqType() {
         // TODO 待完善
-        if (ClassDetectionUtils.isPresent("org.dromara.dynamictp.adapter.rocketmq.RocketMqDtpAdapter")) {
-            return ClassDetectionUtils.isPresent("org.apache.rocketmq.client.MQAdmin") ? "rocketmq" : WindConstants.EMPTY;
+        if (WindClassUtils.isPresent("org.dromara.dynamictp.adapter.rocketmq.RocketMqDtpAdapter")) {
+            return WindClassUtils.isPresent("org.apache.rocketmq.client.MQAdmin") ? "rocketmq" : WindConstants.EMPTY;
         }
-        if (ClassDetectionUtils.isPresent("org.dromara.dynamictp.adapter.rabbitmq.RabbitMqDtpAdapter")) {
-            return ClassDetectionUtils.isPresent("com.rabbitmq.client.Connection") ? "rabbitmq" : WindConstants.EMPTY;
+        if (WindClassUtils.isPresent("org.dromara.dynamictp.adapter.rabbitmq.RabbitMqDtpAdapter")) {
+            return WindClassUtils.isPresent("com.rabbitmq.client.Connection") ? "rabbitmq" : WindConstants.EMPTY;
         }
         return WindConstants.EMPTY;
     }
 
     private static String getCommonName() {
-        if (ClassDetectionUtils.isPresent("org.dromara.dynamictp.starter.cloud.nacos.autoconfigure.DtpCloudNacosAutoConfiguration")) {
-            return ClassDetectionUtils.isPresent("com.wind.nacos.NacosConfigRepository") ? "common" : WindConstants.EMPTY;
+        if (WindClassUtils.isPresent("org.dromara.dynamictp.starter.cloud.nacos.autoconfigure.DtpCloudNacosAutoConfiguration")) {
+            return WindClassUtils.isPresent("com.wind.nacos.NacosConfigRepository") ? "common" : WindConstants.EMPTY;
         }
         return WindConstants.EMPTY;
     }

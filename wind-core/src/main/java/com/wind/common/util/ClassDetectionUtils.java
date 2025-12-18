@@ -6,6 +6,7 @@ package com.wind.common.util;
  * @author wuxp
  * @date 2023-10-19 15:48
  **/
+@Deprecated(forRemoval = true)
 public final class ClassDetectionUtils {
 
     private ClassDetectionUtils() {

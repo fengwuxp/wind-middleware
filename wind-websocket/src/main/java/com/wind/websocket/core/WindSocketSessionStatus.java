@@ -16,6 +16,8 @@ public enum WindSocketSessionStatus implements DescriptiveEnum {
 
     SUSPENDED("挂起"),
 
+    ARCHIVED("已归档"),
+
     DELETED("已删除");
 
     private final String desc;

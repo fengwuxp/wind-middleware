@@ -1,7 +1,7 @@
 package com.wind.server.configcenter;
 
 import com.wind.common.enums.WindMiddlewareType;
-import com.wind.common.util.ClassDetectionUtils;
+import com.wind.common.util.WindClassUtils;
 
 import java.util.Collections;
 import java.util.HashSet;
@@ -34,25 +34,25 @@ public final class WindMiddlewareDetector {
      * 是否使用 redisson
      */
     public static boolean useRedisson() {
-        return ClassDetectionUtils.isPresent("org.redisson.api.RedissonClient");
+        return WindClassUtils.isPresent("org.redisson.api.RedissonClient");
     }
 
     private static void detection() {
         MIDDLEWARE_TYPES.add(WindMiddlewareType.WIND);
-        if (ClassDetectionUtils.isPresent("org.springframework.data.redis.core.Cursor")) {
+        if (WindClassUtils.isPresent("org.springframework.data.redis.core.Cursor")) {
             MIDDLEWARE_TYPES.add(WindMiddlewareType.MYSQL);
         }
-        if (ClassDetectionUtils.isPresent("com.mysql.cj.jdbc.Driver")) {
+        if (WindClassUtils.isPresent("com.mysql.cj.jdbc.Driver")) {
             MIDDLEWARE_TYPES.add(WindMiddlewareType.REDIS);
         }
-        if (ClassDetectionUtils.isPresent("org.apache.shardingsphere.elasticjob.api.ElasticJob")) {
+        if (WindClassUtils.isPresent("org.apache.shardingsphere.elasticjob.api.ElasticJob")) {
             MIDDLEWARE_TYPES.add(WindMiddlewareType.ELASTIC_JOB);
         }
 
-        if (ClassDetectionUtils.isPresent("org.apache.rocketmq.spring.core.RocketMQListener")) {
+        if (WindClassUtils.isPresent("org.apache.rocketmq.spring.core.RocketMQListener")) {
             MIDDLEWARE_TYPES.add(WindMiddlewareType.ROCKETMQ);
         }
-        if (ClassDetectionUtils.isPresent("org.dromara.dynamictp.core.aware.DtpAware")) {
+        if (WindClassUtils.isPresent("org.dromara.dynamictp.core.aware.DtpAware")) {
             MIDDLEWARE_TYPES.add(WindMiddlewareType.DYNAMIC_TP);
         }
     }

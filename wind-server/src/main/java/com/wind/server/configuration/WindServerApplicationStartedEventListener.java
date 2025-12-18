@@ -2,7 +2,7 @@ package com.wind.server.configuration;
 
 import com.wind.common.i18n.SpringI18nMessageUtils;
 import com.wind.common.spring.SpringApplicationContextUtils;
-import com.wind.common.util.ClassDetectionUtils;
+import com.wind.common.util.WindClassUtils;
 import com.wind.middleware.idempotent.WindIdempotentExecuteUtils;
 import com.wind.middleware.idempotent.WindIdempotentKeyStorage;
 import com.wind.server.i18n.WindAcceptI18nHeaderLocaleResolver;
@@ -107,7 +107,7 @@ public class WindServerApplicationStartedEventListener implements ApplicationLis
     private static class IdempotentInitializer {
 
         private static void initialize(ApplicationContext applicationContext) {
-            if (!ClassDetectionUtils.isPresent("com.wind.middleware.idempotent.WindIdempotentExecuteUtils")) {
+            if (!WindClassUtils.isPresent("com.wind.middleware.idempotent.WindIdempotentExecuteUtils")) {
                 log.info("unsupported wind idempotent");
                 return;
             }

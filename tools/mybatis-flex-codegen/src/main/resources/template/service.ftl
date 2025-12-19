@@ -37,7 +37,7 @@ void update${name}(@NonNull Update${name}Request request);
 *
 * @param id ${comment} id
 */
-default void delete${name}ById(@@NonNull Long id){
+default void delete${name}ById(@NonNull Long id){
 delete${name}ByIds(id);
 }
 
@@ -54,7 +54,7 @@ void delete${name}ByIds(@NonNull Long... ids);
 * @param id ${comment} id
 * @return ${name}
 */
-@NonNull ${name}DTO query${name}ById(@NonNull Long id);
+@NonNull ${name}DTO get${name}ById(@NonNull Long id);
 
 /**
 * 分页查询 ${comment}

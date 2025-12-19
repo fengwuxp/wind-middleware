@@ -22,8 +22,8 @@ import lombok.experimental.*;
 */
 @Data
 @NoArgsConstructor
-@EqualsAndHashCode<#if javaClassName?ends_with('Query')>(callSuper = true)</#if>
-@ToString<#if javaClassName?ends_with('Query')>(callSuper = true)</#if>
+@EqualsAndHashCode
+@ToString
 @Accessors(chain = true)
 public class  ${javaClassName} <#if javaClassName?ends_with('DTO')>implements java.io.Serializable</#if> {
 

@@ -57,7 +57,7 @@ public class JavaEntityParser {
         List<String> annotations = new ArrayList<>();
         Arrays.stream(field.getAnnotations())
                 // 仅支持验证注解
-                .filter(annotation -> annotation.annotationType().getName().startsWith("javax.validation.constraints"))
+                .filter(annotation -> annotation.annotationType().getName().startsWith("jakarta.validation.constraints"))
                 .forEach(annotation -> {
                     if (isNoneJavaLang(annotation.annotationType())) {
                         dependencies.add(annotation.annotationType().getName());

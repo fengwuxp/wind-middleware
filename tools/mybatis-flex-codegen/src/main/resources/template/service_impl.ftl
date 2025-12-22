@@ -20,6 +20,7 @@ import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import import org.jspecify.annotations.NonNull;
+import java.util.List;
 import java.util.Arrays;
 
 /**
@@ -60,15 +61,8 @@ AssertUtils.isTrue( ${firstLowName}Mapper.update(entity) == 1, "更新${comment}
 @Override
 public void delete${name}ByIds(@NonNull Long... ids){
 AssertUtils.notEmpty(ids, "argument ids must not empty");
-<#if useLogicDeleted>
-    QueryWrapper wrapper = QueryWrapper.create().where(${name}NameRefs.${firstLowName}.id.in(ids));
-    ${name} entity = new ${name}();
-    entity.setDeleted(true);
-    AssertUtils.isTrue(${firstLowName}Mapper.updateByQuery(entity, true, wrapper) == ids.length, "删除${comment}失败");
-<#else >
-    int total = ${firstLowName}Mapper.deleteBatchByIds(Arrays.asList(ids));
-    AssertUtils.isTrue(total == ids.length, "删除${comment}失败");
-</#if>
+int total = ${firstLowName}Mapper.deleteBatchByIds(List.of(ids));
+AssertUtils.isTrue(total == ids.length, "删除${comment}失败");
 }
 
 @Override

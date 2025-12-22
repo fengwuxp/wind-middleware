@@ -2,6 +2,8 @@ package com.wind.script.expression;
 
 import lombok.Data;
 
+import java.io.Serial;
+import java.io.Serializable;
 import java.util.List;
 
 /**
@@ -11,7 +13,10 @@ import java.util.List;
  * @date 2023-09-23 07:44
  **/
 @Data
-public class ExpressionDescriptor {
+public class ExpressionDescriptor implements Serializable {
+
+    @Serial
+    private static final long serialVersionUID = 9181900345416728145L;
 
     /**
      * 逻辑运算关系 AND、OR

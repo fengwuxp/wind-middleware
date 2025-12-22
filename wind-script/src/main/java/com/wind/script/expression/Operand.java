@@ -1,10 +1,12 @@
 package com.wind.script.expression;
 
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import jakarta.validation.constraints.NotNull;
+import java.io.Serial;
+import java.io.Serializable;
 
 /**
  * 表达式操作数，{@link #value}用于在表达式中计算
@@ -15,7 +17,10 @@ import jakarta.validation.constraints.NotNull;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class Operand {
+public class Operand implements Serializable {
+
+    @Serial
+    private static final long serialVersionUID = 6873181395184723950L;
 
     /**
      * 操作数 value

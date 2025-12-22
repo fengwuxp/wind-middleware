@@ -72,7 +72,7 @@ AssertUtils.notEmpty(ids, "argument ids must not empty");
 }
 
 @Override
-public @NonNull ${name}DTO query${name}ById(@NonNull Long id){
+public @NonNull ${name}DTO get${name}ById(@NonNull Long id){
 return ${name}Converter.INSTANCE.convertTo${name}DTO(find${name}(id));
 }
 

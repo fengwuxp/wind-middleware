@@ -18,6 +18,8 @@ public enum WindDateFormater {
 
     ISO_8601_EXTENDED_DATETIME(DateTimeFormatter.ofPattern(WindDateFormatPatterns.ISO_8601_EXTENDED_DATETIME)),
 
+    HH_MM_SS(DateTimeFormatter.ofPattern(WindDateFormatPatterns.HH_MM_SS)),
+
     YYYYMMDD(DateTimeFormatter.ofPattern(WindDateFormatPatterns.YYYYMMDD)),
 
     YYYYMMDDHH(DateTimeFormatter.ofPattern(WindDateFormatPatterns.YYYYMMDDHH)),

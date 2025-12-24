@@ -1,8 +1,10 @@
 package com.wind.common;
 
 /**
- * 日期格式化常量
- * 时间格式参见：https://blog.csdn.net/lilongsy/article/details/130130776
+ * 日期格式化常量（包含 ISO 8601 及常用业务格式）
+ * https://www.iso.org/standard/70907.html
+ * https://www.rfc-editor.org/rfc/rfc3339
+ * https://en.wikipedia.org/wiki/ISO_8601
  *
  * @author wuxp
  * @date 2024-04-07 15:51

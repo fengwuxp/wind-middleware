@@ -4,9 +4,7 @@ import com.wind.common.query.WindPagination;
 import com.wind.common.query.supports.QueryOrderField;
 import com.wind.common.query.supports.QueryType;
 import org.jspecify.annotations.Nullable;
-import org.springframework.util.CollectionUtils;
 
-import java.beans.Transient;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -49,13 +47,11 @@ public interface CursorPagination<T> extends WindPagination<T> {
     boolean hasNext();
 
     /**
-     * @return {@link #getRecords()}是否为 null 或空集合
+     * 创建一个空的分页对象
+     *
+     * @param <E> 分页数据类型
+     * @return 分页对象
      */
-    @Transient
-    default boolean isEmpty() {
-        return CollectionUtils.isEmpty(getRecords());
-    }
-
     static <E> CursorPagination<E> empty() {
         return of(-1L, Collections.emptyList(), 0, QueryType.QUERY_RESET, null, null);
     }

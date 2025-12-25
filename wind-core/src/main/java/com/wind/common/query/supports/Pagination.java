@@ -3,10 +3,7 @@ package com.wind.common.query.supports;
 
 import com.wind.common.query.WindPagination;
 import jakarta.validation.constraints.NotNull;
-import org.jspecify.annotations.Nullable;
-import org.springframework.util.CollectionUtils;
 
-import java.beans.Transient;
 import java.util.Collections;
 import java.util.List;
 
@@ -38,24 +35,6 @@ public interface Pagination<T> extends WindPagination<T> {
      */
     int getQuerySize();
 
-    /**
-     * 为了节省传输内容，该方法不参与序列化
-     *
-     * @return 获取第一条数据
-     */
-    @Transient
-    @Nullable
-    default T getFirst() {
-        return CollectionUtils.firstElement(getRecords());
-    }
-
-    /**
-     * @return {@link #getRecords()}是否为 null 或空集合
-     */
-    @Transient
-    default boolean isEmpty() {
-        return CollectionUtils.isEmpty(getRecords());
-    }
 
     static <E> Pagination<E> empty() {
         return new ImmutablePagination<>();

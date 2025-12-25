@@ -33,12 +33,19 @@ public interface WindPagination<T> extends Serializable {
      */
     int getQuerySize();
 
-
     /**
      * @return 当前查询类型
      */
     @NotNull
     QueryType getQueryType();
+
+    /**
+     * @return {@link #getRecords()} 是否为 null 或空集合
+     */
+    @Transient
+    default boolean isEmpty() {
+        return CollectionUtils.isEmpty(getRecords());
+    }
 
     /**
      * 为了节省传输内容，该方法不参与序列化

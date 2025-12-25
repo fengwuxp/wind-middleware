@@ -14,11 +14,11 @@ import java.util.Date;
  * @author wuxp
  * @date 2023-10-18 08:02
  **/
-public record DateTimeSequenceGenerator(SequenceTimeScopeType timeScope, SequenceGenerator dateCounter) implements SequenceGenerator {
+public record DateTimeSequenceGenerator(SequenceTimeScopeType timeScope, SequenceGenerator generator) implements SequenceGenerator {
 
     @Override
     public String next() {
-        return String.format("%s%s", DateFormatUtils.format(new Date(), timeScope.getPattern()), dateCounter.next());
+        return String.format("%s%s", DateFormatUtils.format(new Date(), timeScope.getPattern()), generator.next());
     }
 
     /**

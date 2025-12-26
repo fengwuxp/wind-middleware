@@ -17,10 +17,10 @@ class SpringExpressionConditionalExpressionJoinerTest {
     @Test
     void testJoin() {
         Assertions.assertEquals("#user.age == 10", joiner.join(createContextVariable("user.age"), createConstant(10), Op.EQ));
-        Assertions.assertEquals("#user.age > 10", joiner.join(createContextVariable("user.age"), createConstant(10), Op.GE));
-        Assertions.assertEquals("#user.age >= 10", joiner.join(createContextVariable("user.age"), createConstant(10), Op.GET));
-        Assertions.assertEquals("#user.age < 10", joiner.join(createContextVariable("user.age"), createConstant(10), Op.LE));
-        Assertions.assertEquals("#user.age <= 10", joiner.join(createContextVariable("user.age"), createConstant(10), Op.LET));
+        Assertions.assertEquals("#user.age > 10", joiner.join(createContextVariable("user.age"), createConstant(10), Op.GT));
+        Assertions.assertEquals("#user.age >= 10", joiner.join(createContextVariable("user.age"), createConstant(10), Op.GE));
+        Assertions.assertEquals("#user.age < 10", joiner.join(createContextVariable("user.age"), createConstant(10), Op.LT));
+        Assertions.assertEquals("#user.age <= 10", joiner.join(createContextVariable("user.age"), createConstant(10), Op.LE));
         Assertions.assertEquals("T(com.wind.script.spring.SpringExpressionOperators).inRange(#user.age,{1,100})",
                 joiner.join(createContextVariable("user.age"), createConstant(new Integer[]{1, 100}), Op.IN_RANG));
         Assertions.assertEquals("!T(com.wind.script.spring.SpringExpressionOperators).inRange(#user.age,{1,100})",

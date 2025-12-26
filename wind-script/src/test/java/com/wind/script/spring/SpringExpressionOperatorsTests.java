@@ -1,9 +1,10 @@
 package com.wind.script.spring;
 
-import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+
+import java.util.List;
 
 /**
  * @author wuxp
@@ -20,8 +21,8 @@ class SpringExpressionOperatorsTests {
     @Test
     void testContainsCollection() {
         Assertions.assertTrue(SpringExpressionOperators.contains(ImmutableSet.of("a", "b", "c"), "c"));
-        Assertions.assertTrue(SpringExpressionOperators.contains("c", ImmutableList.of("a", "b", "c")));
-        Assertions.assertTrue(SpringExpressionOperators.contains(1, ImmutableList.of(1, 2, 3)));
+        Assertions.assertTrue(SpringExpressionOperators.contains("c", List.of("a", "b", "c")));
+        Assertions.assertTrue(SpringExpressionOperators.contains(1, List.of(1, 2, 3)));
     }
 
     @Test
@@ -45,7 +46,7 @@ class SpringExpressionOperatorsTests {
 
     @Test
     void testInRange() {
-        Assertions.assertTrue(SpringExpressionOperators.inRange(1, ImmutableList.of(1, 2)));
+        Assertions.assertTrue(SpringExpressionOperators.inRange(1, List.of(1, 2)));
         Assertions.assertTrue(SpringExpressionOperators.inRange(1, new int[]{0, 3}));
         Assertions.assertFalse(SpringExpressionOperators.inRange(10, new int[]{0, 3}));
     }

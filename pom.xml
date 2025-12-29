@@ -73,6 +73,7 @@
         <commons-lang3.version>3.19.0</commons-lang3.version>
         <commons-text.version>1.14.0</commons-text.version>
         <tika.version>3.2.3</tika.version>
+        <commons-collections4.version>4.5.0</commons-collections4.version>
         <mapstruct.version>1.6.3</mapstruct.version>
         <redisson.version>3.50.0</redisson.version>
         <kryo.version>5.6.2</kryo.version>
@@ -403,6 +404,11 @@
                 <groupId>org.apache.tika</groupId>
                 <artifactId>tika-core</artifactId>
                 <version>${tika.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.commons</groupId>
+                <artifactId>commons-collections4</artifactId>
+                <version>${commons-collections4.version}</version>
             </dependency>
             <dependency>
                 <groupId>com.google.guava</groupId>

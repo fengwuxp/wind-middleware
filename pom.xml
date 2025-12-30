@@ -8,7 +8,7 @@
         <!-- https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-dependencies -->
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-dependencies</artifactId>
-        <version>4.0.0</version>
+        <version>4.0.1</version>
     </parent>
 
     <groupId>com.wind.middleware</groupId>
@@ -42,7 +42,7 @@
     </modules>
 
     <properties>
-        <revision>1.0.3-jdk21-SNAPSHOT</revision>
+        <revision>1.10.0-jdk21-SNAPSHOT</revision>
         <!--   测试相关     -->
         <jacoco-coverage-agent/>
         <tests.fork.count/>
@@ -65,7 +65,7 @@
         <spring-boot.version>3.5.0</spring-boot.version>
         <spring-cloud-commons.version>4.3.0</spring-cloud-commons.version>
         <spring-cloud-albaba.version>2023.0.3.3</spring-cloud-albaba.version>
-        <rocketmq-spring-boot-starter.version>2.3.4</rocketmq-spring-boot-starter.version>
+        <rocketmq-spring-boot-starter.version>2.3.5</rocketmq-spring-boot-starter.version>
         <sentinel.version>1.8.8</sentinel.version>
         <mybatis-flex.version>1.11.3</mybatis-flex.version>
         <mybatis.version>3.5.19</mybatis.version>
@@ -75,7 +75,7 @@
         <tika.version>3.2.3</tika.version>
         <commons-collections4.version>4.5.0</commons-collections4.version>
         <mapstruct.version>1.6.3</mapstruct.version>
-        <redisson.version>3.50.0</redisson.version>
+        <redisson.version>4.0.0</redisson.version>
         <kryo.version>5.6.2</kryo.version>
         <elasticjob.version>3.0.4</elasticjob.version>
         <dynamic-tp.version>1.2.2-x</dynamic-tp.version>

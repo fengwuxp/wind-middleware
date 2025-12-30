@@ -5,13 +5,11 @@ import com.zaxxer.hikari.HikariDataSource;
 import lombok.AllArgsConstructor;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.ImportAutoConfiguration;
-import org.springframework.boot.autoconfigure.jdbc.DataSourceProperties;
-import org.springframework.boot.autoconfigure.jdbc.DataSourceTransactionManagerAutoConfiguration;
-import org.springframework.boot.autoconfigure.jdbc.JdbcTemplateAutoConfiguration;
-import org.springframework.boot.autoconfigure.sql.init.SqlInitializationAutoConfiguration;
-import org.springframework.boot.autoconfigure.sql.init.SqlInitializationProperties;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
-
+import org.springframework.boot.jdbc.autoconfigure.DataSourceProperties;
+import org.springframework.boot.jdbc.autoconfigure.DataSourceTransactionManagerAutoConfiguration;
+import org.springframework.boot.jdbc.autoconfigure.JdbcTemplateAutoConfiguration;
+import org.springframework.boot.sql.autoconfigure.init.SqlInitializationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.EnableAspectJAutoProxy;
@@ -34,8 +32,7 @@ import javax.sql.DataSource;
 @ImportAutoConfiguration(value = {
         AbstractJdbcTest.H2InitializationAutoConfiguration.class,
         DataSourceTransactionManagerAutoConfiguration.class,
-        JdbcTemplateAutoConfiguration.class,
-        SqlInitializationAutoConfiguration.class
+        JdbcTemplateAutoConfiguration.class
 })
 @Transactional(rollbackFor = Exception.class)
 @TestPropertySource(locations = {"classpath:application-h2.properties", "classpath:application-test.properties"})

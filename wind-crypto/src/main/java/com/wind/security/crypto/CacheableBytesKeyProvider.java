@@ -18,7 +18,7 @@ public class CacheableBytesKeyProvider extends AbstractBytesKeyProvider<String> 
     }
 
     @Override
-    protected String loadKey(String key) {
-        return key;
+    protected String loadKey(String loadKeyParams) {
+        return loadKeyParams;
     }
 }

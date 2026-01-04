@@ -22,12 +22,12 @@ public class EnvBytesKeyProvider extends AbstractBytesKeyProvider<String> {
     }
 
     @Override
-    protected String loadKey(String name) {
-        String result = System.getenv(name);
-        result = StringUtils.hasText(result) ? result : System.getProperty(name, result);
+    protected String loadKey(String loadKeyParams) {
+        String result = System.getenv(loadKeyParams);
+        result = StringUtils.hasText(result) ? result : System.getProperty(loadKeyParams, result);
         if (StringUtils.hasText(result)) {
             return result;
         }
-        throw BaseException.common(String.format("name = %s env not found", name));
+        throw BaseException.common(String.format("name = %s env not found", loadKeyParams));
     }
 }

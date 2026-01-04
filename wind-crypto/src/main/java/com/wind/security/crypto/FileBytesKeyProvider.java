@@ -26,9 +26,9 @@ public final class FileBytesKeyProvider extends AbstractBytesKeyProvider<String>
     }
 
     @Override
-    protected String loadKey(String filepath) {
+    protected String loadKey(String loadKeyParams) {
         try {
-            byte[] bytes = FileCopyUtils.copyToByteArray(Files.newInputStream(Paths.get(filepath)));
+            byte[] bytes = FileCopyUtils.copyToByteArray(Files.newInputStream(Paths.get(loadKeyParams)));
             return new String(bytes);
         } catch (IOException exception) {
             throw new BaseException(DefaultExceptionCode.COMMON_ERROR, "load key error", exception);

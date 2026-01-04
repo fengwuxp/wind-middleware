@@ -25,16 +25,16 @@ public abstract class AbstractBytesKeyProvider<T> implements BytesKeyGenerator {
     /**
      * 用于加载秘钥的参数
      */
-    private final T loadKeyParam;
+    private final T loadKeyParams;
 
-    protected AbstractBytesKeyProvider(T loadKeyParam, Function<String, byte[]> keyDecryptor) {
-        this.loadKeyParam = loadKeyParam;
+    protected AbstractBytesKeyProvider(T loadKeyParams, Function<String, byte[]> keyDecryptor) {
+        this.loadKeyParams = loadKeyParams;
         this.keyDecryptor = keyDecryptor;
         this.keyBytes = loadKeyBytes();
     }
 
-    protected AbstractBytesKeyProvider(T loadKeyParam) {
-        this(loadKeyParam, NONE);
+    protected AbstractBytesKeyProvider(T loadKeyParams) {
+        this(loadKeyParams, NONE);
     }
 
     @Override
@@ -47,10 +47,16 @@ public abstract class AbstractBytesKeyProvider<T> implements BytesKeyGenerator {
         return keyBytes;
     }
 
-    protected abstract String loadKey(T loadKeyParam);
+    /**
+     * 加载秘钥
+     *
+     * @param loadKeyParams 加载秘钥的参数
+     * @return 秘钥
+     */
+    protected abstract String loadKey(T loadKeyParams);
 
     private byte[] loadKeyBytes() {
-        String key = loadKey(this.loadKeyParam);
+        String key = loadKey(this.loadKeyParams);
         return keyDecryptor == null ? key.getBytes() : keyDecryptor.apply(key);
     }
 }

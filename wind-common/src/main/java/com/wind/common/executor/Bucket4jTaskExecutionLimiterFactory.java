@@ -127,11 +127,23 @@ public final class Bucket4jTaskExecutionLimiterFactory {
      * 漏桶，匀速填充，不支持累计 （上限为桶的容量 {@param tokenPerSecond}）
      *
      * @param resourceKey    限流的资源或任务唯一标识
+     * @param capacity       桶的容量
+     * @param tokenPerSecond 填充的令牌数
+     * @return WindExecutionLimiter
+     */
+    public static WindExecutionLimiter leakyBucketWithSeconds(String resourceKey, int capacity, int tokenPerSecond) {
+        return leakyBucket(resourceKey, capacity, tokenPerSecond, Duration.ofSeconds(1));
+    }
+
+    /**
+     * 漏桶，匀速填充，不支持累计 （上限为桶的容量 {@param tokenPerSecond}）
+     *
+     * @param resourceKey    限流的资源或任务唯一标识
      * @param tokenPerSecond 填充的令牌数
      * @return WindExecutionLimiter
      */
     public static WindExecutionLimiter leakyBucketWithSeconds(String resourceKey, int tokenPerSecond) {
-        return leakyBucket(resourceKey, tokenPerSecond, tokenPerSecond, Duration.ofSeconds(1));
+        return leakyBucketWithSeconds(resourceKey, tokenPerSecond, tokenPerSecond);
     }
 
     /**

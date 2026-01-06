@@ -4,8 +4,8 @@ import com.wind.common.exception.BaseException;
 import com.wind.common.exception.DefaultExceptionCode;
 import com.wind.common.limit.WindExecutionLimiter;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.core.task.TaskDecorator;
 import org.jspecify.annotations.NonNull;
+import org.springframework.core.task.TaskDecorator;
 
 import java.time.Duration;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -24,6 +24,19 @@ public record RateLimiterTaskDecorator(String resourceKey, WindExecutionLimiter 
      * 默认 false 仅输出告警日志
      */
     private static final AtomicBoolean THROW_EXCEPTION_WITH_LIMIT = new AtomicBoolean(false);
+
+    /**
+     * 创建限流任务装饰器（匀速执行），默认等待时间 200 毫秒
+     *
+     * @param resourceKey    限流的资源或任务唯一标识
+     * @param capacity       桶的容量
+     * @param tokenPerSecond 每秒执行数
+     * @param maxWait        最大等待时间
+     * @return 限流任务装饰器
+     */
+    public static RateLimiterTaskDecorator leaky(String resourceKey, int capacity, int tokenPerSecond, Duration maxWait) {
+        return new RateLimiterTaskDecorator(resourceKey, Bucket4jTaskExecutionLimiterFactory.leakyBucketWithSeconds(resourceKey, capacity, tokenPerSecond), maxWait);
+    }
 
     /**
      * 创建限流任务装饰器（匀速执行），默认等待时间 200 毫秒

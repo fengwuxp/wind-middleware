@@ -42,15 +42,15 @@ public final class SpringExpressionOperators {
         } else if (left instanceof Collection<?> collection) {
             // 集合
             return collection.contains(right);
-        } else if (right instanceof Collection) {
+        } else if (right instanceof Collection<?> collection) {
             // 集合
-            return ((Collection<?>) right).contains(left);
-        } else if (left instanceof Object[]) {
+            return collection.contains(left);
+        } else if (left instanceof Object[] array) {
             // 对象数组
-            return Arrays.asList((Object[]) left).contains(right);
-        } else if (right instanceof Object[]) {
+            return Arrays.asList(array).contains(right);
+        } else if (right instanceof Object[] array) {
             // 对象数组
-            return Arrays.asList((Object[]) right).contains(left);
+            return Arrays.asList(array).contains(left);
         } else if (ClassUtils.isPrimitiveArray(left.getClass())) {
             // 原子类型数组
             return containsWithPrimitiveArray(left, right);

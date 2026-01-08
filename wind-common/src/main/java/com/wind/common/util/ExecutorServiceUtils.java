@@ -229,7 +229,7 @@ public final class ExecutorServiceUtils {
          * @return 线程池
          */
         public ExecutorService nativeBuild() {
-            ExecutorService result = createRawExecutor();
+            ExecutorService result = buildNativeExecutor();
             if (shutdownOnJvmExit) {
                 registerShutdownHook(threadNamePrefix, result);
             }
@@ -259,7 +259,7 @@ public final class ExecutorServiceUtils {
                 // 这里把 VirtualThreadMdcTaskDecorator 放在最外层，确保 MDC/ScopedValue 在执行期间可见
                 finalDecorator = VirtualThreadMdcTaskDecorator.composite(threadNamePrefix, finalDecorator);
             }
-            ExecutorService result = new DecoratingExecutorServiceWrapper(createRawExecutor(), finalDecorator);
+            ExecutorService result = new DecoratingExecutorServiceWrapper(buildNativeExecutor(), finalDecorator);
             if (shutdownOnJvmExit) {
                 registerShutdownHook(threadNamePrefix, result);
             }
@@ -272,7 +272,7 @@ public final class ExecutorServiceUtils {
          * @return 线程池
          */
         @NonNull
-        private ExecutorService createRawExecutor() {
+        public ExecutorService buildNativeExecutor() {
             if (useVirtualThreads) {
                 // 原生虚拟线程 executor（无任何额外包装）
                 return Executors.newThreadPerTaskExecutor(Thread.ofVirtual().name(threadNamePrefix, 0).factory());

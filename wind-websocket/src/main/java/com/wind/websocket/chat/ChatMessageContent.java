@@ -4,9 +4,9 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.wind.core.WritableContextVariables;
-import lombok.experimental.FieldNameConstants;
-
 import jakarta.validation.constraints.NotBlank;
+import lombok.experimental.FieldNameConstants;
+import org.jspecify.annotations.NonNull;
 
 import java.io.Serial;
 import java.io.Serializable;
@@ -57,18 +57,21 @@ public record ChatMessageContent(ChatMessageContentType contentType, String cont
     }
 
     @Override
-    public WritableContextVariables putVariable(@NotBlank String name, Object val) {
+    @NonNull
+    public WritableContextVariables putVariable(@NonNull String name, Object val) {
         variables.put(name, val);
         return this;
     }
 
     @Override
-    public WritableContextVariables removeVariable(@NotBlank String name) {
+    @NonNull
+    public WritableContextVariables removeVariable(@NonNull String name) {
         variables.remove(name);
         return this;
     }
 
     @Override
+    @NonNull
     public Map<String, Object> getContextVariables() {
         return variables;
     }

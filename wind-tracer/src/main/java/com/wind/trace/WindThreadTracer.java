@@ -6,6 +6,7 @@ import com.wind.common.util.IpAddressUtils;
 import com.wind.core.WritableContextVariables;
 import com.wind.sequence.SequenceGenerator;
 import jakarta.validation.constraints.NotNull;
+import org.jspecify.annotations.NonNull;
 import org.slf4j.MDC;
 
 import java.util.Collections;
@@ -72,7 +73,8 @@ final class WindThreadTracer implements WindTracer {
     }
 
     @Override
-    public WritableContextVariables putVariable(String name, Object val) {
+    @NonNull
+    public WritableContextVariables putVariable(@NonNull String name, Object val) {
         AssertUtils.hasText(name, "argument name must not empty");
         if (val != null) {
             requireVariables().put(name, val);
@@ -85,7 +87,8 @@ final class WindThreadTracer implements WindTracer {
     }
 
     @Override
-    public WritableContextVariables removeVariable(String name) {
+    @NonNull
+    public WritableContextVariables removeVariable(@NonNull String name) {
         requireVariables().remove(name);
         return this;
     }

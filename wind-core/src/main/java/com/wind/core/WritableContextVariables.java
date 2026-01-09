@@ -1,8 +1,7 @@
 package com.wind.core;
 
 
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
+import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
 import java.util.Collections;
@@ -24,8 +23,8 @@ public interface WritableContextVariables extends ReadonlyContextVariables {
      * @param val  变量值
      * @return this
      */
-    @NotNull
-    WritableContextVariables putVariable(@NotBlank String name, @Nullable Object val);
+    @NonNull
+    WritableContextVariables putVariable(@NonNull String name, @Nullable Object val);
 
     /**
      * 移除变量
@@ -33,8 +32,8 @@ public interface WritableContextVariables extends ReadonlyContextVariables {
      * @param name 变量名
      * @return this
      */
-    @NotNull
-    WritableContextVariables removeVariable(@NotBlank String name);
+    @NonNull
+    WritableContextVariables removeVariable(@NonNull String name);
 
     /**
      * 创建一个可写的上下文变量

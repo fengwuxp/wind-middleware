@@ -1,5 +1,7 @@
 package com.wind.core;
 
+import org.jspecify.annotations.NonNull;
+
 import java.util.Map;
 
 /**
@@ -10,18 +12,21 @@ import java.util.Map;
  **/
 record DefaultWritableContextVariables(Map<String, Object> contextVariables) implements WritableContextVariables {
     @Override
-    public WritableContextVariables putVariable(String name, Object val) {
+    @NonNull
+    public WritableContextVariables putVariable(@NonNull String name, Object val) {
         contextVariables.put(name, val);
         return this;
     }
 
     @Override
-    public WritableContextVariables removeVariable(String name) {
+    @NonNull
+    public WritableContextVariables removeVariable(@NonNull String name) {
         contextVariables.remove(name);
         return this;
     }
 
     @Override
+    @NonNull
     public Map<String, Object> getContextVariables() {
         return contextVariables;
     }

@@ -1,8 +1,7 @@
 package com.wind.core;
 
 import com.wind.common.exception.AssertUtils;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
+import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
 import java.util.Collections;
@@ -23,7 +22,7 @@ public interface ReadonlyContextVariables {
      * @return 上下文变量
      */
     @Nullable
-    default <T> T getContextVariable(@NotBlank String name) {
+    default <T> T getContextVariable(@NonNull String name) {
         return getContextVariable(name, null);
     }
 
@@ -36,7 +35,7 @@ public interface ReadonlyContextVariables {
      */
     @SuppressWarnings("unchecked")
     @Nullable
-    default <T> T getContextVariable(@NotBlank String name, @Nullable T defaultValue) {
+    default <T> T getContextVariable(@NonNull String name, @Nullable T defaultValue) {
         AssertUtils.hasText(name, "argument context variable name must not empty");
         Map<String, Object> contextVariables = getContextVariables();
         return contextVariables == null ? null : (T) contextVariables.getOrDefault(name, defaultValue);
@@ -48,8 +47,8 @@ public interface ReadonlyContextVariables {
      * @param name 变量名称
      * @return 上下文变量
      */
-    @NotNull
-    default <T> T requireContextVariable(@NotBlank String name) {
+    @NonNull
+    default <T> T requireContextVariable(@NonNull String name) {
         T result = getContextVariable(name);
         AssertUtils.notNull(result, () -> String.format("context variable %s must not null", name));
         return result;
@@ -58,16 +57,16 @@ public interface ReadonlyContextVariables {
     /**
      * @return 获取所有的只读上下文变量
      */
-    @NotNull
+    @NonNull
     Map<String, Object> getContextVariables();
 
-    @NotNull
+    @NonNull
     static ReadonlyContextVariables empty() {
         return of(Collections.emptyMap());
     }
 
-    @NotNull
-    static ReadonlyContextVariables of(@NotNull Map<String, Object> contextVariables) {
+    @NonNull
+    static ReadonlyContextVariables of(@NonNull Map<String, Object> contextVariables) {
         AssertUtils.notNull(contextVariables, "argument contextVariables must not null");
         return () -> contextVariables;
     }

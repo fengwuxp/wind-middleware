@@ -66,8 +66,8 @@ public interface ReadonlyContextVariables {
     }
 
     @NonNull
-    static ReadonlyContextVariables of(@NonNull Map<String, Object> contextVariables) {
-        AssertUtils.notNull(contextVariables, "argument contextVariables must not null");
-        return () -> contextVariables;
+    static ReadonlyContextVariables of(Map<String, Object> contextVariables) {
+        Map<String, Object> variables = contextVariables == null ? Collections.emptyMap() : contextVariables;
+        return () -> variables;
     }
 }

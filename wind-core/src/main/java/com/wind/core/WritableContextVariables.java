@@ -51,6 +51,7 @@ public interface WritableContextVariables extends ReadonlyContextVariables {
      * @return WritableContextVariables
      */
     static WritableContextVariables of(Map<String, Object> variables) {
-        return new DefaultWritableContextVariables(new HashMap<>(variables));
+        Map<String, Object> contextVariables = variables == null ? Collections.emptyMap() : variables;
+        return new DefaultWritableContextVariables(new HashMap<>(contextVariables));
     }
 }

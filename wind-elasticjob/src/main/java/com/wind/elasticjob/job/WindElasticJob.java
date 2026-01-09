@@ -1,14 +1,14 @@
 package com.wind.elasticjob.job;
 
 import com.wind.common.WindConstants;
-
 import com.wind.elasticjob.enums.ElasticJobListenerType;
 import jakarta.validation.constraints.NotNull;
+
 import java.util.Collections;
 import java.util.List;
 
 /**
- * wind elastic job 具有一定的自描述能力
+ * wind elastic job 通过 {@link com.wind.elasticjob.WindElasticJobRegistrar} 自动注册
  *
  * @author wuxp
  * @date 2024-12-15 18:19

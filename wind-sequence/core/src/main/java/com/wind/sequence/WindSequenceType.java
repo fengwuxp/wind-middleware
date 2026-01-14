@@ -25,20 +25,9 @@ public interface WindSequenceType {
     String getPrefix();
 
     /**
-     * TODO 下一个版本移除
-     *
-     * @return 序列号默认长度
-     */
-    @Deprecated(forRemoval = true)
-    int defaultLength();
-
-    /**
      * @return 获取序列号长度
      */
-    default int length() {
-        return defaultLength();
-    }
-
+    int length();
 
     /**
      * 创建序列号类型
@@ -79,11 +68,6 @@ public interface WindSequenceType {
             @Override
             public String getPrefix() {
                 return prefix;
-            }
-
-            @Override
-            public int defaultLength() {
-                return length();
             }
 
             @Override

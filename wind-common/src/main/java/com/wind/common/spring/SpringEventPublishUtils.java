@@ -30,9 +30,6 @@ public final class SpringEventPublishUtils {
 
     /**
      * 上下文中已注册的事务回调事件 ids
-     *
-     * @key eventId
-     * @value event
      */
     private static final ThreadLocal<Set<String>> TRANSACTION_EVENT_IDS = ThreadLocal.withInitial(HashSet::new);
 
@@ -80,10 +77,6 @@ public final class SpringEventPublishUtils {
             if (event instanceof SpringTransactionEvent ev) {
                 String eventId = ev.getEventId();
                 Set<String> eventIds = TRANSACTION_EVENT_IDS.get();
-                if (eventIds == null) {
-                    eventIds = new HashSet<>();
-                    TRANSACTION_EVENT_IDS.set(eventIds);
-                }
                 if (eventIds.contains(eventId)) {
                     // 忽略重复事件
                     return;

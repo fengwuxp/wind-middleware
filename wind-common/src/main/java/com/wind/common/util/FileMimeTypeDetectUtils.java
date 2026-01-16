@@ -2,11 +2,11 @@ package com.wind.common.util;
 
 import com.wind.common.exception.BaseException;
 import com.wind.common.exception.DefaultExceptionCode;
-import org.jspecify.annotations.Nullable;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.tika.Tika;
+import org.jspecify.annotations.Nullable;
 import org.springframework.core.io.InputStreamSource;
 import org.springframework.util.MimeType;
 import org.springframework.util.StringUtils;
@@ -93,15 +93,15 @@ public final class FileMimeTypeDetectUtils {
      *
      * @param source   输入流
      * @param filename 文件名
-     * @return mime 文件类型
+     * @return MIME 文件类型
      */
     @NotBlank
     public static String detect(@NotNull InputStreamSource source, @Nullable String filename) {
-        try (InputStream in = source.getInputStream()) {
+        try {
             if (StringUtils.hasText(filename)) {
-                return TIKA.detect(in, filename);
+                return TIKA.detect(source.getInputStream(), filename);
             } else {
-                return TIKA.detect(in);
+                return TIKA.detect(source.getInputStream());
             }
         } catch (IOException exception) {
             log.error("detect mimeType exception, filename = {}, message = {}", filename, exception.getMessage(), exception);

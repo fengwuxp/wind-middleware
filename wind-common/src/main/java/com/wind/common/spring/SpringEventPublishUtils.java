@@ -5,6 +5,7 @@ import com.wind.common.spring.event.SpringTransactionEvent;
 import com.wind.common.util.ExecutorServiceUtils;
 import com.wind.trace.task.ContextPropagationTaskDecorator;
 import lombok.extern.slf4j.Slf4j;
+import org.jspecify.annotations.NonNull;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.transaction.support.TransactionSynchronization;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
@@ -29,6 +30,9 @@ public final class SpringEventPublishUtils {
 
     /**
      * 上下文中已注册的事务回调事件 ids
+     *
+     * @key eventId
+     * @value event
      */
     private static final ThreadLocal<Set<String>> TRANSACTION_EVENT_IDS = ThreadLocal.withInitial(HashSet::new);
 
@@ -57,14 +61,20 @@ public final class SpringEventPublishUtils {
         EXECUTOR.execute(ContextPropagationTaskDecorator.of().decorate(() -> publishEvent(event)));
     }
 
+
+    @Deprecated(forRemoval = true)
+    public static void publishEventIfInTransaction(@NonNull Object event) {
+        publishEventWithCommitFallback(event);
+    }
+
     /**
      * 如果在事务内，事件推迟到事务提交后发送。如果 {@param event} 实现了 {@link SpringTransactionEvent} 接口，
      * 无论事务中发送了多少次相同的{@link SpringTransactionEvent#getEventId()}事件，在事务结束后只会发送最后一次事件。
      *
      * @param event 事件对象
      */
-    public static void publishEventIfInTransaction(Object event) {
-        if (TransactionSynchronizationManager.isSynchronizationActive()) {
+    public static void publishEventWithCommitFallback(@NonNull Object event) {
+        if (TransactionSynchronizationManager.isSynchronizationActive() && TransactionSynchronizationManager.isActualTransactionActive()) {
             // 在事务中，通过注册回调的方式发送消息
             if (event instanceof SpringTransactionEvent ev) {
                 String eventId = ev.getEventId();
@@ -74,7 +84,7 @@ public final class SpringEventPublishUtils {
                     TRANSACTION_EVENT_IDS.set(eventIds);
                 }
                 if (eventIds.contains(eventId)) {
-                    // 如果该事件已注册，则不重复注册
+                    // 忽略重复事件
                     return;
                 }
                 eventIds.add(eventId);
@@ -88,7 +98,6 @@ public final class SpringEventPublishUtils {
                     } finally {
                         // Reset ThreadLocal
                         TRANSACTION_EVENT_IDS.remove();
-                        TRANSACTION_EVENT_IDS.set(new HashSet<>());
                     }
                 }
             });

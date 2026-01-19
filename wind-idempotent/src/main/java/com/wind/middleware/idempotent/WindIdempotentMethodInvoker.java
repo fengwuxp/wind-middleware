@@ -7,7 +7,7 @@ import java.util.function.Supplier;
 
 /**
  * 幂等方法执行包装器
- * 支持 1~6 个参数方法的幂等执行，包括返回值和 void 方法
+ * 支持 1 ~ 6 个参数方法的幂等执行，包括返回值和 void 方法
  *
  * @author wuxp
  * @date 2025-10-13

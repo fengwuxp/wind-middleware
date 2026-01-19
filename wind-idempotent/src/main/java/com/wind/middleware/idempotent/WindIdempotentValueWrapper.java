@@ -4,10 +4,11 @@ package com.wind.middleware.idempotent;
 import org.jspecify.annotations.Nullable;
 
 /**
- * 幂等值包装类
+ * 幂等值包装类，用于获取幂等执行结果
  *
  * @author wuxp
  * @date 2025-10-13 10:56
+ * @see WindIdempotentKeyStorage
  **/
 public interface WindIdempotentValueWrapper {
 

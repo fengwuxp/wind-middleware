@@ -1,5 +1,6 @@
 package com.wind.middleware.idempotent;
 
+import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
@@ -54,14 +55,14 @@ class WindIdempotentExecuteUtilsTests {
     static void init() {
         WindIdempotentExecuteUtils.configureStorage(new WindIdempotentKeyStorage() {
             @Override
-            public void save(String idempotentKey, Object value) {
+            public void save(@NonNull String idempotentKey, Object value) {
                 KEY_SATES.put(idempotentKey, true);
                 STORAGE_CACHE.computeIfAbsent(idempotentKey, k -> value);
             }
 
             @Nullable
             @Override
-            public WindIdempotentValueWrapper checkExistsAndGetValue(String idempotentKey) {
+            public WindIdempotentValueWrapper checkExistsAndGetValue(@NonNull String idempotentKey) {
                 if (exists(idempotentKey)) {
                     Object val = STORAGE_CACHE.get(idempotentKey);
                     return new KryoWindIdempotentValueWrapper(val);
@@ -70,7 +71,7 @@ class WindIdempotentExecuteUtilsTests {
             }
 
             @Override
-            public boolean exists(String idempotentKey) {
+            public boolean exists(@NonNull String idempotentKey) {
                 return Objects.equals(KEY_SATES.get(idempotentKey), true);
             }
         });

@@ -24,11 +24,27 @@ public final class WindIdempotentExecuteUtils {
         throw new AssertionError();
     }
 
+    /**
+     * 执行一个幂等任务。
+     * 如果同一 idempotentKey 已经执行过，则直接返回历史结果；
+     * 否则执行 supplier，并缓存结果。
+     *
+     * @param idempotentKey 幂等 key
+     * @param supplier      幂等任务
+     */
     public static <T> T execute(String idempotentKey, Supplier<T> supplier) {
         return executeWithThrows(idempotentKey, supplier::get, v -> {
         });
     }
 
+    /**
+     * 执行一个幂等任务。
+     * 如果同一 idempotentKey 已经执行过，则直接返回历史结果；
+     * 否则执行 supplier，并缓存结果。
+     *
+     * @param idempotentKey 幂等 key
+     * @param supplier      幂等任务
+     */
     public static <T> T executeWithThrows(String idempotentKey, WindFunctions.ThrowsSupplier<T> supplier) {
         return executeWithThrows(idempotentKey, supplier, v -> {
         });
@@ -47,7 +63,6 @@ public final class WindIdempotentExecuteUtils {
         WindIdempotentKeyStorage storage = requireStorage();
         WindIdempotentValueWrapper wrapper = storage.checkExistsAndGetValue(idempotentKey);
         if (wrapper == null) {
-            // TODO 限制并发？
             try {
                 T value = supplier.get();
                 // 保存幂等执行结果

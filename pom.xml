@@ -184,42 +184,6 @@
                 <scope>import</scope>
             </dependency>
             <dependency>
-                <groupId>io.swagger.core.v3</groupId>
-                <artifactId>swagger-core-jakarta</artifactId>
-                <version>${swagger-openapiv3.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>io.swagger.core.v3</groupId>
-                <artifactId>swagger-annotations-jakarta</artifactId>
-                <version>${swagger-openapiv3.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>io.swagger.core.v3</groupId>
-                <artifactId>swagger-models</artifactId>
-                <version>${swagger-openapiv3.version}</version>
-            </dependency>
-            <!-- https://mvnrepository.com/artifact/org.apache.rocketmq/rocketmq-spring-boot-starter -->
-            <dependency>
-                <groupId>org.apache.rocketmq</groupId>
-                <artifactId>rocketmq-spring-boot-starter</artifactId>
-                <version>${rocketmq-spring-boot-starter.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>com.alibaba.csp</groupId>
-                <artifactId>sentinel-prometheus-metric-exporter</artifactId>
-                <version>${sentinel.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>com.alibaba.nacos</groupId>
-                <artifactId>nacos-client</artifactId>
-                <version>${nacos.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.mybatis</groupId>
-                <artifactId>mybatis</artifactId>
-                <version>${mybatis.version}</version>
-            </dependency>
-            <dependency>
                 <groupId>com.wind.tools</groupId>
                 <artifactId>wind-mybatis-flex-processor</artifactId>
                 <version>${revision}</version>
@@ -348,6 +312,42 @@
                 <groupId>com.wind.middleware</groupId>
                 <artifactId>wind-websocket</artifactId>
                 <version>${revision}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.swagger.core.v3</groupId>
+                <artifactId>swagger-core-jakarta</artifactId>
+                <version>${swagger-openapiv3.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.swagger.core.v3</groupId>
+                <artifactId>swagger-annotations-jakarta</artifactId>
+                <version>${swagger-openapiv3.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.swagger.core.v3</groupId>
+                <artifactId>swagger-models</artifactId>
+                <version>${swagger-openapiv3.version}</version>
+            </dependency>
+            <!-- https://mvnrepository.com/artifact/org.apache.rocketmq/rocketmq-spring-boot-starter -->
+            <dependency>
+                <groupId>org.apache.rocketmq</groupId>
+                <artifactId>rocketmq-spring-boot-starter</artifactId>
+                <version>${rocketmq-spring-boot-starter.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.alibaba.csp</groupId>
+                <artifactId>sentinel-prometheus-metric-exporter</artifactId>
+                <version>${sentinel.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.alibaba.nacos</groupId>
+                <artifactId>nacos-client</artifactId>
+                <version>${nacos.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.mybatis</groupId>
+                <artifactId>mybatis</artifactId>
+                <version>${mybatis.version}</version>
             </dependency>
             <dependency>
                 <groupId>mysql</groupId>

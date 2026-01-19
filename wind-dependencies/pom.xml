@@ -17,132 +17,132 @@
             <dependency>
                 <groupId>com.wind.tools</groupId>
                 <artifactId>wind-mybatis-flex-processor</artifactId>
-                <version>${revision}</version>
+                <version>${project.version}</version>
             </dependency>
             <dependency>
                 <groupId>com.wind.tools</groupId>
                 <artifactId>mybatis-flex-codegen</artifactId>
-                <version>${revision}</version>
+                <version>${project.version}</version>
             </dependency>
             <dependency>
                 <groupId>com.wind.tools</groupId>
                 <artifactId>wind-codegen-sources-supports</artifactId>
-                <version>${revision}</version>
+                <version>${project.version}</version>
             </dependency>
             <dependency>
                 <groupId>com.wind.tools</groupId>
                 <artifactId>h2-functions-for-mysql</artifactId>
-                <version>${revision}</version>
+                <version>${project.version}</version>
             </dependency>
             <dependency>
                 <groupId>com.wind.middleware</groupId>
                 <artifactId>logback-kafka-appender</artifactId>
-                <version>${revision}</version>
+                <version>${project.version}</version>
             </dependency>
             <dependency>
                 <groupId>com.wind.middleware</groupId>
                 <artifactId>wind-config-center-core</artifactId>
-                <version>${revision}</version>
+                <version>${project.version}</version>
             </dependency>
             <dependency>
                 <groupId>com.wind.middleware</groupId>
                 <artifactId>wind-nacos-spring-cloud-config-starter</artifactId>
-                <version>${revision}</version>
+                <version>${project.version}</version>
             </dependency>
             <dependency>
                 <groupId>com.wind.middleware</groupId>
                 <artifactId>wind-elasticjob</artifactId>
-                <version>${revision}</version>
+                <version>${project.version}</version>
             </dependency>
             <dependency>
                 <groupId>com.wind.middleware</groupId>
                 <artifactId>wind-script</artifactId>
-                <version>${revision}</version>
+                <version>${project.version}</version>
             </dependency>
             <dependency>
                 <groupId>com.wind.middleware</groupId>
                 <artifactId>wind-core</artifactId>
-                <version>${revision}</version>
+                <version>${project.version}</version>
             </dependency>
             <dependency>
                 <groupId>com.wind.middleware</groupId>
                 <artifactId>wind-crypto</artifactId>
-                <version>${revision}</version>
+                <version>${project.version}</version>
             </dependency>
             <dependency>
                 <groupId>com.wind.middleware</groupId>
                 <artifactId>wind-common</artifactId>
-                <version>${revision}</version>
+                <version>${project.version}</version>
             </dependency>
             <dependency>
                 <groupId>com.wind.middleware</groupId>
                 <artifactId>wind-idempotent</artifactId>
-                <version>${revision}</version>
+                <version>${project.version}</version>
             </dependency>
             <dependency>
                 <groupId>com.wind.middleware</groupId>
                 <artifactId>wind-object-mask</artifactId>
-                <version>${revision}</version>
+                <version>${project.version}</version>
             </dependency>
             <dependency>
                 <groupId>com.wind.middleware</groupId>
                 <artifactId>wind-server</artifactId>
-                <version>${revision}</version>
+                <version>${project.version}</version>
             </dependency>
             <dependency>
                 <groupId>com.wind.middleware</groupId>
                 <artifactId>wind-web</artifactId>
-                <version>${revision}</version>
+                <version>${project.version}</version>
             </dependency>
             <dependency>
                 <groupId>com.wind.middleware</groupId>
                 <artifactId>wind-sequence-core</artifactId>
-                <version>${revision}</version>
+                <version>${project.version}</version>
             </dependency>
             <dependency>
                 <groupId>com.wind.middleware</groupId>
                 <artifactId>wind-sequence-jdbc</artifactId>
-                <version>${revision}</version>
+                <version>${project.version}</version>
             </dependency>
             <dependency>
                 <groupId>com.wind.middleware</groupId>
                 <artifactId>wind-restful</artifactId>
-                <version>${revision}</version>
+                <version>${project.version}</version>
             </dependency>
             <dependency>
                 <groupId>com.wind.middleware</groupId>
                 <artifactId>wind-retrofit</artifactId>
-                <version>${revision}</version>
+                <version>${project.version}</version>
             </dependency>
             <dependency>
                 <groupId>com.wind.middleware</groupId>
                 <artifactId>wind-tracer</artifactId>
-                <version>${revision}</version>
+                <version>${project.version}</version>
             </dependency>
             <dependency>
                 <groupId>com.wind.middleware</groupId>
                 <artifactId>wind-sentinel</artifactId>
-                <version>${revision}</version>
+                <version>${project.version}</version>
             </dependency>
             <dependency>
                 <groupId>com.wind.middleware</groupId>
                 <artifactId>wind-rocketmq-spring-boot-starter</artifactId>
-                <version>${revision}</version>
+                <version>${project.version}</version>
             </dependency>
             <dependency>
                 <groupId>com.wind.middleware</groupId>
                 <artifactId>wind-context-annotations</artifactId>
-                <version>${revision}</version>
+                <version>${project.version}</version>
             </dependency>
             <dependency>
                 <groupId>com.wind.middleware</groupId>
                 <artifactId>wind-context-injection</artifactId>
-                <version>${revision}</version>
+                <version>${project.version}</version>
             </dependency>
             <dependency>
                 <groupId>com.wind.middleware</groupId>
                 <artifactId>wind-websocket</artifactId>
-                <version>${revision}</version>
+                <version>${project.version}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>

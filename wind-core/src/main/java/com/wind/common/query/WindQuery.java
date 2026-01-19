@@ -2,8 +2,8 @@ package com.wind.common.query;
 
 import com.wind.common.query.supports.QueryOrderType;
 import com.wind.common.query.supports.QueryType;
-import org.jspecify.annotations.Nullable;
 import jakarta.validation.constraints.NotNull;
+import org.jspecify.annotations.Nullable;
 
 
 /**
@@ -70,4 +70,14 @@ public interface WindQuery<OrderField> {
     default boolean shouldCountTotal() {
         return getQueryType().isCountTotal();
     }
+
+    /**
+     * 是否需要查询结果集
+     *
+     * @return <code>true</code> 需要查询结果集
+     */
+    default boolean shouldQueryResult() {
+        return getQueryType().isQueryResult();
+    }
+
 }

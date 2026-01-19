@@ -67,7 +67,7 @@
         <spring-cloud-albaba.version>2023.0.3.3</spring-cloud-albaba.version>
         <rocketmq-spring-boot-starter.version>2.3.5</rocketmq-spring-boot-starter.version>
         <sentinel.version>1.8.8</sentinel.version>
-        <mybatis-flex.version>1.11.3</mybatis-flex.version>
+        <mybatis-flex.version>1.11.5</mybatis-flex.version>
         <mybatis.version>3.5.19</mybatis.version>
         <commons-io.version>2.20.0</commons-io.version>
         <commons-lang3.version>3.19.0</commons-lang3.version>

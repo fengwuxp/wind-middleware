@@ -1,6 +1,5 @@
 package com.wind.server.configcenter;
 
-import com.google.common.collect.ImmutableMap;
 import com.wind.common.WindConstants;
 import com.wind.common.enums.ConfigFileType;
 import com.wind.common.enums.WindMiddlewareType;
@@ -133,10 +132,9 @@ public record WindPropertySourceLoader(ConfigRepository repository, WindConfigCe
 
     private void loadRedissonConfig(String redissonName, CompositePropertySource result) {
         if (StringUtils.hasLength(redissonName)) {
-            // TODO 增加凭据替换支持
             String name = String.format("%s%s%s", redissonName, WindConstants.DASHED, WindConstants.REDISSON_NAME);
             ConfigDescriptor descriptor = ConfigDescriptor.immutable(name, WindMiddlewareType.REDIS.name(), ConfigFileType.YAML);
-            Map<String, Object> source = ImmutableMap.of(SPRING_REDISSON_CONFIG_NAME, repository.getTextConfig(descriptor));
+            Map<String, Object> source = Map.of(SPRING_REDISSON_CONFIG_NAME, repository.getTextConfig(descriptor));
             result.addFirstPropertySource(new MapPropertySource(WIND_REDISSON_PROPERTY_SOURCE_NAME, source));
         }
     }

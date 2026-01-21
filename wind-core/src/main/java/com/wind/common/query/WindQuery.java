@@ -24,6 +24,13 @@ public interface WindQuery<OrderField> {
     void setQuerySize(@NotNull Integer querySize);
 
     /**
+     * @return 允许的最大查询大小
+     */
+    default int getMaxQuerySize() {
+        return 8192;
+    }
+
+    /**
      * @return 查询类型
      */
     @NotNull
@@ -59,7 +66,8 @@ public interface WindQuery<OrderField> {
         if (orderFields == null || orderTypes == null) {
             return false;
         }
-        return orderFields.length > 0 && orderFields.length == orderTypes.length;
+        int length = orderFields.length;
+        return length > 0 && length < 3 && length == orderTypes.length;
     }
 
     /**

@@ -7,11 +7,13 @@ import com.wind.common.query.supports.QueryOrderType;
 import com.wind.common.query.supports.QueryType;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
+import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
 import java.beans.Transient;
 import java.util.Objects;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import static com.wind.common.query.cursor.CursorQueryUtils.CURSOR_FILED_NAME;
 
@@ -23,6 +25,11 @@ import static com.wind.common.query.cursor.CursorQueryUtils.CURSOR_FILED_NAME;
  **/
 @Data
 public abstract class AbstractCursorQuery<OrderField extends QueryOrderField> implements CursorBasedQuery<OrderField> {
+
+    /**
+     * 避免查询页面数据过大，拖垮数据库
+     */
+    private static final AtomicInteger MAX_QUERY_SIZE = new AtomicInteger(8192);
 
     /**
      * 允许的排序字段
@@ -60,6 +67,11 @@ public abstract class AbstractCursorQuery<OrderField extends QueryOrderField> im
      */
     private String nextCursor;
 
+    @Override
+    public void setQuerySize(@NonNull Integer querySize) {
+        AssertUtils.isTrue(querySize <= getMaxQuerySize(), () -> String.format("查询大小不能超过：%d", MAX_QUERY_SIZE.get()));
+        this.querySize = querySize;
+    }
 
     public OrderField[] getOrderFields() {
         AssertUtils.notEmpty(orderFields, "argument orderFields must not empty, cursor query must use {} order", CURSOR_FILED_NAME);
@@ -109,5 +121,20 @@ public abstract class AbstractCursorQuery<OrderField extends QueryOrderField> im
     @Transient
     public boolean isFirst() {
         return prevCursor == null && nextCursor == null;
+    }
+
+    @Override
+    public int getMaxQuerySize() {
+        return MAX_QUERY_SIZE.get();
+    }
+
+    /**
+     * 配置查询大小最大值
+     *
+     * @param querySize 查询大小
+     */
+    public static void configureMaxQuerySize(int querySize) {
+        AssertUtils.isTrue(querySize > 0, "查询大小必须大于 0");
+        MAX_QUERY_SIZE.set(querySize);
     }
 }

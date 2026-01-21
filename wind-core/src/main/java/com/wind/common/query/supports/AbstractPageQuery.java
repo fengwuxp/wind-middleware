@@ -61,6 +61,14 @@ public abstract class AbstractPageQuery<OrderField extends QueryOrderField> impl
     }
 
     /**
+     * @return 查询偏移量
+     */
+    @Transient
+    public int getOffset() {
+        return (this.queryPage - 1) * this.querySize;
+    }
+
+    /**
      * 配置查询大小最大值
      *
      * @param querySize 查询大小
@@ -77,13 +85,4 @@ public abstract class AbstractPageQuery<OrderField extends QueryOrderField> impl
     public int getMaxQuerySize() {
         return MAX_QUERY_SIZE.get();
     }
-
-    /**
-     * @return 查询偏移量
-     */
-    @Transient
-    public int getOffset() {
-        return (this.queryPage - 1) * this.querySize;
-    }
-
 }

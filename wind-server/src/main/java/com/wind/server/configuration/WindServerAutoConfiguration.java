@@ -4,7 +4,7 @@ import com.wind.common.exception.AssertUtils;
 import com.wind.context.injection.MethodParameterInjector;
 import com.wind.script.auditlog.AuditLogRecorder;
 import com.wind.script.auditlog.ScriptAuditLogRecorder;
-import com.wind.server.actuate.health.GracefulShutdownHealthIndicator;
+import com.wind.server.actuator.health.GracefulShutdownHealthIndicator;
 import com.wind.server.aop.WindControllerMethodInterceptor;
 import com.wind.server.logging.WebAuditLogRecorder;
 import com.wind.server.web.exception.RestfulErrorAttributes;

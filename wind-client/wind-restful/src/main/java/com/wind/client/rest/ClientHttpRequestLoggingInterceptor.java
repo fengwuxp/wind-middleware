@@ -10,7 +10,9 @@ import org.springframework.http.client.ClientHttpRequestInterceptor;
 import org.springframework.http.client.ClientHttpResponse;
 import org.springframework.util.StopWatch;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.Objects;
 
@@ -85,7 +87,8 @@ public class ClientHttpRequestLoggingInterceptor implements ClientHttpRequestInt
         // 2xx && 生产环境，仅打印部分内容（减少内存的消耗）
         boolean limitPrint = response.getStatusCode().is2xxSuccessful() && Objects.equals(env, WindConstants.PROD);
         if (limitPrint) {
-            byte[] bytes = IOUtils.toByteArray(response.getBody(), MAX_BODY_LENGTH);
+            InputStream body = response.getBody();
+            byte[] bytes = IOUtils.toByteArray(body, Math.min(body.available(), MAX_BODY_LENGTH));
             long contentLength = response.getHeaders().getContentLength();
             return new String(bytes, StandardCharsets.UTF_8) + "\n...[truncated, response size = " + contentLength + ", print size = " + bytes.length + "]";
         }

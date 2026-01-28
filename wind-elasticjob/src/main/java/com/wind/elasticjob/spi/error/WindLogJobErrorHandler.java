@@ -17,13 +17,12 @@ public class WindLogJobErrorHandler implements JobErrorHandler {
 
     @Override
     public void handleException(final String jobName, final Throwable cause) {
-        log.error("Job {} execute exception, message = {}", jobName, cause.getMessage(), cause);
+        log.error("{} job execute exception, message = {}", jobName, cause.getMessage(), cause);
     }
 
     @Override
     public void init(Properties props) {
-        String level = props.getProperty("logLevel", "ERROR");
-        log.debug("WindLogJobErrorHandler initialized, logLevel= {}", level);
+        log.info("WindLogJobErrorHandler initialized");
     }
 
     @Override

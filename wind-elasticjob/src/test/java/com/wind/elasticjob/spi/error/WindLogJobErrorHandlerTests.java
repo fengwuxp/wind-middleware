@@ -1,4 +1,4 @@
-package com.wind.elasticjob.error.handler;
+package com.wind.elasticjob.spi.error;
 
 import com.wind.elasticjob.enums.ElasticJobErrorHandlerType;
 import org.apache.shardingsphere.elasticjob.error.handler.JobErrorHandler;
@@ -18,7 +18,8 @@ class WindLogJobErrorHandlerTests {
 
     @Test
     void testCreateHandler() {
-        Optional<JobErrorHandler> optional = JobErrorHandlerFactory.createHandler(ElasticJobErrorHandlerType.WIND_LOG.name(), new Properties());
+        Optional<JobErrorHandler> optional = JobErrorHandlerFactory.createHandler(ElasticJobErrorHandlerType.LOG.name(), new Properties());
         Assertions.assertTrue(optional.isPresent());
+        Assertions.assertInstanceOf(WindLogJobErrorHandler.class, optional.get());
     }
 }

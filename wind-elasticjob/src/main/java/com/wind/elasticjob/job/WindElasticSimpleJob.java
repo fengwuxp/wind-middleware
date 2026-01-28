@@ -1,6 +1,5 @@
 package com.wind.elasticjob.job;
 
-import com.wind.elasticjob.enums.ElasticJobExecutorServiceHandlerType;
 import org.apache.shardingsphere.elasticjob.simple.job.SimpleJob;
 
 /**
@@ -11,8 +10,4 @@ import org.apache.shardingsphere.elasticjob.simple.job.SimpleJob;
  **/
 public interface WindElasticSimpleJob extends WindElasticJob, SimpleJob {
 
-    @Override
-    default ElasticJobExecutorServiceHandlerType getJobExecutorServiceHandlerType() {
-        return ElasticJobExecutorServiceHandlerType.SINGLE;
-    }
 }

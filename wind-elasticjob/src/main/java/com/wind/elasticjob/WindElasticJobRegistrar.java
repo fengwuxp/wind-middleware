@@ -2,11 +2,11 @@ package com.wind.elasticjob;
 
 import com.wind.common.util.ServiceInfoUtils;
 import com.wind.elasticjob.enums.ElasticJobErrorHandlerType;
-import com.wind.elasticjob.enums.ElasticJobListenerType;
 import com.wind.elasticjob.enums.ElasticJobShardingStrategyType;
 import com.wind.elasticjob.job.WindElasticDataFlowJob;
 import com.wind.elasticjob.job.WindElasticJob;
 import com.wind.elasticjob.job.WindElasticSimpleJob;
+import com.wind.elasticjob.spi.executor.WindSingleElasticJobExecutorServiceHandler;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.shardingsphere.elasticjob.api.ElasticJob;
 import org.apache.shardingsphere.elasticjob.api.JobConfiguration;
@@ -51,6 +51,7 @@ public class WindElasticJobRegistrar {
     public void onContextClosedEvent(ContextClosedEvent event) {
         log.info("shutdown elastic job, size = {}", bootstraps.size());
         bootstraps.forEach(ScheduleJobBootstrap::shutdown);
+        WindSingleElasticJobExecutorServiceHandler.destroyExecutorFactory();
     }
 
     /**
@@ -71,6 +72,7 @@ public class WindElasticJobRegistrar {
 
     private JobConfiguration createJobConfiguration(WindElasticJob job) {
         return JobConfiguration.newBuilder(job.getName(), job.getShardingTotalCount())
+                .jobExecutorServiceHandlerType(job.getJobExecutorServiceHandlerType().name())
                 .shardingItemParameters(job.getShardingItemParameters())
                 .jobShardingStrategyType(ElasticJobShardingStrategyType.ROUND_ROBIN.name())
                 .jobErrorHandlerType(ElasticJobErrorHandlerType.LOG.name())

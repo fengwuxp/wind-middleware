@@ -1,6 +1,7 @@
 package com.wind.elasticjob.job;
 
 import com.wind.common.WindConstants;
+import com.wind.elasticjob.enums.ElasticJobExecutorServiceHandlerType;
 import com.wind.elasticjob.enums.ElasticJobListenerType;
 import jakarta.validation.constraints.NotNull;
 
@@ -66,6 +67,13 @@ public interface WindElasticJob {
      */
     default boolean isMisFire() {
         return true;
+    }
+
+    /**
+     * @return 执行器服务处理方式
+     */
+    default ElasticJobExecutorServiceHandlerType getJobExecutorServiceHandlerType() {
+        return ElasticJobExecutorServiceHandlerType.CPU;
     }
 
     /**

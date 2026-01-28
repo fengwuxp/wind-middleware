@@ -1,4 +1,4 @@
-package com.wind.elasticjob.error.handler;
+package com.wind.elasticjob.spi.error;
 
 import com.wind.elasticjob.enums.ElasticJobErrorHandlerType;
 import lombok.extern.slf4j.Slf4j;

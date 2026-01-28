@@ -1,6 +1,6 @@
 package com.wind.elasticjob.enums;
 
-import com.wind.elasticjob.listener.ElasticJobLogTraceListener;
+import com.wind.elasticjob.spi.listener.ElasticJobLogTraceListener;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 

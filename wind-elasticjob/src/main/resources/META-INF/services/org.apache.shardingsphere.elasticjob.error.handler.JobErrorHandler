@@ -1,1 +1,1 @@
-com.wind.elasticjob.error.handler.WindLogJobErrorHandler
+com.wind.elasticjob.spi.error.WindLogJobErrorHandler

@@ -8,6 +8,7 @@ import org.springframework.boot.autoconfigure.ImportAutoConfiguration;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceProperties;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceTransactionManagerAutoConfiguration;
 import org.springframework.boot.autoconfigure.jdbc.JdbcTemplateAutoConfiguration;
+import org.springframework.boot.autoconfigure.sql.init.SqlInitializationAutoConfiguration;
 import org.springframework.boot.autoconfigure.sql.init.SqlInitializationProperties;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 
@@ -33,7 +34,8 @@ import javax.sql.DataSource;
 @ImportAutoConfiguration(value = {
         AbstractJdbcTest.H2InitializationAutoConfiguration.class,
         DataSourceTransactionManagerAutoConfiguration.class,
-        JdbcTemplateAutoConfiguration.class
+        JdbcTemplateAutoConfiguration.class,
+        SqlInitializationAutoConfiguration.class
 })
 @Transactional(rollbackFor = Exception.class)
 @TestPropertySource(locations = {"classpath:application-h2.properties", "classpath:application-test.properties"})

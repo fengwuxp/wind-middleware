@@ -25,7 +25,7 @@ public class JdbcSequenceRepository implements SequenceRepository {
     private static final SequenceSql DEFAULT_SQL = new SequenceSql(
             "insert into `%s`(`name`,`group_name`,`seq_value`,`step`) values (?, ?, 0, 1)",
             "select id from `%s` where name = ?",
-            "select seq_value as sequenceValue, step as stepValue from `%s` where id = ?",
+            "select seq_value as seqValue, step as stepValue from `%s` where id = ?",
             "update `%s` set seq_value = seq_value + step where id = ? and seq_value = ?"
     );
 
@@ -72,21 +72,21 @@ public class JdbcSequenceRepository implements SequenceRepository {
         /**
          * 查询序列sql
          */
-        private final String querySequenceValue;
+        private final String querySeqValue;
 
         /**
          * 获取下一个序列sql
          */
         private final String next;
 
-        public SequenceSql(String create, String findId, String querySequenceValue, String next) {
-            this("t_wind_sequence", create, findId, querySequenceValue, next);
+        public SequenceSql(String create, String findId, String querySeqValue, String next) {
+            this("t_wind_sequence", create, findId, querySeqValue, next);
         }
 
-        public SequenceSql(String tableName, String create, String findId, String querySequenceValue, String next) {
+        public SequenceSql(String tableName, String create, String findId, String querySeqValue, String next) {
             this.create = String.format(create, tableName);
             this.findId = String.format(findId, tableName);
-            this.querySequenceValue = String.format(querySequenceValue, tableName);
+            this.querySeqValue = String.format(querySeqValue, tableName);
             this.next = String.format(next, tableName);
         }
 
@@ -106,24 +106,24 @@ public class JdbcSequenceRepository implements SequenceRepository {
                     // 创建序列
                     jdbcTemplate.update(sequenceSql.create, sequenceName, groupName);
                     Long result = jdbcTemplate.queryForObject(sequenceSql.findId, Long.class, sequenceName);
-                    AssertUtils.notNull(result, String.format("find sequence name = %s id error", sequenceName));
+                    AssertUtils.notNull(result, String.format("find sequence name = %s id failure", sequenceName));
                     return result;
                 }
-                return ids.get(0);
+                return ids.getFirst();
             });
         }
 
         @Override
         public String next() {
             Integer next = transactionTemplate.execute(transactionStatus -> {
-                SequenceValue current = jdbcTemplate.queryForObject(sequenceSql.querySequenceValue,
+                SequenceValue current = jdbcTemplate.queryForObject(sequenceSql.querySeqValue,
                         new BeanPropertyRowMapper<>(SequenceValue.class), sequenceId);
                 AssertUtils.notNull(current, () -> "not found current sequence value");
-                AssertUtils.isTrue(jdbcTemplate.update(sequenceSql.next, sequenceId, current.sequenceValue) > 0, () -> String.format("update " +
-                        "sequence name = %s error", sequenceName));
-                return current.sequenceValue + current.stepValue;
+                AssertUtils.isTrue(jdbcTemplate.update(sequenceSql.next, sequenceId, current.seqValue) > 0,
+                        () -> String.format("update sequence name = %s failure", sequenceName));
+                return current.seqValue + current.stepValue;
             });
-            AssertUtils.notNull(next, () -> String.format("get sequence name = %s error", sequenceName));
+            AssertUtils.notNull(next, () -> String.format("get sequence name = %s failure", sequenceName));
             return String.valueOf(next);
         }
     }
@@ -131,7 +131,7 @@ public class JdbcSequenceRepository implements SequenceRepository {
     @Data
     static class SequenceValue {
 
-        private Integer sequenceValue;
+        private Integer seqValue;
 
         private Integer stepValue;
     }

@@ -14,5 +14,4 @@ create table `t_wind_sequence`
     `version`      int(11)             NOT NULL DEFAULT 0 COMMENT '数据版本控制',
     primary key (`id`),
     unique `uk_wind_sequence_name` (`name`)
-) COMMENT = '全局序列号表' ENGINE = InnoDBdefault
-                           charset = utf8mb4;
+) COMMENT = '全局序列号表' ENGINE = InnoDB default charset = utf8mb4;

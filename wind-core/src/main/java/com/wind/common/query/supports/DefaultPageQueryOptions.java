@@ -46,6 +46,17 @@ public final class DefaultPageQueryOptions extends AbstractPageQuery<DefaultOrde
         return defaults(1, 20, field, orderType);
     }
 
+
+    /**
+     * 仅返回结果集
+     *
+     * @return DefaultPageQueryOptions
+     */
+    @NonNull
+    public static DefaultPageQueryOptions result() {
+        return result(20);
+    }
+
     /**
      * 仅返回结果集
      *

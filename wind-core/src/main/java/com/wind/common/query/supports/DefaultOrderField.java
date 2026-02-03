@@ -46,7 +46,17 @@ public enum DefaultOrderField implements QueryOrderField {
     /**
      * 是否启用
      */
-    ENABLED("is_enabled");
+    ENABLED("is_enabled"),
+
+    /**
+     * 完成时间
+     */
+    FINISHED_TIME("finished_time"),
+
+    /**
+     * 完成时间
+     */
+    COMPLETED_TIME("completed_time");
 
     /**
      * 排序字段

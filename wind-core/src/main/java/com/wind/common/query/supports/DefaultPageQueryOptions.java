@@ -10,7 +10,7 @@ import org.jspecify.annotations.Nullable;
  * @author wuxp
  * @date 2025-12-09 13:46
  **/
-public final class DefaultPageQueryOptions extends AbstractPageQuery<DefaultOrderField> {
+public final class DefaultPageQueryOptions extends SortablePageQuery<DefaultOrderField> {
 
     /**
      * 降序

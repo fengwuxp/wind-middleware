@@ -11,7 +11,7 @@ import org.jspecify.annotations.NonNull;
  * @author wuxp
  * @date 2025-12-09 13:40
  **/
-public final class DefaultCursorQueryOptions extends AbstractCursorQuery<DefaultCursorQueryOrderField> {
+public final class DefaultCursorQueryOptions extends SortableCursorQuery<DefaultCursorQueryOrderField> {
 
     /**
      * 创建游标查询参数

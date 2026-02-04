@@ -25,7 +25,6 @@ public enum DefaultCursorQueryOrderField implements QueryOrderField {
      */
     GMT_CREATE("gmt_create");
 
-
     /**
      * 排序字段
      */

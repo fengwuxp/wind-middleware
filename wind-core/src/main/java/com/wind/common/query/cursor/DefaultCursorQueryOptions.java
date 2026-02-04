@@ -16,6 +16,16 @@ public final class DefaultCursorQueryOptions extends SortableCursorQuery<Default
     /**
      * 创建游标查询参数
      *
+     * @return DefaultCursorQueryOptions
+     */
+    @NonNull
+    public static DefaultCursorQueryOptions defaults() {
+        return order(DefaultCursorQueryOrderField.ID, QueryOrderType.DESC);
+    }
+
+    /**
+     * 创建游标查询参数
+     *
      * @param field 排序字段
      * @return DefaultCursorQueryOptions
      */

@@ -8,11 +8,11 @@ import com.wind.server.web.restful.RestfulApiRespFactory;
 import com.wind.trace.WindTracer;
 import com.wind.web.exception.GlobalExceptionLogDecisionMaker;
 import com.wind.web.util.HttpResponseMessageUtils;
-import org.jspecify.annotations.NonNull;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
+import org.jspecify.annotations.NonNull;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.net.URI;
@@ -25,9 +25,11 @@ import static com.wind.common.WindConstants.HTTP_REQUEST_URL_TRACE_NAME;
 import static com.wind.common.WindConstants.LOCAL_HOST_IP_V4;
 import static com.wind.common.WindConstants.WIND_TRANCE_ID_HEADER_NAME;
 import static com.wind.common.WindHttpConstants.HTTP_HOST_HEADER_NAME;
+import static com.wind.common.WindHttpConstants.HTTP_REFERER_HEADER_NAME;
 import static com.wind.common.WindHttpConstants.HTTP_REQUEST_CLIENT_ID_HEADER_NAME;
 import static com.wind.common.WindHttpConstants.HTTP_REQUEST_HOST_ATTRIBUTE_NAME;
 import static com.wind.common.WindHttpConstants.HTTP_REQUEST_IP_ATTRIBUTE_NAME;
+import static com.wind.common.WindHttpConstants.HTTP_REQUEST_REFERER_ATTRIBUTE_NAME;
 import static com.wind.common.WindHttpConstants.HTTP_USER_AGENT_HEADER_NAME;
 
 /**
@@ -97,6 +99,7 @@ public class TraceFilter extends OncePerRequestFilter {
         request.setAttribute(HTTP_REQUEST_IP_ATTRIBUTE_NAME, requestSourceIp);
         contextVariables.put(HTTP_REQUEST_IP_ATTRIBUTE_NAME, requestSourceIp);
         contextVariables.put(HTTP_REQUEST_HOST_ATTRIBUTE_NAME, getRequestSourceHost(request));
+        contextVariables.put(HTTP_REQUEST_REFERER_ATTRIBUTE_NAME, getRequestSourceReferer(request));
         contextVariables.put(HTTP_REQUEST_URL_TRACE_NAME, request.getRequestURI());
         contextVariables.put(HTTP_USER_AGENT_HEADER_NAME, request.getHeader(HTTP_USER_AGENT_HEADER_NAME));
         contextVariables.put(HTTP_REQUEST_CLIENT_ID_HEADER_NAME, request.getHeader(HTTP_REQUEST_CLIENT_ID_HEADER_NAME));
@@ -133,5 +136,13 @@ public class TraceFilter extends OncePerRequestFilter {
             log.error("get request host error, request url = {}", request.getRequestURL());
             return WindConstants.UNKNOWN;
         }
+    }
+
+    private String getRequestSourceReferer(HttpServletRequest request) {
+        String referer = request.getHeader(HTTP_REFERER_HEADER_NAME);
+        if (referer != null) {
+            return referer.split("\\?", 2)[0];
+        }
+        return null;
     }
 }

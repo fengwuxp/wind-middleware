@@ -27,6 +27,7 @@
                         "requestUrl": "%X{requestUrl:-}",
                         "requestSourceIp": "%X{requestSourceIp:-}",
                         "requestSourceHost": "%X{requestSourceHost:-}",
+                        "requestSourceReferer": "%X{requestSourceReferer:-}"
                         "userAgent": "%X{User-Agent:-}",
                         "podIp": "%X{localhostIpv4:-}",
                         "thread": "%thread",

@@ -23,6 +23,11 @@ public final class WindHttpConstants {
     public static final String HTTP_REQUEST_HOST_ATTRIBUTE_NAME = "requestSourceHost";
 
     /**
+     * http request 来源 referer
+     */
+    public static final String HTTP_REQUEST_REFERER_ATTRIBUTE_NAME = "requestSourceReferer";
+
+    /**
      * api 请求账号
      */
     public static final String API_SECRET_ACCOUNT_ATTRIBUTE_NAME = "Wind-Attribute-Api-Secret-Account";
@@ -31,6 +36,8 @@ public final class WindHttpConstants {
      * http request Host header name
      */
     public static final String HTTP_HOST_HEADER_NAME = "Host";
+
+    public static final String HTTP_REFERER_HEADER_NAME = "referer";
 
     /**
      * http request User-Agent header name

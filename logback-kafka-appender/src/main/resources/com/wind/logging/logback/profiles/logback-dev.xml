@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<included>
+    <include resource="com/wind/logging/logback/logback-safety.xml"/>
+    <root level="INFO">
+        <appender-ref ref="DISRUPTOR_CONSOLE"/>
+        <appender-ref ref="DISRUPTOR_APP"/>
+        <appender-ref ref="DISRUPTOR_APP_ERROR"/>
+        <appender-ref ref="DISRUPTOR_KAFKA"/>
+    </root>
+</included>

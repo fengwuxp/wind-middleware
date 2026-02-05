@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
 <included>
     <!-- spring property -->
     <springProperty name="KAFKA_TOPIC" scope="context" source="spring.kafka.log.topic"/>
@@ -23,13 +24,14 @@
                         "tenant": "%X{tenant:-}",
                         "userId": "%X{userId:-}",
                         "appName": "${APP_NAME}",
-                        "env": "${SPRING_PROFILES_ACTIVE}",
+                        "env": "${SPRING_PROFILES_ACTIVE:-unkown}",
                         "requestUrl": "%X{requestUrl:-}",
                         "requestSourceIp": "%X{requestSourceIp:-}",
                         "requestSourceHost": "%X{requestSourceHost:-}",
-                        "requestSourceReferer": "%X{requestSourceReferer:-}"
-                        "userAgent": "%X{User-Agent:-}",
+                        "requestSourceReferer": "%X{requestSourceReferer:-}",
+                        "userAgent": "%X{userAgent:-}",
                         "podIp": "%X{localhostIpv4:-}",
+                        "middlewareType": "%X{middlewareType:-}",
                         "thread": "%thread",
                         "virtualThreadId": "%X{virtualThreadId:-}",
                         "logger": "%logger",

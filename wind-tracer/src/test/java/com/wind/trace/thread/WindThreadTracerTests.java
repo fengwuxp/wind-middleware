@@ -14,7 +14,7 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-import static com.wind.common.WindConstants.LOCAL_HOST_IP_V4;
+import static com.wind.common.WindConstants.LOCALHOST_IP_V4;
 import static com.wind.common.WindConstants.TRACE_ID_NAME;
 
 /**
@@ -31,7 +31,7 @@ class WindThreadTracerTests {
         WindTracer.TRACER.clear();
         WindTracer.TRACER.trace();
         Assertions.assertNotEquals(traceId, WindTracer.TRACER.getTraceId());
-        Assertions.assertNotNull(WindTracer.TRACER.getContextVariable(LOCAL_HOST_IP_V4));
+        Assertions.assertNotNull(WindTracer.TRACER.getContextVariable(LOCALHOST_IP_V4));
     }
 
     @Test

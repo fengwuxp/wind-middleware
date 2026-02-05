@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<included>
+    <!-- SiftingAppender 按 MDC key 分流 -->
+    <appender name="MIDDLEWARE" class="ch.qos.logback.classic.sift.SiftingAppender">
+        <discriminator class="ch.qos.logback.classic.sift.MDCBasedDiscriminator">
+            <key>middlewareType</key>
+            <defaultValue>unknown</defaultValue>
+        </discriminator>
+        <sift>
+            <appender name="FILE-${middlewareType}" class="ch.qos.logback.core.rolling.RollingFileAppender">
+                <encoder>
+                    <pattern>${FILE_LOG_PATTERN}</pattern>
+                    <charset>${FILE_LOG_CHARSET}</charset>
+                </encoder>
+                <file>${APP_LOG_FILEPATH}/${middlewareType}.log</file>
+                <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+                    <fileNamePattern>${APP_LOG_FILEPATH}/${middlewareType}.%d{yyyy-MM-dd}.%i.gz</fileNamePattern>
+                    <cleanHistoryOnStart>${LOGBACK_ROLLINGPOLICY_CLEAN_HISTORY_ON_START:-false}</cleanHistoryOnStart>
+                    <maxFileSize>${LOGBACK_ROLLINGPOLICY_MAX_FILE_SIZE:-10MB}</maxFileSize>
+                    <totalSizeCap>${LOGBACK_ROLLINGPOLICY_TOTAL_SIZE_CAP:-0}</totalSizeCap>
+                    <maxHistory>${LOGBACK_ROLLINGPOLICY_MAX_HISTORY:-7}</maxHistory>
+                </rollingPolicy>
+            </appender>
+        </sift>
+    </appender>
+
+    <appender name="DISRUPTOR_MIDDLEWARE" class="net.logstash.logback.appender.LoggingEventAsyncDisruptorAppender">
+        <appender-ref ref="MIDDLEWARE"/>
+    </appender>
+
+    <logger name="com.aliyun.oss" additivity="false">
+        <appender-ref ref="DISRUPTOR_MIDDLEWARE"/>
+    </logger>
+    <logger name="com.aliyun.kms20160120" additivity="false">
+        <appender-ref ref="DISRUPTOR_MIDDLEWARE"/>
+    </logger>
+    <logger name="org.apache.shardingsphere.elasticjob" additivity="false">
+        <appender-ref ref="DISRUPTOR_MIDDLEWARE"/>
+    </logger>
+    <logger name="org.redisson" additivity="false">
+        <appender-ref ref="DISRUPTOR_MIDDLEWARE"/>
+    </logger>
+</included>

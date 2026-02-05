@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Logging Safety Baseline 防止日志风暴 / 循环发送 / 噪声爆炸  -->
+<included>
+    <!-- Apache HttpClient wire log -->
+    <logger name="org.apache.http.impl.conn.Wire" level="WARN"/>
+    <logger name="org.apache.http.wire" level="WARN"/>
+
+    <!-- OkHttp debug logging -->
+    <logger name="okhttp3.logging" level="WARN"/>
+
+    <!-- Netty wire logging -->
+    <logger name="io.netty.handler.logging" level="WARN"/>
+
+</included>

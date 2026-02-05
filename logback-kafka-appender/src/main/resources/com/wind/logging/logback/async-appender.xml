@@ -1,4 +1,5 @@
-<!-- ASyNC Appender -->
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Async Appender -->
 <included>
     <appender name="ASYNC_CONSOLE" class="ch.qos.logback.classic.AsyncAppender">
         <!-- 不丢失日志.默认的,如果队列的80%已满,则会丢弃 TRACT、DEBUG、INF O级别的日志 -->
@@ -10,17 +11,17 @@
         <!-- 添加附加的 appender,最多只能添加一个 -->
         <appender-ref ref="CONSOLE"/>
     </appender>
-    <appender name="ASYNC_FILE" class="ch.qos.logback.classic.AsyncAppender">
+    <appender name="ASYNC_APP" class="ch.qos.logback.classic.AsyncAppender">
         <discardingThreshold>0</discardingThreshold>
         <queueSize>4096</queueSize>
         <neverBlock>true</neverBlock>
         <!-- 添加附加的 appender,最多只能添加一个 -->
-        <appender-ref ref="FILE"/>
+        <appender-ref ref="APP"/>
     </appender>
-    <appender name="ASYNC_ERROR_FILE" class="ch.qos.logback.classic.AsyncAppender">
+    <appender name="ASYNC_APP_ERROR" class="ch.qos.logback.classic.AsyncAppender">
         <discardingThreshold>0</discardingThreshold>
         <queueSize>4096</queueSize>
         <neverBlock>true</neverBlock>
-        <appender-ref ref="ERROR_FILE"/>
+        <appender-ref ref="APP_ERROR"/>
     </appender>
 </included>

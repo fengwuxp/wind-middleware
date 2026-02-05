@@ -239,11 +239,16 @@ public final class WindConstants {
     /**
      * 本机 ipv4 地址
      */
-    public static final String LOCAL_HOST_IP_V4 = "localhostIpv4";
+    public static final String LOCALHOST_IP_V4 = "localhostIpv4";
 
     /**
      * 本机 ipv6 地址
      */
-    public static final String LOCAL_HOST_IP_V6 = "localhostIpv6";
+    public static final String LOCALHOST_IP_V6 = "localhostIpv6";
+
+    /**
+     * 中间件类型变量名称
+     */
+    public static final String MIDDLEWARE_MDC_VARIABLE_NAME = "middlewareType";
 
 }

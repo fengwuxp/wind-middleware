@@ -56,8 +56,7 @@ public interface ConfigRepository {
             String config = getTextConfig(descriptor);
             return PROPERTY_SOURCE_LOADER.load(descriptor.getName(), new ByteArrayResource(config.getBytes(StandardCharsets.UTF_8)));
         } catch (Exception exception) {
-            throw new BaseException(DefaultExceptionCode.COMMON_ERROR, String.format("load config name = %s failure", descriptor.getName()),
-                    exception);
+            throw new BaseException(DefaultExceptionCode.COMMON_ERROR, String.format("load config name = %s failure", descriptor.getName()), exception);
         }
     }
 

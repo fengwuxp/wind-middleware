@@ -26,6 +26,7 @@ public class MiddlewareTagTurboFilter extends TurboFilter {
             "com.aliyun.oss", "oss",
             "com.aliyun.kms", "kms",
             "org.apache.shardingsphere.elasticjob", "elasticjob",
+            "com.wind.elasticjob", "elasticjob",
             "org.redisson", "redisson"
     ));
 

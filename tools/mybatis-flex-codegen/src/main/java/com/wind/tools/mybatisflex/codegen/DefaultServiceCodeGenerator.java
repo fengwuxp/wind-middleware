@@ -15,10 +15,10 @@ import freemarker.template.DefaultObjectWrapper;
 import freemarker.template.DefaultObjectWrapperBuilder;
 import freemarker.template.Template;
 import freemarker.template.TemplateException;
-
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
+
 import java.io.File;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
@@ -165,7 +165,7 @@ public class DefaultServiceCodeGenerator {
      */
     private GenCodeInfo rebuildEntityByUpdateRequest(GenCodeInfo entity) {
         GenCodeInfo info = rebuildEntity(entity, UPDATE_REQUEST_IGNORE_FIELDS);
-        info.getFields().forEach(DefaultServiceCodeGenerator::removeNotNullionAnnotations);
+        info.getFields().forEach(DefaultServiceCodeGenerator::removeNotNullAnnotations);
         Optional<GenCodeInfo.FieldInfo> id = info.getFields().stream().filter(field -> Objects.equals("id", field.getName())).findFirst();
         if (id.isPresent()) {
             List<String> annotations = new ArrayList<>(id.get().getAnnotations());
@@ -176,14 +176,14 @@ public class DefaultServiceCodeGenerator {
         return info;
     }
 
-    private static GenCodeInfo.FieldInfo removeNotNullionAnnotations(GenCodeInfo.FieldInfo field) {
+    private static GenCodeInfo.FieldInfo removeNotNullAnnotations(GenCodeInfo.FieldInfo field) {
         List<String> annotations = field.getAnnotations().stream()
                 // 查询对象移除验证注解
                 .filter(name ->
                         !(Objects.equals(NotNull.class.getSimpleName(), name) ||
                                 Objects.equals(NotBlank.class.getSimpleName(), name) ||
                                 Objects.equals(NotEmpty.class.getSimpleName(), name))
-                ).collect(Collectors.toList());
+                ).toList();
         Set<String> dependencies = field.getDependencies().stream()
                 // 查询对象移除验证注解
                 .filter(name ->
@@ -199,7 +199,7 @@ public class DefaultServiceCodeGenerator {
         List<GenCodeInfo.FieldInfo> fields = entity.getFields()
                 .stream()
                 .filter(field -> !ignoreFields.contains(field.getName()))
-                .collect(Collectors.toList());
+                .toList();
         return entity
                 .duplicate()
                 .setFields(fields);
@@ -214,8 +214,8 @@ public class DefaultServiceCodeGenerator {
                 .filter(field -> UPDATE_REQUEST_IGNORE_FIELDS.contains(field.getName()))
                 // 创建、更新时间增加范围查询支持
                 .map(field -> Arrays.asList(
-                        field.rename("min" + field.getFirstUpCaseName(), "查询到最小 " + field.getName()),
-                        field.rename("max" + field.getFirstUpCaseName(), "查询到最大 " + field.getName())
+                        field.rename(field.getName() + "Min", "查询到最小 " + field.getName()),
+                        field.rename(field.getName() + "Max", "查询到最大 " + field.getName())
                 ))
                 .flatMap(Collection::stream)
                 .toList();

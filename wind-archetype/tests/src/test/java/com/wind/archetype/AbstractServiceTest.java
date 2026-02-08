@@ -2,22 +2,26 @@ package com.wind.archetype;
 
 
 import com.wind.common.spring.SpringApplicationContextUtils;
+import com.wind.tools.h2.H2FunctionInitializer;
+import com.zaxxer.hikari.HikariDataSource;
 import lombok.AllArgsConstructor;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.ImportAutoConfiguration;
-import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
-import org.springframework.boot.autoconfigure.jdbc.DataSourceTransactionManagerAutoConfiguration;
-import org.springframework.boot.autoconfigure.sql.init.SqlInitializationAutoConfiguration;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
+import org.springframework.boot.jdbc.autoconfigure.DataSourceInitializationAutoConfiguration;
+import org.springframework.boot.jdbc.autoconfigure.DataSourceProperties;
+import org.springframework.boot.jdbc.autoconfigure.DataSourceTransactionManagerAutoConfiguration;
+import org.springframework.boot.jdbc.autoconfigure.JdbcTemplateAutoConfiguration;
+import org.springframework.boot.sql.autoconfigure.init.SqlInitializationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.EnableAspectJAutoProxy;
 import org.springframework.context.annotation.Import;
-import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
-import org.springframework.transaction.PlatformTransactionManager;
-import org.springframework.transaction.annotation.EnableTransactionManagement;
 import org.springframework.transaction.annotation.Transactional;
+
+import javax.sql.DataSource;
 
 /**
  * 参考文档说明：
@@ -29,17 +33,16 @@ import org.springframework.transaction.annotation.Transactional;
 @SpringJUnitConfig()
 @Import({AbstractServiceTest.TestConfig.class})
 @ImportAutoConfiguration(value = {
-        DataSourceAutoConfiguration.class,
-        DataSourceTransactionManagerAutoConfiguration.class,
         AbstractServiceTest.H2InitializationAutoConfiguration.class,
-        SqlInitializationAutoConfiguration.class,
-//        MybatisFlexAutoConfiguration.class
-        AbstractServiceTest.H2InitializationAutoConfiguration.class
+        DataSourceTransactionManagerAutoConfiguration.class,
+        JdbcTemplateAutoConfiguration.class,
+        DataSourceInitializationAutoConfiguration.class
 })
 @Transactional(rollbackFor = Exception.class)
 @TestPropertySource(locations = {"classpath:application-h2.properties", "classpath:application-test.properties"})
 @EnableAspectJAutoProxy(proxyTargetClass = true)
 public abstract class AbstractServiceTest {
+
 
     @Configuration
     @Import({SpringApplicationContextUtils.class})
@@ -52,19 +55,15 @@ public abstract class AbstractServiceTest {
      */
     @AllArgsConstructor
     @AutoConfiguration
+    @EnableConfigurationProperties({DataSourceProperties.class, SqlInitializationProperties.class})
     public static class H2InitializationAutoConfiguration {
 
-
+        @Bean
+        public DataSource dataSource(DataSourceProperties properties) {
+            properties.setType(HikariDataSource.class);
+            DataSource result = properties.initializeDataSourceBuilder().build();
+            H2FunctionInitializer.initialize(result);
+            return result;
+        }
     }
-
-    /**
-     * @author wuxp
-     * @date 2024-12-16 10:12
-     **/
-    @EnableTransactionManagement
-    @Configuration
-//    @MapperScan({"com.wind.*.dal.mapper"})
-    public class MybatisFlexTestConfiguration {
-    }
-
 }

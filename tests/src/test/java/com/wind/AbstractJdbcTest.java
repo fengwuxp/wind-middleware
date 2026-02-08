@@ -1,11 +1,13 @@
 package com.wind;
 
+import com.wind.common.spring.SpringApplicationContextUtils;
 import com.wind.tools.h2.H2FunctionInitializer;
 import com.zaxxer.hikari.HikariDataSource;
 import lombok.AllArgsConstructor;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.ImportAutoConfiguration;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
+import org.springframework.boot.jdbc.autoconfigure.DataSourceInitializationAutoConfiguration;
 import org.springframework.boot.jdbc.autoconfigure.DataSourceProperties;
 import org.springframework.boot.jdbc.autoconfigure.DataSourceTransactionManagerAutoConfiguration;
 import org.springframework.boot.jdbc.autoconfigure.JdbcTemplateAutoConfiguration;
@@ -32,7 +34,8 @@ import javax.sql.DataSource;
 @ImportAutoConfiguration(value = {
         AbstractJdbcTest.H2InitializationAutoConfiguration.class,
         DataSourceTransactionManagerAutoConfiguration.class,
-        JdbcTemplateAutoConfiguration.class
+        JdbcTemplateAutoConfiguration.class,
+        DataSourceInitializationAutoConfiguration.class
 })
 @Transactional(rollbackFor = Exception.class)
 @TestPropertySource(locations = {"classpath:application-h2.properties", "classpath:application-test.properties"})
@@ -40,6 +43,7 @@ import javax.sql.DataSource;
 public abstract class AbstractJdbcTest {
 
     @Configuration
+    @Import({SpringApplicationContextUtils.class})
     static class TestConfig {
 
     }
@@ -59,8 +63,6 @@ public abstract class AbstractJdbcTest {
             H2FunctionInitializer.initialize(result);
             return result;
         }
-
-
     }
 
 }

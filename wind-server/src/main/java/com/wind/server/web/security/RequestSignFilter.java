@@ -101,7 +101,7 @@ public record RequestSignFilter(SignatureHttpHeaderNames headerNames, ApiSecretA
 
         if (!ServiceInfoUtils.isOnline()) {
             // 线下环境返回服务端的签名字符串，方便客户端排查签名错误
-            response.addHeader(headerNames.debugSignContent(), signatureRequest.getSignText(account.getSigner()));
+            response.addHeader(headerNames.debugSignContent(), signatureRequest.getSignText(account.getSigner().getAlgorithm()));
             if (StringUtils.hasText(signatureRequest.queryString())) {
                 response.addHeader(headerNames.debugSignQuery(), signatureRequest.queryString());
             }

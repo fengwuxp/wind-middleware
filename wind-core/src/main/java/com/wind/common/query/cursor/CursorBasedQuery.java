@@ -4,9 +4,9 @@ import com.wind.common.exception.BaseException;
 import com.wind.common.query.WindQuery;
 import com.wind.common.query.supports.QueryOrderField;
 import com.wind.common.query.supports.QueryOrderType;
-import org.jspecify.annotations.Nullable;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
+import org.jspecify.annotations.Nullable;
 
 /**
  * 基于游标（Cursor-based）分页查询的通用接口定义。

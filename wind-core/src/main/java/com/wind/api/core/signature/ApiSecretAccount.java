@@ -1,9 +1,9 @@
 package com.wind.api.core.signature;
 
-import org.jspecify.annotations.Nullable;
-
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import org.jspecify.annotations.Nullable;
+
 import java.util.Objects;
 
 /**

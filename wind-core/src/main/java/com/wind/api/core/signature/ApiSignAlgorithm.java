@@ -1,11 +1,11 @@
 package com.wind.api.core.signature;
 
-import com.wind.signature.algorithm.HmacSHA256Signer;
-import com.wind.signature.algorithm.Sha256WithRsaSigner;
+import com.wind.signature.SignatureAlgorithm;
+import com.wind.signature.WindTextSigner;
+import com.wind.signature.algorithm.HmacShaByteSigner;
+import com.wind.signature.algorithm.ShaWithRsaByteSigner;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-
-import java.util.Objects;
 
 /**
  * @author wuxp
@@ -19,55 +19,71 @@ public enum ApiSignAlgorithm implements ApiSigner {
      * 摘要签名
      * 参见：https://www.yuque.com/suiyuerufeng-akjad/wind/qal4b72cxw84cu6g
      */
-    HMAC_SHA256(HmacSHA256Signer.ALGORITHM_NAME, new ApiSigner() {
-        /**
-         * 签名验证
-         *
-         * @param request 用于验证签名的请求
-         * @param sign    待验证的签名
-         * @return 签名验证是否通过
-         */
-        @Override
-        public boolean verify(ApiSignatureRequest request, String secretKey, String sign) {
-            return Objects.equals(sign(request, secretKey), sign);
-        }
+    HMAC_SHA256(SignatureAlgorithm.HMAC_SHA256),
 
-
-        @Override
-        public String sign(ApiSignatureRequest request, String secretKey) {
-            return HmacSHA256Signer.sign(request.getSignTextForDigest(), secretKey);
-        }
-    }),
+    HMAC_SHA512(SignatureAlgorithm.HMAC_SHA512),
 
     /**
      * 参见：https://www.yuque.com/suiyuerufeng-akjad/wind/qal4b72cxw84cu6g
      */
-    SHA256_WITH_RSA(Sha256WithRsaSigner.ALGORITHM_NAME, new ApiSigner() {
-
-        @Override
-        public String sign(ApiSignatureRequest request, String privateKey) {
-            return Sha256WithRsaSigner.sign(request.getSignTextForSha256WithRsa(), privateKey);
-        }
-
-        @Override
-        public boolean verify(ApiSignatureRequest request, String publicKey, String sign) {
-            return Sha256WithRsaSigner.verify(request.getSignTextForSha256WithRsa(), publicKey, sign);
-        }
-    }),
+    SHA256_WITH_RSA(SignatureAlgorithm.SHA256_WITH_RSA),
     ;
 
-    private final String algorithm;
+    /**
+     * 签名算法
+     */
+    private final SignatureAlgorithm algorithm;
 
-    private final ApiSigner delegate;
+    /**
+     * 签名实现
+     */
+    private final ApiSigner signer;
 
+    ApiSignAlgorithm(SignatureAlgorithm algorithm) {
+        this(algorithm, factory(algorithm));
+    }
 
     @Override
     public String sign(ApiSignatureRequest request, String secretKey) {
-        return delegate.sign(request, secretKey);
+        return signer.sign(request, secretKey);
     }
 
     @Override
     public boolean verify(ApiSignatureRequest request, String secretKey, String sign) {
-        return delegate.verify(request, secretKey, sign);
+        return signer.verify(request, secretKey, sign);
     }
+
+    /**
+     * 创建签名器
+     *
+     * @param algorithm 签名算法
+     * @return 签名器
+     */
+    private static ApiSigner factory(SignatureAlgorithm algorithm) {
+        return switch (algorithm) {
+            case HMAC_SHA256 -> new ApiSignerWrapper(HmacShaByteSigner.hmacSha256Base64(), algorithm);
+            case HMAC_SHA512 -> new ApiSignerWrapper(HmacShaByteSigner.hmacSha512Base64(), algorithm);
+            case SHA256_WITH_RSA -> new ApiSignerWrapper(ShaWithRsaByteSigner.sha256WithRsaBas4(), algorithm);
+        };
+    }
+
+    /**
+     * Api 签名实现
+     *
+     * @author wuxp
+     * @date 2026-02-09 17:05
+     **/
+    private record ApiSignerWrapper(WindTextSigner delegate, SignatureAlgorithm algorithm) implements ApiSigner {
+
+        @Override
+        public String sign(ApiSignatureRequest request, String secretKey) {
+            return delegate.sign(request.getSignText(algorithm), secretKey);
+        }
+
+        @Override
+        public boolean verify(ApiSignatureRequest request, String secretKey, String sign) {
+            return delegate.verify(request.getSignText(algorithm), secretKey, sign);
+        }
+    }
+
 }

@@ -5,6 +5,7 @@ import java.util.logging.Logger;
 
 /**
  * java util logging logger 工厂，在应用未绑定 slf4j-log 实现时使用（例如：spring 应用启动阶段）
+ *
  * @author wuxp
  * @date 2025-03-12 18:54
  **/

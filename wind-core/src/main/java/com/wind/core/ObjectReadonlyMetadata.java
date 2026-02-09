@@ -1,9 +1,9 @@
 package com.wind.core;
 
 import com.wind.common.exception.AssertUtils;
+import jakarta.validation.constraints.NotBlank;
 import org.jspecify.annotations.Nullable;
 
-import jakarta.validation.constraints.NotBlank;
 import java.util.Map;
 
 /**

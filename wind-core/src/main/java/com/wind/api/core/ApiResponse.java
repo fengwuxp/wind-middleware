@@ -1,8 +1,8 @@
 package com.wind.api.core;
 
+import jakarta.validation.constraints.NotBlank;
 import org.jspecify.annotations.Nullable;
 
-import jakarta.validation.constraints.NotBlank;
 import java.io.Serializable;
 
 /**

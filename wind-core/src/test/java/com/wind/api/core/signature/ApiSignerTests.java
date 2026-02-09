@@ -23,6 +23,14 @@ class ApiSignerTests {
     }
 
     @Test
+    void testSha512Sign() {
+        String secretKey = "10241nl401kmdsai21o312..";
+        ApiSignatureRequest signatureRequest = mockRequest();
+        String sign = ApiSignAlgorithm.HMAC_SHA512.sign(signatureRequest, secretKey);
+        Assertions.assertTrue(ApiSignAlgorithm.HMAC_SHA512.verify(copyAndReplaceSecretRequest(signatureRequest), secretKey, sign));
+    }
+
+    @Test
     void testSha256WithRsaSign() {
         KeyPair keyPair = genKeyPir();
         String publicKey = Base64.getEncoder().encodeToString(keyPair.getPublic().getEncoded());

@@ -3,6 +3,7 @@ package com.wind.api.core.signature;
 import com.wind.common.WindConstants;
 import com.wind.common.annotations.VisibleForTesting;
 import com.wind.common.exception.AssertUtils;
+import com.wind.signature.SignatureAlgorithm;
 import jakarta.validation.constraints.NotNull;
 import lombok.Builder;
 import lombok.experimental.FieldNameConstants;
@@ -66,13 +67,14 @@ public record ApiSignatureRequest(String method, String requestPath, String nonc
      * @param algorithm 签名算法
      * @return 签名字符串
      */
-    public String getSignText(ApiSignAlgorithm algorithm) {
-        return Objects.equals(algorithm, ApiSignAlgorithm.SHA256_WITH_RSA) ? getSignTextForSha256WithRsa() : getSignTextForDigest();
+    public String getSignText(SignatureAlgorithm algorithm) {
+        return Objects.equals(algorithm, SignatureAlgorithm.SHA256_WITH_RSA) ? getSignTextForSha256WithRsa() : getSignTextForDigest();
     }
 
     /**
      * @return 获取摘要签名字符串
      */
+    @VisibleForTesting
     String getSignTextForDigest() {
         StringBuilder result = new StringBuilder()
                 .append(Fields.method).append(WindConstants.EQ).append(method).append(WindConstants.AND)
@@ -97,6 +99,7 @@ public record ApiSignatureRequest(String method, String requestPath, String nonc
     /**
      * @return 获取 Sha256WithRsa 签名字符串
      */
+    @VisibleForTesting
     String getSignTextForSha256WithRsa() {
         return method + WindConstants.SPACE + requestPath + WindConstants.LF +
                 timestamp + WindConstants.LF +

@@ -20,6 +20,18 @@
             <groupId>com.wind.middleware</groupId>
             <artifactId>wind-core</artifactId>
         </dependency>
+        <!-- Source: https://mvnrepository.com/artifact/org.bouncycastle/bcprov-jdk18on -->
+        <dependency>
+            <groupId>org.bouncycastle</groupId>
+            <artifactId>bcprov-jdk18on</artifactId>
+            <version>1.83</version>
+        </dependency>
+        <!-- BouncyCastle OpenPGP -->
+        <dependency>
+            <groupId>org.bouncycastle</groupId>
+            <artifactId>bcpg-jdk18on</artifactId>
+            <version>1.83</version>
+        </dependency>
     </dependencies>
 
 </project>

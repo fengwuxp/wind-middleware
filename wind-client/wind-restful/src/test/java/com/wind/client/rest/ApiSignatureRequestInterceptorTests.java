@@ -3,6 +3,7 @@ package com.wind.client.rest;
 import com.wind.api.core.signature.ApiSecretAccount;
 import com.wind.api.core.signature.SignatureHttpHeaderNames;
 import org.apache.commons.lang3.RandomStringUtils;
+import org.jspecify.annotations.NonNull;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpHeaders;
@@ -11,7 +12,6 @@ import org.springframework.http.HttpRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.client.ClientHttpRequestExecution;
 import org.springframework.http.client.ClientHttpResponse;
-import org.jspecify.annotations.NonNull;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -38,7 +38,7 @@ class ApiSignatureRequestInterceptorTests {
         }
     }
 
-    private static ClientHttpRequestExecution mockExecution() {
+    static ClientHttpRequestExecution mockExecution() {
         return (request, body) -> new ClientHttpResponse() {
             @Override
             @NonNull
@@ -71,9 +71,10 @@ class ApiSignatureRequestInterceptorTests {
         };
     }
 
-    private HttpRequest mockHttpRequest() {
+    static HttpRequest mockHttpRequest() {
         HttpHeaders httpHeaders = new HttpHeaders();
         httpHeaders.add("Content-Type", "application/json");
+        httpHeaders.add("Accept", "application/json");
         return new HttpRequest() {
             @Override
             @NonNull

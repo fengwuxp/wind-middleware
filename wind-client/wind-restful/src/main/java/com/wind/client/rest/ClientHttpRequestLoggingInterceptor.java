@@ -59,25 +59,29 @@ public class ClientHttpRequestLoggingInterceptor implements ClientHttpRequestInt
     private void log(HttpRequest request, byte[] body, ClientHttpResponse response, long elapsed) throws IOException {
         String requestBody = new String(body, StandardCharsets.UTF_8);
         String responseBody = readResponseBody(response);
-        String logText = String.format("""
-                URI: %s
-                Method: %s
-                RequestHeaders: %s
-                RequestBody: %s
-                ResponseStatus: %s
-                ResponseBody: %s
-                Elapsed: %dms
-                """, request.getURI(), request.getMethod(), request.getHeaders(), requestBody, response.getStatusCode(), responseBody, elapsed);
+        String logFormat = """
+                URI: {}
+                Method: {}
+                RequestHeaders: {}
+                RequestBody: {}
+                ResponseStatus: {}
+                ResponseBody:{}
+                ResponseHeaders: {}
+                Elapsed: {}ms
+                """;
         if (Boolean.TRUE.equals(WindTracer.TRACER.getContextVariable(ENABLE_API_REQUEST_LOG_PRINT_VARIABLE_NAME))) {
             // 强制打印
-            log.info(logText);
+            log.info(logFormat, request.getURI(), request.getMethod(), request.getHeaders(), requestBody, response.getStatusCode(), responseBody, response.getHeaders(), elapsed);
         } else {
             if (!Objects.equals(env, WindConstants.PROD)) {
-                log.info(logText);
+                log.info(logFormat, request.getURI(), request.getMethod(), request.getHeaders(), requestBody, response.getStatusCode(), responseBody, response.getHeaders(),
+                        elapsed);
             } else if (response.getStatusCode().is2xxSuccessful()) {
-                log.debug(logText);
+                log.debug(logFormat, request.getURI(), request.getMethod(), request.getHeaders(), requestBody, response.getStatusCode(), responseBody, response.getHeaders(),
+                        elapsed);
             } else {
-                log.error(logText);
+                log.error(logFormat, request.getURI(), request.getMethod(), request.getHeaders(), requestBody, response.getStatusCode(), responseBody, response.getHeaders(),
+                        elapsed);
             }
         }
     }

@@ -48,6 +48,13 @@ public final class PgpKeyUtils {
         throw new AssertionError();
     }
 
+    /**
+     * 读取 PGP 公钥
+     *
+     * @param publicKey 公钥内容
+     * @return 公钥
+     */
+    @NonNull
     public static PGPPublicKey readPublicKey(@NonNull String publicKey) {
         return readPublicKey(new ByteArrayInputStream(publicKey.getBytes(StandardCharsets.UTF_8)));
     }
@@ -91,7 +98,7 @@ public final class PgpKeyUtils {
     private static PGPPublicKey findEncryptionKey(PGPPublicKeyRingCollection pgpPub) {
         for (PGPPublicKeyRing keyRing : pgpPub) {
             for (PGPPublicKey key : keyRing) {
-                if (key.isEncryptionKey() && !key.isRevoked() && !hasExpired(key)) {
+                if (key.isEncryptionKey() && !key.hasRevocation() && isActive(key)) {
                     return key;
                 }
             }
@@ -102,7 +109,7 @@ public final class PgpKeyUtils {
     private static PGPPublicKey findFirstValidKey(PGPPublicKeyRingCollection pgpPub) {
         for (PGPPublicKeyRing keyRing : pgpPub) {
             for (PGPPublicKey key : keyRing) {
-                if (!key.isRevoked() && !hasExpired(key)) {
+                if (!key.hasRevocation() && isActive(key)) {
                     return key;
                 }
             }
@@ -110,14 +117,14 @@ public final class PgpKeyUtils {
         return null;
     }
 
-    private static boolean hasExpired(PGPPublicKey key) {
+    private static boolean isActive(PGPPublicKey key) {
         if (key.getValidSeconds() == 0) {
-            return false; // 永不过期
+            return true; // 永不过期
         }
 
         Date creationTime = key.getCreationTime();
         long expirationTime = creationTime.getTime() + (key.getValidSeconds() * 1000L);
-        return System.currentTimeMillis() > expirationTime;
+        return System.currentTimeMillis() <= expirationTime;
     }
 
     @NonNull

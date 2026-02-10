@@ -100,7 +100,7 @@ public class PgpRsaByteEncryptor implements BytesEncryptor {
             Object object = pgpObjectFactory.nextObject();
 
             // 如果第一个对象是 PGPEncryptedDataList
-            PGPEncryptedDataList encryptedData;
+            PGPEncryptedDataList encryptedData = null;
             if (object instanceof PGPEncryptedDataList data) {
                 encryptedData = data;
             } else {
@@ -112,44 +112,29 @@ public class PgpRsaByteEncryptor implements BytesEncryptor {
                         break;
                     }
                 }
-                if (object == null) {
-                    throw new BaseException(
-                            DefaultExceptionCode.COMMON_ERROR,
-                            "No encrypted data found in the input"
-                    );
+                if (encryptedData == null) {
+                    throw new BaseException(DefaultExceptionCode.COMMON_ERROR, "No encrypted data found in the input");
                 }
-                encryptedData = (PGPEncryptedDataList) object;
             }
 
             // 查找可以解密的加密数据包
             PGPPublicKeyEncryptedData encryptedDataPacket = null;
             for (PGPEncryptedData encryptedDataItem : encryptedData) {
-                if (encryptedDataItem instanceof PGPPublicKeyEncryptedData pubKeyData) {
-                    if (decryptionKey != null && decryptionKey.getKeyID() == pubKeyData.getKeyIdentifier().getKeyId()) {
-                        encryptedDataPacket = pubKeyData;
-                        break;
-                    }
+                if ((encryptedDataItem instanceof PGPPublicKeyEncryptedData pubKeyData) &&
+                        decryptionKey != null && decryptionKey.getKeyID() == pubKeyData.getKeyIdentifier().getKeyId()) {
+                    encryptedDataPacket = pubKeyData;
+                    break;
                 }
             }
 
             if (encryptedDataPacket == null) {
-                throw new BaseException(
-                        DefaultExceptionCode.COMMON_ERROR,
-                        "Cannot find encrypted data that can be decrypted with the provided private key"
-                );
+                throw new BaseException(DefaultExceptionCode.COMMON_ERROR, "Cannot find encrypted data that can be decrypted with the provided private key");
             }
 
             // 解密数据
-            InputStream clearStream = encryptedDataPacket.getDataStream(
-                    new JcePublicKeyDataDecryptorFactoryBuilder().setProvider(BOUNCY_CASTLE_NAME).build(decryptionKey)
-            );
-
+            InputStream clearStream = encryptedDataPacket.getDataStream(new JcePublicKeyDataDecryptorFactoryBuilder().setProvider(BOUNCY_CASTLE_NAME).build(decryptionKey));
             // 处理解密后的数据
-            PGPObjectFactory clearObjectFactory = new PGPObjectFactory(
-                    clearStream,
-                    new JcaKeyFingerprintCalculator()
-            );
-
+            PGPObjectFactory clearObjectFactory = new PGPObjectFactory(clearStream, new JcaKeyFingerprintCalculator());
             Object clearObject = clearObjectFactory.nextObject();
 
             // 处理压缩数据（如果存在）
@@ -173,18 +158,12 @@ public class PgpRsaByteEncryptor implements BytesEncryptor {
 
                 // 验证完整性
                 if (encryptedDataPacket.isIntegrityProtected() && !encryptedDataPacket.verify()) {
-                    throw new BaseException(
-                            DefaultExceptionCode.COMMON_ERROR,
-                            "Message integrity check failed"
-                    );
+                    throw new BaseException(DefaultExceptionCode.COMMON_ERROR, "Message integrity check failed");
                 }
-
                 return out.toByteArray();
             } else {
-                throw new BaseException(
-                        DefaultExceptionCode.COMMON_ERROR,
-                        "Expected literal data packet, found: " +
-                                (clearObject != null ? clearObject.getClass().getName() : "null")
+                throw new BaseException(DefaultExceptionCode.COMMON_ERROR,
+                        "Expected literal data packet, found: " + (clearObject != null ? clearObject.getClass().getName() : "null")
                 );
             }
         } catch (IOException | PGPException e) {

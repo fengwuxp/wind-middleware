@@ -5,11 +5,18 @@ import com.wind.common.spring.SpringApplicationContextUtils;
 import lombok.AllArgsConstructor;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.ImportAutoConfiguration;
+import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
+import org.springframework.boot.autoconfigure.jdbc.DataSourceTransactionManagerAutoConfiguration;
+import org.springframework.boot.autoconfigure.sql.init.SqlInitializationAutoConfiguration;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.EnableAspectJAutoProxy;
 import org.springframework.context.annotation.Import;
+import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
+import org.springframework.transaction.PlatformTransactionManager;
+import org.springframework.transaction.annotation.EnableTransactionManagement;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
@@ -21,7 +28,14 @@ import org.springframework.transaction.annotation.Transactional;
  */
 @SpringJUnitConfig()
 @Import({AbstractServiceTest.TestConfig.class})
-@ImportAutoConfiguration(value = {AbstractServiceTest.H2InitializationAutoConfiguration.class})
+@ImportAutoConfiguration(value = {
+        DataSourceAutoConfiguration.class,
+        DataSourceTransactionManagerAutoConfiguration.class,
+        AbstractServiceTest.H2InitializationAutoConfiguration.class,
+        SqlInitializationAutoConfiguration.class,
+//        MybatisFlexAutoConfiguration.class
+        AbstractServiceTest.H2InitializationAutoConfiguration.class
+})
 @Transactional(rollbackFor = Exception.class)
 @TestPropertySource(locations = {"classpath:application-h2.properties", "classpath:application-test.properties"})
 @EnableAspectJAutoProxy(proxyTargetClass = true)
@@ -30,7 +44,6 @@ public abstract class AbstractServiceTest {
     @Configuration
     @Import({SpringApplicationContextUtils.class})
     static class TestConfig {
-
 
     }
 
@@ -43,4 +56,15 @@ public abstract class AbstractServiceTest {
 
 
     }
+
+    /**
+     * @author wuxp
+     * @date 2024-12-16 10:12
+     **/
+    @EnableTransactionManagement
+    @Configuration
+//    @MapperScan({"com.wind.*.dal.mapper"})
+    public class MybatisFlexTestConfiguration {
+    }
+
 }

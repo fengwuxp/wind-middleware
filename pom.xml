@@ -42,7 +42,7 @@
     </modules>
 
     <properties>
-        <revision>1.10.0-jdk21-SNAPSHOT</revision>
+        <revision>4.0.0-SNAPSHOT</revision>
         <!--   测试相关     -->
         <jacoco-coverage-agent/>
         <tests.fork.count/>
@@ -96,6 +96,7 @@
         <googleauth.version>1.5.0</googleauth.version>
         <bucket4j.version>8.10.1</bucket4j.version>
         <json-path.version>2.9.0</json-path.version>
+        <bouncycastle.version>1.83</bouncycastle.version>
         <error_prone_annotations.version>2.42.0</error_prone_annotations.version>
         <podam.version>8.0.2.RELEASE</podam.version>
     </properties>
@@ -570,6 +571,18 @@
                 <groupId>com.bucket4j</groupId>
                 <artifactId>bucket4j-redis</artifactId>
                 <version>${bucket4j.version}</version>
+            </dependency>
+            <!-- Source: https://mvnrepository.com/artifact/org.bouncycastle/bcprov-jdk18on -->
+            <dependency>
+                <groupId>org.bouncycastle</groupId>
+                <artifactId>bcprov-jdk18on</artifactId>
+                <version>${bouncycastle.version}</version>
+            </dependency>
+            <!-- BouncyCastle OpenPGP -->
+            <dependency>
+                <groupId>org.bouncycastle</groupId>
+                <artifactId>bcpg-jdk18on</artifactId>
+                <version>${bouncycastle.version}</version>
             </dependency>
             <dependency>
                 <groupId>com.google.errorprone</groupId>

@@ -156,9 +156,19 @@ public final class WindConstants {
     public static final String WIND_I18N_MESSAGE_PREFIX = "wind.i18n.messages";
 
     /**
-     * 配置前缀
+     * Wind Server 配置前缀
      */
     public static final String WIND_SERVER_PROPERTIES_PREFIX = "wind.server";
+
+    /**
+     * Wind Security 配置前缀
+     */
+    public static final String WIND_SECURITY_PROPERTIES_PREFIX = "wind.secuiry";
+
+    /**
+     * Wind Security MFA 配置前缀
+     */
+    public static final String WIND_SECURITY_MFA_PROPERTIES_PREFIX = WIND_SECURITY_PROPERTIES_PREFIX + ".mfa";
 
     public static final String ENABLED_NAME = "enabled";
 

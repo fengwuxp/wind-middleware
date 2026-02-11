@@ -1,8 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<included>
-    <root level="INFO">
-        <appender-ref ref="CONSOLE_ASYNC"/>
-        <appender-ref ref="FILE_ASYNC"/>
-        <appender-ref ref="ERROR_FILE_ASYNC"/>
-    </root>
-</included>

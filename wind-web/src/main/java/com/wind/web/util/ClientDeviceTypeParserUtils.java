@@ -2,6 +2,7 @@ package com.wind.web.util;
 
 
 import com.wind.common.WindConstants;
+import com.wind.common.WindHttpConstants;
 import com.wind.common.enums.WindClientDeviceType;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.Data;
@@ -29,9 +30,9 @@ public final class ClientDeviceTypeParserUtils {
     private static final Parser UA_PARSER = new Parser();
 
     /**
-     * 用户认证方式属性名称
+     * 用户登录方式属性名称
      */
-    private static final String USER_AUTHENTICATION_METHOD_ATTRIBUTE_NAME = "USER_AUTHENTICATION_METHOD";
+    private static final String USER_LOGIN_METHOD_ATTRIBUTE_NAME = "USER_LOGIN_METHOD";
 
 
     private static final String CLIENT_HINTS_PLATFORM_HEADER_NAME = "Sec-CH-UA-Platform";
@@ -94,11 +95,12 @@ public final class ClientDeviceTypeParserUtils {
 
         UserClientInfo result = new UserClientInfo();
         result.setDeviceType(deviceType);
+        result.setDeviceId(HttpServletRequestUtils.getHeader(WindHttpConstants.HTTP_REQUEST_CLIENT_ID_HEADER_NAME, request));
 
         // ----------- 获取 OS 与版本信息 -----------
-        String os = header(request, CLIENT_HINTS_PLATFORM_HEADER_NAME);
-        String model = header(request, CLIENT_HINTS_MODEL_HEADER_NAME);      // 设备型号
-        String osVersion = header(request, CLIENT_HINTS_PLATFORM_VERSION_HEADER_NAME); // 平台版本
+        String os = HttpServletRequestUtils.getHeader(CLIENT_HINTS_PLATFORM_HEADER_NAME, request);
+        String model = HttpServletRequestUtils.getHeader(CLIENT_HINTS_MODEL_HEADER_NAME, request);      // 设备型号
+        String osVersion = HttpServletRequestUtils.getHeader(CLIENT_HINTS_PLATFORM_VERSION_HEADER_NAME, request); // 平台版本
 
         if (!StringUtils.hasText(os)) {
             // Client Hints 不存在，回退到 UA
@@ -115,8 +117,7 @@ public final class ClientDeviceTypeParserUtils {
         result.setClientAppVersion(StringUtils.hasText(model) ? model : null);
 
         // ----------- 获取登录方式（请求属性或默认） -----------
-        Object authenticationMethod = request.getAttribute(USER_AUTHENTICATION_METHOD_ATTRIBUTE_NAME);
-        result.setAuthenticationMethod(String.valueOf(authenticationMethod));
+        result.setLoginMethod(HttpServletRequestUtils.getRequestAttribute(USER_LOGIN_METHOD_ATTRIBUTE_NAME, request));
         return result;
     }
 
@@ -185,10 +186,11 @@ public final class ClientDeviceTypeParserUtils {
     // 1. Client Hints 解析逻辑
     // ==========================
 
-    private static WindClientDeviceType parseFromClientHints(HttpServletRequest req) {
-        String platform = header(req, CLIENT_HINTS_PLATFORM_HEADER_NAME);
-        String mobileFlag = header(req, CLIENT_HINTS_MOBILE_HEADER_NAME);   // "?1" 或 "?0"
-        String model = header(req, CLIENT_HINTS_MODEL_HEADER_NAME);
+    private static WindClientDeviceType parseFromClientHints(HttpServletRequest request) {
+        String platform = HttpServletRequestUtils.getHeader(CLIENT_HINTS_PLATFORM_HEADER_NAME, request);
+        // "?1" 或 "?0"
+        String mobileFlag = HttpServletRequestUtils.getHeader(CLIENT_HINTS_MOBILE_HEADER_NAME, request);
+        String model = HttpServletRequestUtils.getHeader(CLIENT_HINTS_MODEL_HEADER_NAME, request);
 
         if (platform == null) {
             return null; // 没有 CH, 回退 UA
@@ -206,8 +208,8 @@ public final class ClientDeviceTypeParserUtils {
             }
             case IOS -> {
                 // iOS 无法直接区分 iPad，需要 UA fallback
-                String ua = req.getHeader("User-Agent");
-                if (ua != null && ua.toLowerCase().contains("ipad")) {
+                String ua = HttpServletRequestUtils.getHeader(WindHttpConstants.HTTP_USER_AGENT_HEADER_NAME);
+                if (ua != null && ua.toLowerCase().contains(IPAD)) {
                     yield WindClientDeviceType.IPAD;
                 }
                 yield WindClientDeviceType.IPHONE;
@@ -227,14 +229,6 @@ public final class ClientDeviceTypeParserUtils {
         return m.contains(IPAD) || m.contains(TABLET) || m.contains(GALAXY_TAB) || m.contains(NEXUS_7) || m.contains(NEXUS_9);
     }
 
-
-    private static String header(HttpServletRequest req, String name) {
-        String val = req.getHeader(name);
-        if (val == null) {
-            return null;
-        }
-        return val.replace("\"", "").trim();
-    }
 
     // ==========================
     // 2. UA + uap-java 解析逻辑
@@ -349,16 +343,34 @@ public final class ClientDeviceTypeParserUtils {
     @Data
     public static class UserClientInfo {
 
+        /**
+         * 设备类型
+         */
         private WindClientDeviceType deviceType;
 
+        /**
+         * 设备ID
+         */
         private String deviceId;
 
+        /**
+         * 设备ID
+         */
         private String os;
 
+        /**
+         * 操作系统版本
+         */
         private String osVersion;
 
+        /**
+         * 客户端应用版本
+         */
         private String clientAppVersion;
 
-        private String authenticationMethod;
+        /**
+         * 登录方式
+         */
+        private String loginMethod;
     }
 }

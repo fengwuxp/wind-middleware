@@ -3,8 +3,7 @@ package com.wind.web.util;
 import com.wind.common.exception.AssertUtils;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
+import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 import org.springframework.web.context.request.RequestAttributes;
 import org.springframework.web.context.request.RequestContextHolder;
@@ -25,7 +24,7 @@ public final class HttpServletRequestUtils {
         throw new AssertionError();
     }
 
-    @NotNull
+    @NonNull
     public static HttpServletRequest requireContextRequest() {
         HttpServletRequest result = getContextRequestOfNullable();
         AssertUtils.notNull(result, NOT_CURRENTLY_IN_WEB_SERVLET_CONTEXT);
@@ -41,24 +40,59 @@ public final class HttpServletRequestUtils {
         return ((ServletRequestAttributes) requestAttributes).getRequest();
     }
 
-    public static <T> T requireRequestAttribute(@NotBlank String name) {
+    public static <T> T requireRequestAttribute(@NonNull String name) {
         return requireRequestAttribute(name, requireContextRequest());
     }
 
-    public static <T> T requireRequestAttribute(@NotBlank String name, @NotNull HttpServletRequest request) {
+    public static <T> T requireRequestAttribute(@NonNull String name, @NonNull HttpServletRequest request) {
         T result = getRequestAttribute(name, request);
         AssertUtils.notNull(result, () -> String.format("attribute = %s must not null", name));
         return result;
     }
 
     @Nullable
-    public static String getHeader(@NotBlank String headerName) {
-        return requireContextRequest().getHeader(headerName);
+    public static String getHeader(@NonNull String headerName) {
+        return getHeader(headerName, requireContextRequest());
+    }
+
+    public static String getHeader(@NonNull String headerName, String defaultValue) {
+        return getHeader(headerName, defaultValue, requireContextRequest());
+    }
+
+    public static String getHeader(@NonNull String headerName, String defaultValue, @NonNull HttpServletRequest request) {
+        String result = getHeader(headerName, request);
+        return result == null ? defaultValue : result;
+    }
+
+    /**
+     * 获取请求头
+     *
+     * @param headerName 请求头名称
+     * @return 请求头值
+     */
+    @Nullable
+    public static String getHeader(@NonNull String headerName, @NonNull HttpServletRequest request) {
+        String val = request.getHeader(headerName);
+        if (val == null) {
+            return null;
+        }
+        return val.replace("\"", "").trim();
     }
 
     @Nullable
-    public static <T> T getRequestAttribute(@NotBlank String name) {
+    public static <T> T getRequestAttribute(@NonNull String name) {
         return getRequestAttribute(name, requireContextRequest());
+    }
+
+    @Nullable
+    public static <T> T getRequestAttribute(@NonNull String name, T defaultValue) {
+        return getRequestAttribute(name, defaultValue, requireContextRequest());
+    }
+
+    @Nullable
+    public static <T> T getRequestAttribute(@NonNull String name, @Nullable T defaultValue, @NonNull HttpServletRequest request) {
+        Object result = getRequestAttribute(name, request);
+        return result == null ? defaultValue : (T) result;
     }
 
     @Nullable
@@ -67,7 +101,7 @@ public final class HttpServletRequestUtils {
         return (T) request.getAttribute(name);
     }
 
-    @NotNull
+    @NonNull
     public static HttpServletResponse requireContextResponse() {
         HttpServletResponse result = getContextResponseOfNullable();
         AssertUtils.notNull(result, NOT_CURRENTLY_IN_WEB_SERVLET_CONTEXT);

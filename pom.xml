@@ -42,7 +42,7 @@
     </modules>
 
     <properties>
-        <revision>3.5.9</revision>
+        <revision>3.0.0-SNAPSHOT</revision>
         <!--   测试相关     -->
         <jacoco-coverage-agent/>
         <tests.fork.count/>
@@ -95,6 +95,7 @@
         <springdoc-openapi.version>2.8.12</springdoc-openapi.version>
         <googleauth.version>1.5.0</googleauth.version>
         <bucket4j.version>8.10.1</bucket4j.version>
+        <uap-java.version>1.6.1</uap-java.version>
         <json-path.version>2.9.0</json-path.version>
         <error_prone_annotations.version>2.42.0</error_prone_annotations.version>
         <podam.version>8.0.2.RELEASE</podam.version>
@@ -571,6 +572,11 @@
                 <groupId>com.bucket4j</groupId>
                 <artifactId>bucket4j-redis</artifactId>
                 <version>${bucket4j.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.github.ua-parser</groupId>
+                <artifactId>uap-java</artifactId>
+                <version>${uap-java.version}</version>
             </dependency>
             <dependency>
                 <groupId>com.google.errorprone</groupId>

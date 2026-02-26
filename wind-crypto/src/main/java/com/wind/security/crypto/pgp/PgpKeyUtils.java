@@ -26,6 +26,7 @@ import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.security.Security;
 import java.util.Date;
+import java.util.Iterator;
 
 /**
  * PGP 密钥工具类
@@ -138,78 +139,6 @@ public final class PgpKeyUtils {
         }
     }
 
-    /**
-     * 读取 PGP 私钥
-     *
-     * @param privateKey 私钥内容
-     * @param passphrase 密码
-     * @return 私钥
-     */
-    @NonNull
-    public static PGPPrivateKey readPrivateKey(String privateKey, String passphrase) {
-        return readPrivateKey(new ByteArrayInputStream(privateKey.getBytes(StandardCharsets.UTF_8)), passphrase);
-    }
-
-    /**
-     * 读取 PGP 私钥
-     *
-     * @param input      输入流
-     * @param passphrase 密码
-     * @return 私钥
-     */
-    public static PGPPrivateKey readPrivateKey(InputStream input, String passphrase) {
-        try (InputStream decoderStream = PGPUtil.getDecoderStream(input)) {
-            PGPSecretKeyRingCollection pgpSec = new PGPSecretKeyRingCollection(
-                    decoderStream,
-                    new JcaKeyFingerprintCalculator()
-            );
-
-            // 尝试找解密密钥
-            PGPPrivateKey privateKey = findDecryptionKey(pgpSec, passphrase);
-            if (privateKey != null) {
-                return privateKey;
-            }
-
-            // 如果没有专门的解密密钥，使用第一个有效密钥
-            privateKey = findFirstPrivateKey(pgpSec, passphrase);
-            if (privateKey != null) {
-                return privateKey;
-            }
-
-        } catch (IOException | PGPException exception) {
-            log.error("Failed to read PGP private key", exception);
-            throw new BaseException(DefaultExceptionCode.COMMON_ERROR,
-                    "PGP private key read failed", exception);
-        }
-        throw new BaseException(DefaultExceptionCode.COMMON_ERROR,
-                "No valid PGP private key found");
-    }
-
-    private static PGPPrivateKey findDecryptionKey(PGPSecretKeyRingCollection pgpSec,
-                                                   String passphrase)
-            throws PGPException {
-        for (PGPSecretKeyRing keyRing : pgpSec) {
-            for (PGPSecretKey key : keyRing) {
-                if (key.isSigningKey() && !key.isPrivateKeyEmpty()) {
-                    try {
-                        PGPPrivateKey privateKey = key.extractPrivateKey(
-                                new JcePBESecretKeyDecryptorBuilder()
-                                        .setProvider("BC")
-                                        .build(passphrase.toCharArray())
-                        );
-                        if (privateKey != null) {
-                            return privateKey;
-                        }
-                    } catch (PGPException e) {
-                        log.debug("Failed to extract private key (wrong passphrase?)", e);
-                        // 继续尝试其他密钥
-                    }
-                }
-            }
-        }
-        return null;
-    }
-
     private static PGPPrivateKey findFirstPrivateKey(PGPSecretKeyRingCollection pgpSec,
                                                      String passphrase)
             throws PGPException {
@@ -235,20 +164,54 @@ public final class PgpKeyUtils {
     }
 
     /**
-     * 读取 PGP 私钥
+     * 读取 PGP 私钥环
      *
-     * @param filePath   私钥文件路径
-     * @param passphrase 密码
-     * @return 私钥
+     * @param input 输入流
+     * @return 私钥环
+     */
+    public static PGPSecretKeyRing readSecretKeyRing(@NonNull InputStream input) {
+        try (InputStream decoderStream = PGPUtil.getDecoderStream(input)) {
+            PGPSecretKeyRingCollection pgpSec = new PGPSecretKeyRingCollection(
+                    decoderStream,
+                    new JcaKeyFingerprintCalculator()
+            );
+
+            // 获取第一个私钥环（通常只有一个）
+            Iterator<PGPSecretKeyRing> keyRings = pgpSec.getKeyRings();
+            if (keyRings.hasNext()) {
+                return keyRings.next();
+            } else {
+                throw new BaseException(DefaultExceptionCode.COMMON_ERROR, "No PGP secret key ring found in input");
+            }
+        } catch (IOException | PGPException exception) {
+            log.error("Failed to read PGP secret key ring", exception);
+            throw new BaseException(DefaultExceptionCode.COMMON_ERROR, "PGP secret key ring read failed", exception);
+        }
+    }
+
+    /**
+     * 读取 PGP 私钥环
+     *
+     * @param privateKeyContent 私钥内容
+     * @return 私钥环
+     */
+    public static PGPSecretKeyRing readSecretKeyRing(@NonNull String privateKeyContent) {
+        return readSecretKeyRing(new ByteArrayInputStream(privateKeyContent.getBytes(StandardCharsets.UTF_8)));
+    }
+
+    /**
+     * 读取 PGP 私钥环
+     *
+     * @param filePath 私钥文件路径
+     * @return 私钥环
      */
     @NonNull
-    public static PGPPrivateKey readPrivateKeyWithFile(String filePath, String passphrase) {
+    public static PGPSecretKeyRing readSecretKeyRingWithFile(@NonNull String filePath) {
         try {
-            return readPrivateKey(new FileInputStream(filePath), passphrase);
+            return readSecretKeyRing(new FileInputStream(filePath));
         } catch (FileNotFoundException exception) {
-            log.error("PGP private key file not found: {}", filePath, exception);
-            throw new BaseException(DefaultExceptionCode.COMMON_ERROR,
-                    "PGP private key file not found: " + filePath, exception);
+            log.error("PGP private ring file not found: {}", filePath, exception);
+            throw new BaseException(DefaultExceptionCode.COMMON_ERROR, "PGP private key file not found: " + filePath, exception);
         }
     }
 }

@@ -18,8 +18,11 @@ import org.bouncycastle.openpgp.PGPObjectFactory;
 import org.bouncycastle.openpgp.PGPPrivateKey;
 import org.bouncycastle.openpgp.PGPPublicKey;
 import org.bouncycastle.openpgp.PGPPublicKeyEncryptedData;
+import org.bouncycastle.openpgp.PGPSecretKey;
+import org.bouncycastle.openpgp.PGPSecretKeyRing;
 import org.bouncycastle.openpgp.PGPUtil;
 import org.bouncycastle.openpgp.operator.jcajce.JcaKeyFingerprintCalculator;
+import org.bouncycastle.openpgp.operator.jcajce.JcePBESecretKeyDecryptorBuilder;
 import org.bouncycastle.openpgp.operator.jcajce.JcePGPDataEncryptorBuilder;
 import org.bouncycastle.openpgp.operator.jcajce.JcePublicKeyDataDecryptorFactoryBuilder;
 import org.bouncycastle.openpgp.operator.jcajce.JcePublicKeyKeyEncryptionMethodGenerator;
@@ -34,6 +37,7 @@ import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
 import java.security.SecureRandom;
 import java.util.Date;
+import java.util.function.Function;
 
 import static com.wind.security.crypto.pgp.PgpKeyUtils.BOUNCY_CASTLE_NAME;
 
@@ -47,11 +51,11 @@ public class PgpRsaByteEncryptor implements BytesEncryptor {
 
     private final PGPPublicKey encryptionKey;
 
-    private final PGPPrivateKey decryptionKey;
+    private final Function<Long, PGPPrivateKey> privateKeyResolver;
 
-    public PgpRsaByteEncryptor(PGPPublicKey encryptionKey, PGPPrivateKey decryptionKey) {
+    public PgpRsaByteEncryptor(PGPPublicKey encryptionKey, Function<Long, PGPPrivateKey> privateKeyResolver) {
         this.encryptionKey = encryptionKey;
-        this.decryptionKey = decryptionKey;
+        this.privateKeyResolver = privateKeyResolver;
     }
 
     @Override
@@ -120,10 +124,14 @@ public class PgpRsaByteEncryptor implements BytesEncryptor {
             // 查找可以解密的加密数据包
             PGPPublicKeyEncryptedData encryptedDataPacket = null;
             for (PGPEncryptedData encryptedDataItem : encryptedData) {
-                if ((encryptedDataItem instanceof PGPPublicKeyEncryptedData pubKeyData) &&
-                        decryptionKey != null && decryptionKey.getKeyID() == pubKeyData.getKeyIdentifier().getKeyId()) {
-                    encryptedDataPacket = pubKeyData;
-                    break;
+                if (encryptedDataItem instanceof PGPPublicKeyEncryptedData pubKeyData) {
+                    long keyId = pubKeyData.getKeyIdentifier().getKeyId();
+                    PGPPrivateKey privateKey = privateKeyResolver.apply(keyId);
+                    if (privateKey != null) {
+                        encryptedDataPacket = pubKeyData;
+                        // 注意：这里不能立即使用 privateKey 解密，因为需要保留上下文，我们可以在后面解密时再传入
+                        break;
+                    }
                 }
             }
 
@@ -132,7 +140,9 @@ public class PgpRsaByteEncryptor implements BytesEncryptor {
             }
 
             // 解密数据
-            InputStream clearStream = encryptedDataPacket.getDataStream(new JcePublicKeyDataDecryptorFactoryBuilder().setProvider(BOUNCY_CASTLE_NAME).build(decryptionKey));
+            PGPPrivateKey pgpPrivateKey = privateKeyResolver.apply(encryptedDataPacket.getKeyIdentifier().getKeyId());
+            InputStream clearStream =
+                    encryptedDataPacket.getDataStream(new JcePublicKeyDataDecryptorFactoryBuilder().setProvider(BOUNCY_CASTLE_NAME).build(pgpPrivateKey));
             // 处理解密后的数据
             PGPObjectFactory clearObjectFactory = new PGPObjectFactory(clearStream, new JcaKeyFingerprintCalculator());
             Object clearObject = clearObjectFactory.nextObject();
@@ -203,8 +213,8 @@ public class PgpRsaByteEncryptor implements BytesEncryptor {
      * @return PGP TextEncryptor
      */
     public static TextEncryptor ofDecryptor(String privateKey, String passphrase) {
-        PGPPrivateKey pgpPrivateKey = PgpKeyUtils.readPrivateKey(privateKey, passphrase);
-        PgpRsaByteEncryptor delegate = new PgpRsaByteEncryptor(null, pgpPrivateKey);
+        PGPSecretKeyRing secretKeyRing = PgpKeyUtils.readSecretKeyRing(privateKey);
+        PgpRsaByteEncryptor delegate = new PgpRsaByteEncryptor(null, privateKeyResolver(secretKeyRing, passphrase));
         return new TextEncryptor() {
             @Override
             public String encrypt(String text) {
@@ -229,8 +239,8 @@ public class PgpRsaByteEncryptor implements BytesEncryptor {
      */
     public static TextEncryptor text(String publicKey, String privateKey, String passphrase) {
         PGPPublicKey pgpPublicKey = PgpKeyUtils.readPublicKey(publicKey);
-        PGPPrivateKey pgpPrivateKey = PgpKeyUtils.readPrivateKey(privateKey, passphrase);
-        PgpRsaByteEncryptor delegate = new PgpRsaByteEncryptor(pgpPublicKey, pgpPrivateKey);
+        PGPSecretKeyRing secretKeyRing = PgpKeyUtils.readSecretKeyRing(privateKey);
+        PgpRsaByteEncryptor delegate = new PgpRsaByteEncryptor(pgpPublicKey, privateKeyResolver(secretKeyRing, passphrase));
         return new TextEncryptor() {
             @Override
             public String encrypt(String text) {
@@ -242,6 +252,20 @@ public class PgpRsaByteEncryptor implements BytesEncryptor {
             public String decrypt(String encryptedText) {
                 byte[] result = delegate.decrypt(encryptedText.getBytes(StandardCharsets.UTF_8));
                 return new String(result, StandardCharsets.UTF_8);
+            }
+        };
+    }
+
+    private static Function<Long, PGPPrivateKey> privateKeyResolver(PGPSecretKeyRing secretKeyRing, String passphrase) {
+        return keyId -> {
+            PGPSecretKey secretKey = secretKeyRing.getSecretKey(keyId);
+            if (secretKey == null) {
+                return null;
+            }
+            try {
+                return secretKey.extractPrivateKey(new JcePBESecretKeyDecryptorBuilder().setProvider(BOUNCY_CASTLE_NAME).build(passphrase.toCharArray()));
+            } catch (PGPException e) {
+                throw new BaseException(DefaultExceptionCode.COMMON_ERROR, "Failed to extract private key for key ID: " + Long.toHexString(keyId), e);
             }
         };
     }

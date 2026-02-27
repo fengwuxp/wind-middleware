@@ -5,6 +5,7 @@ import com.wind.trace.WindTracer;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.IOUtils;
 import org.springframework.http.HttpRequest;
+import org.springframework.http.MediaType;
 import org.springframework.http.client.ClientHttpRequestExecution;
 import org.springframework.http.client.ClientHttpRequestInterceptor;
 import org.springframework.http.client.ClientHttpResponse;
@@ -13,6 +14,7 @@ import org.springframework.util.StopWatch;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
+import java.util.List;
 import java.util.Objects;
 
 /**
@@ -29,6 +31,15 @@ public class ClientHttpRequestLoggingInterceptor implements ClientHttpRequestInt
      * 手动开启请求日志（每请求上下文变量）
      */
     public static final String ENABLE_API_REQUEST_LOG_PRINT_VARIABLE_NAME = "api.request.log.print.enable";
+
+    private static final List<MediaType> ALLOW_LOG_CONTENT_TYPES= List.of(
+            MediaType.APPLICATION_JSON,
+            MediaType.APPLICATION_XML,
+            MediaType.TEXT_HTML,
+            MediaType.TEXT_PLAIN,
+            MediaType.TEXT_XML,
+            MediaType.APPLICATION_ATOM_XML
+    );
 
     /**
      * 最大读取响应体字节数，防止大响应耗尽内存
@@ -52,6 +63,7 @@ public class ClientHttpRequestLoggingInterceptor implements ClientHttpRequestInt
         watch.start();
         ClientHttpResponse response = execution.execute(request, body);
         watch.stop();
+        MediaType contentType = response.getHeaders().getContentType();
         log(request, body, response, watch.getTotalTimeMillis());
         return response;
     }
@@ -87,6 +99,10 @@ public class ClientHttpRequestLoggingInterceptor implements ClientHttpRequestInt
     }
 
     private String readResponseBody(ClientHttpResponse response) throws IOException {
+        MediaType contentType = response.getHeaders().getContentType();
+        if (contentType == null || ALLOW_LOG_CONTENT_TYPES.stream().noneMatch(mediaType -> mediaType.isCompatibleWith(contentType))) {
+            return "-";
+        }
         // 2xx && 生产环境，仅打印部分内容（减少内存的消耗）
         boolean limitPrint = response.getStatusCode().is2xxSuccessful() && Objects.equals(env, WindConstants.PROD);
         if (limitPrint) {

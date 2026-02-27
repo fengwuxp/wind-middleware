@@ -1,6 +1,7 @@
 package com.wind.common.query.supports;
 
-import lombok.AllArgsConstructor;
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Getter;
 
 import java.io.Serial;
@@ -14,7 +15,6 @@ import java.util.List;
  * @date 2024-05-06 18:38
  **/
 @Getter
-@AllArgsConstructor
 public final class ImmutablePagination<T> implements Pagination<T> {
 
     @Serial
@@ -29,6 +29,19 @@ public final class ImmutablePagination<T> implements Pagination<T> {
     private final int querySize;
 
     private final QueryType queryType;
+
+    @JsonCreator
+    public ImmutablePagination(@JsonProperty("total") long total,
+                               @JsonProperty("records") List<T> records,
+                               @JsonProperty("queryPage") int queryPage,
+                               @JsonProperty("querySize") int querySize,
+                               @JsonProperty("queryType") QueryType queryType) {
+        this.total = total;
+        this.records = records;
+        this.queryPage = queryPage;
+        this.querySize = querySize;
+        this.queryType = queryType;
+    }
 
     /**
      * 为了给序列化框架使用，提供一个空构造

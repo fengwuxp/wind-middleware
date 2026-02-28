@@ -17,12 +17,13 @@ public class WindLogJobErrorHandler implements JobErrorHandler {
 
     @Override
     public void handleException(final String jobName, final Throwable cause) {
-        log.error("{} job execute exception, message = {}", jobName, cause.getMessage(), cause);
+        log.error("elastic job execution failed jobName = {}, errorType = {}, message= {}",
+                jobName, cause.getClass().getSimpleName(), cause.getMessage(), cause);
     }
 
     @Override
     public void init(Properties props) {
-        log.info("WindLogJobErrorHandler initialized");
+        log.info("WindLogJobErrorHandler initialized with props: {}", props);
     }
 
     @Override

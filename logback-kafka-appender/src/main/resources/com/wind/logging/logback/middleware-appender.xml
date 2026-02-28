@@ -29,18 +29,28 @@
     </appender>
 
     <logger name="com.aliyun.oss" additivity="false">
+        <appender-ref ref="DISRUPTOR_CONSOLE"/>
         <appender-ref ref="DISRUPTOR_MIDDLEWARE"/>
+        <appender-ref ref="DISRUPTOR_KAFKA"/>
     </logger>
     <logger name="com.aliyun.kms20160120" additivity="false">
+        <appender-ref ref="DISRUPTOR_CONSOLE"/>
         <appender-ref ref="DISRUPTOR_MIDDLEWARE"/>
+        <appender-ref ref="DISRUPTOR_KAFKA"/>
     </logger>
     <logger name="org.apache.shardingsphere.elasticjob" additivity="false">
+        <appender-ref ref="DISRUPTOR_CONSOLE"/>
         <appender-ref ref="DISRUPTOR_MIDDLEWARE"/>
+        <appender-ref ref="DISRUPTOR_KAFKA"/>
     </logger>
     <logger name="com.wind.elasticjob" additivity="false">
+        <appender-ref ref="DISRUPTOR_CONSOLE"/>
         <appender-ref ref="DISRUPTOR_MIDDLEWARE"/>
+        <appender-ref ref="DISRUPTOR_KAFKA"/>
     </logger>
     <logger name="org.redisson" additivity="false">
+        <appender-ref ref="DISRUPTOR_CONSOLE"/>
         <appender-ref ref="DISRUPTOR_MIDDLEWARE"/>
+        <appender-ref ref="DISRUPTOR_KAFKA"/>
     </logger>
 </included>

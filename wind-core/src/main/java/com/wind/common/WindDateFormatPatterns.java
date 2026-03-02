@@ -15,7 +15,18 @@ public final class WindDateFormatPatterns {
         throw new AssertionError();
     }
 
-    public static final String ISO_8601_EXTENDED_DATETIME = "yyyy-MM-dd'T'HH:mm:ss";
+    public static final String ISO_8601_LOCAL_DATETIME = "yyyy-MM-dd'T'HH:mm:ss";
+
+    @Deprecated(forRemoval = true)
+    public static final String ISO_8601_EXTENDED_DATETIME = ISO_8601_LOCAL_DATETIME;
+
+    public static final String ISO_8601_LOCAL_DATETIME_MILLIS = "yyyy-MM-dd'T'HH:mm:ss.SSS";
+
+    public static final String ISO_8601_OFFSET_DATETIME = "yyyy-MM-dd'T'HH:mm:ssXXX";
+
+    public static final String ISO_8601_OFFSET_DATETIME_MILLIS = "yyyy-MM-dd'T'HH:mm:ss.SSSXXX";
+
+    public static final String ISO_8601_INSTANT = "yyyy-MM-dd'T'HH:mm:ss.SSSX";
 
     public static final String YYYY_MM_DD_HH_MM_SS = "yyyy-MM-dd HH:mm:ss";
 

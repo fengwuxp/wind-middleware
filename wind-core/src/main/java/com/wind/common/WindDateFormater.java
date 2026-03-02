@@ -16,7 +16,10 @@ import java.time.temporal.TemporalAccessor;
 @Getter
 public enum WindDateFormater {
 
+    @Deprecated(forRemoval = true)
     ISO_8601_EXTENDED_DATETIME(DateTimeFormatter.ofPattern(WindDateFormatPatterns.ISO_8601_EXTENDED_DATETIME)),
+
+    ISO_8601_LOCAL_DATETIME(DateTimeFormatter.ofPattern(WindDateFormatPatterns.ISO_8601_LOCAL_DATETIME)),
 
     HH_MM_SS(DateTimeFormatter.ofPattern(WindDateFormatPatterns.HH_MM_SS)),
 

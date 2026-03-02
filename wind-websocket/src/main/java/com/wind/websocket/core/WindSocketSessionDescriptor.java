@@ -1,9 +1,9 @@
 package com.wind.websocket.core;
 
 import com.wind.core.ObjectReadonlyMetadata;
-
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+
 import java.time.LocalDateTime;
 
 /**

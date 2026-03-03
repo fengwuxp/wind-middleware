@@ -1,7 +1,12 @@
 package com.wind.common.query;
 
+import com.wind.common.query.cursor.CursorBasedQuery;
+import com.wind.common.query.cursor.CursorPagination;
+import com.wind.common.query.supports.PageBasedQuery;
+import com.wind.common.query.supports.Pagination;
 import com.wind.common.query.supports.QueryType;
 import jakarta.validation.constraints.NotNull;
+import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 import org.springframework.util.CollectionUtils;
 
@@ -58,4 +63,19 @@ public interface WindPagination<T> extends Serializable {
         return CollectionUtils.firstElement(getRecords());
     }
 
+    /**
+     * 创建一个空的分页对象
+     *
+     * @param options 查询参数
+     * @return 空的分页对象
+     */
+    static <T> WindPagination<T> empty(@NonNull WindQuery<?> options) {
+        if (options instanceof PageBasedQuery<?>) {
+            return Pagination.empty();
+        } else if (options instanceof CursorBasedQuery<?>) {
+            return CursorPagination.empty();
+        } else {
+            throw new IllegalArgumentException("不支持的分页类型, class = " + options.getClass().getName());
+        }
+    }
 }

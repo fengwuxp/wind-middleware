@@ -99,7 +99,8 @@ public final class PgpKeyUtils {
     private static PGPPublicKey findEncryptionKey(PGPPublicKeyRingCollection pgpPub) {
         for (PGPPublicKeyRing keyRing : pgpPub) {
             for (PGPPublicKey key : keyRing) {
-                if (key.isEncryptionKey() && !key.hasRevocation() && isActive(key)) {
+                // 必须使用加密子密钥（非主密钥），确保 Go 等实现能按 Key ID 找到对应私钥
+                if (!key.isMasterKey() && key.isEncryptionKey() && !key.hasRevocation() && isActive(key)) {
                     return key;
                 }
             }

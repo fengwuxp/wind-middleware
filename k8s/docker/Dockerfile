@@ -17,4 +17,4 @@ ENV SPRING_APPLICATION_NAME=${SPRING_APPLICATION_NAME}
 EXPOSE ${EXPOSE_PORT}
 
 # 启动命令
-ENTRYPOINT ["sh","-c","/home/admin/run/startup.sh"]
+ENTRYPOINT ["/home/admin/run/startup.sh"]

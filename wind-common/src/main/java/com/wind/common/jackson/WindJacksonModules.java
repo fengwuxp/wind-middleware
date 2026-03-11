@@ -1,5 +1,9 @@
 package com.wind.common.jackson;
 
+import com.wind.api.core.ApiResponse;
+import com.wind.api.core.ImmutableApiResponse;
+import com.wind.common.query.WindPagination;
+import com.wind.common.query.supports.Pagination;
 import tools.jackson.databind.JacksonModule;
 import tools.jackson.databind.ext.javatime.deser.LocalDateDeserializer;
 import tools.jackson.databind.ext.javatime.deser.LocalDateTimeDeserializer;
@@ -45,5 +49,19 @@ public final class WindJacksonModules {
         timeModule.addDeserializer(LocalDate.class, new LocalDateDeserializer(DateTimeFormatter.ofPattern(YYYY_MM_DD)));
         timeModule.addDeserializer(LocalTime.class, new LocalTimeDeserializer(DateTimeFormatter.ofPattern(HH_MM_SS)));
         return timeModule;
+    }
+
+    /**
+     * 创建 api 模块
+     *
+     * @return 模块
+     */
+    public static JacksonModule apiModule() {
+        SimpleModule module = new SimpleModule();
+        // 配置 Wind 相关 jackson 反序列化
+        module.addDeserializer(WindPagination.class, new WindPaginationDeserializer<>());
+        module.addDeserializer(Pagination.class, new WindPaginationDeserializer<>());
+        module.addAbstractTypeMapping(ApiResponse.class, ImmutableApiResponse.class);
+        return module;
     }
 }

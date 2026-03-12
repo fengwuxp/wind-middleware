@@ -5,6 +5,8 @@ import com.wind.common.exception.AssertUtils;
 import com.wind.common.exception.BaseException;
 import com.wind.common.exception.DefaultExceptionCode;
 import com.wind.trace.task.WindTaskDecorators;
+import io.micrometer.core.instrument.Metrics;
+import io.micrometer.core.instrument.binder.jvm.ExecutorServiceMetrics;
 import jakarta.validation.constraints.NotBlank;
 import lombok.extern.slf4j.Slf4j;
 import org.jspecify.annotations.NonNull;
@@ -181,6 +183,11 @@ public final class ExecutorServiceUtils {
          */
         private boolean shutdownOnJvmExit = false;
 
+        /**
+         * 是否开启线程池监控
+         */
+        private boolean enableMetrics = true;
+
         private ExecutorBuilder() {
         }
 
@@ -220,6 +227,11 @@ public final class ExecutorServiceUtils {
 
         public ExecutorBuilder shutdownOnJvmExit() {
             this.shutdownOnJvmExit = true;
+            return this;
+        }
+
+        public ExecutorBuilder disableMetrics() {
+            this.enableMetrics = false;
             return this;
         }
 
@@ -273,12 +285,19 @@ public final class ExecutorServiceUtils {
          */
         @NonNull
         public ExecutorService buildNativeExecutor() {
+            ExecutorService result;
             if (useVirtualThreads) {
                 // 原生虚拟线程 executor（无任何额外包装）
-                return Executors.newThreadPerTaskExecutor(Thread.ofVirtual().name(threadNamePrefix, 0).factory());
+                result = Executors.newThreadPerTaskExecutor(Thread.ofVirtual().name(threadNamePrefix, 0).factory());
+            } else {
+                result = new ThreadPoolExecutor(corePoolSize, maximumPoolSize, keepAlive.getSeconds(), TimeUnit.SECONDS, workQueue,
+                        new CustomizableThreadFactory(threadNamePrefix), rejectedExecutionHandler);
             }
-            return new ThreadPoolExecutor(corePoolSize, maximumPoolSize, keepAlive.getSeconds(), TimeUnit.SECONDS, workQueue,
-                    new CustomizableThreadFactory(threadNamePrefix), rejectedExecutionHandler);
+            if (enableMetrics) {
+                // 增加线程池监控
+                ExecutorServiceMetrics.monitor(Metrics.globalRegistry, result, threadNamePrefix);
+            }
+            return result;
         }
 
         private static void registerShutdownHook(String threadNamePrefix, ExecutorService executor) {

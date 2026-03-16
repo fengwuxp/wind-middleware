@@ -2,8 +2,8 @@ package com.wind.trace.task;
 
 import com.wind.trace.WindTracer;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.core.task.TaskDecorator;
 import org.jspecify.annotations.NonNull;
+import org.springframework.core.task.TaskDecorator;
 
 /**
  * 仅 trace 任务，不做线程之间的上下文传递
@@ -22,22 +22,15 @@ public record TraceTaskDecorator(boolean printExceptionLog) implements TaskDecor
     @Override
     @NonNull
     public Runnable decorate(@NonNull Runnable runnable) {
-        return () -> {
+        return () -> WindTracer.TRACER.run(() -> {
             try {
-                WindTracer.TRACER.trace();
                 runnable.run();
-            } catch (Throwable throwable) {
+            } catch (Exception throwable) {
                 if (printExceptionLog) {
                     log.error("execute task exception, message = {}", throwable.getMessage(), throwable);
                 }
                 throw throwable;
-            } finally {
-                if (log.isDebugEnabled()) {
-                    log.debug("task decorate, clear trace context");
-                }
-                // 清除线程上下文
-                WindTracer.TRACER.clear();
             }
-        };
+        });
     }
 }

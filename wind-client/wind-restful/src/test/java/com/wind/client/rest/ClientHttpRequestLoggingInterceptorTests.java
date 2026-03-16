@@ -7,7 +7,6 @@ import org.springframework.http.HttpRequest;
 import org.springframework.http.client.ClientHttpRequestExecution;
 import org.springframework.http.client.ClientHttpResponse;
 
-import javax.imageio.IIOException;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 

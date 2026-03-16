@@ -31,8 +31,7 @@ public final class SendMessageTraceHook implements SendMessageHook {
 
     private void addUserProperties(Message message) {
         if (!message.getProperties().containsKey(WindConstants.TRACE_ID_NAME)) {
-            // TODO traceId 取值
-            message.putUserProperty(WindConstants.TRACE_ID_NAME, WindTracer.TRACER.getTraceId());
+            WindTracer.TRACER.currentTraceId().ifPresent(traceId -> message.putUserProperty(WindConstants.TRACE_ID_NAME, traceId));
         }
     }
 }

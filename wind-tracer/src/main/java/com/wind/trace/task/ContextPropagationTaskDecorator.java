@@ -1,10 +1,11 @@
 package com.wind.trace.task;
 
 import com.wind.common.exception.AssertUtils;
+import com.wind.trace.WindTraceContext;
 import com.wind.trace.WindTracer;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.core.task.TaskDecorator;
 import org.jspecify.annotations.NonNull;
+import org.springframework.core.task.TaskDecorator;
 
 import java.util.Collections;
 import java.util.Map;
@@ -33,30 +34,36 @@ public abstract class ContextPropagationTaskDecorator implements TaskDecorator {
     @NonNull
     public Runnable decorate(@NonNull Runnable task) {
         AssertUtils.notNull(task, "argument task must not null");
-        // 获取当前线程的上下文
-        Map<String, Object> middlewareContext = WindTracer.TRACER.getContextVariables();
+        // 捕获当前 trace context
+        WindTraceContext traceContext = WindTracer.TRACER.currentContext().orElse(null);
+        // 捕获业务上下文
         Map<String, Object> businessContext = snapshotContextVariables();
         return () -> {
-            try {
-                if (log.isDebugEnabled()) {
-                    log.debug("task decorate, trace context: {}", middlewareContext);
+            Runnable execution = () -> {
+                try {
+                    if (log.isDebugEnabled()) {
+                        log.debug("task decorate, trace context: {}", traceContext);
+                    }
+                    restoreContextVariables(businessContext);
+                    task.run();
+                } catch (Throwable throwable) {
+                    if (printExceptionLog) {
+                        log.error("execute task exception", throwable);
+                    }
+                    throw throwable;
+                } finally {
+                    if (log.isDebugEnabled()) {
+                        log.debug("task decorate, clear context variables");
+                    }
+                    clearContextVariables();
                 }
-                // 线程切换，复制上下文 ，traceId 也在 contextVariables 中
-                WindTracer.TRACER.trace(null, middlewareContext);
-                restoreContextVariables(businessContext);
-                task.run();
-            } catch (Throwable throwable) {
-                if (printExceptionLog) {
-                    log.error("execute task exception, message = {}", throwable.getMessage(), throwable);
-                }
-                throw throwable;
-            } finally {
-                if (log.isDebugEnabled()) {
-                    log.debug("task decorate, clear trace context");
-                }
-                // 清除线程上下文
-                WindTracer.TRACER.clear();
-                clearContextVariables();
+
+            };
+            // 如果存在 trace context，则进入新的 scope
+            if (traceContext == null) {
+                execution.run();
+            } else {
+                WindTracer.TRACER.runWithTraceContext(traceContext, execution);
             }
         };
     }

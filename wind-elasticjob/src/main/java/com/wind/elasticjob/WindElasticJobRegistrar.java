@@ -1,15 +1,18 @@
 package com.wind.elasticjob;
 
 import com.wind.common.util.ServiceInfoUtils;
-import com.wind.elasticjob.enums.ElasticJobErrorHandlerType;
+import com.wind.elasticjob.enums.ElasticJobExecutorServiceHandlerType;
+import com.wind.elasticjob.enums.ElasticJobListenerType;
 import com.wind.elasticjob.enums.ElasticJobShardingStrategyType;
 import com.wind.elasticjob.job.WindElasticDataFlowJob;
 import com.wind.elasticjob.job.WindElasticJob;
 import com.wind.elasticjob.job.WindElasticSimpleJob;
 import com.wind.elasticjob.spi.executor.WindSingleElasticJobExecutorServiceHandler;
+import com.wind.trace.WindTracer;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.shardingsphere.elasticjob.api.ElasticJob;
 import org.apache.shardingsphere.elasticjob.api.JobConfiguration;
+import org.apache.shardingsphere.elasticjob.api.ShardingContext;
 import org.apache.shardingsphere.elasticjob.lite.api.bootstrap.impl.ScheduleJobBootstrap;
 import org.apache.shardingsphere.elasticjob.reg.base.CoordinatorRegistryCenter;
 import org.springframework.boot.context.event.ApplicationStartedEvent;
@@ -71,13 +74,11 @@ public class WindElasticJobRegistrar {
     }
 
     private JobConfiguration createJobConfiguration(WindElasticJob job) {
+        job = job.isTraceJob() ? traceJob(job) : job;
         return JobConfiguration.newBuilder(job.getName(), job.getShardingTotalCount())
                 .jobExecutorServiceHandlerType(job.getJobExecutorServiceHandlerType().name())
                 .shardingItemParameters(job.getShardingItemParameters())
                 .jobShardingStrategyType(ElasticJobShardingStrategyType.ROUND_ROBIN.name())
-                .jobErrorHandlerType(ElasticJobErrorHandlerType.LOG.name())
-                // 统一开启任务的日志 trace
-                .jobListenerTypes(job.getElasticJobListenerType().getTypeName())
                 .cron(job.getCron())
                 // 作业启动时是否覆盖本地配置到注册中心
                 .overwrite(job.isOverwrite())
@@ -87,4 +88,152 @@ public class WindElasticJobRegistrar {
                 .misfire(job.isMisFire())
                 .build();
     }
+
+    private WindElasticJob traceJob(WindElasticJob job) {
+        if (job instanceof WindElasticSimpleJob simpleJob) {
+            return new TraceWindElasticSimpleJob(simpleJob);
+        }
+
+        if (job instanceof WindElasticDataFlowJob<?> dataFlowJob) {
+            return new TraceWindElasticDataFlowJob<>(dataFlowJob);
+        }
+        throw new IllegalArgumentException("not support job type");
+    }
+
+    private record TraceWindElasticSimpleJob(WindElasticSimpleJob job) implements WindElasticSimpleJob {
+
+        @Override
+        public String getCron() {
+            return job.getCron();
+        }
+
+        @Override
+        public String getName() {
+            return job.getName();
+        }
+
+        @Override
+        public void execute(ShardingContext shardingContext) {
+            try {
+                WindTracer.TRACER.run(() -> job.execute(shardingContext));
+            } catch (Exception cause) {
+                log.error("elastic job execution failed jobName = {}, errorType = {}, message= {}", getName(), cause.getClass().getSimpleName(), cause.getMessage(), cause);
+                throw cause;
+            }
+        }
+
+        @Override
+        public ElasticJobListenerType getElasticJobListenerType() {
+            return job.getElasticJobListenerType();
+        }
+
+        @Override
+        public ElasticJobExecutorServiceHandlerType getJobExecutorServiceHandlerType() {
+            return job.getJobExecutorServiceHandlerType();
+        }
+
+        @Override
+        public boolean isMisFire() {
+            return job.isMisFire();
+        }
+
+        @Override
+        public boolean isFailover() {
+            return job.isFailover();
+        }
+
+        @Override
+        public boolean isOverwrite() {
+            return job.isOverwrite();
+        }
+
+        @Override
+        public List<String> getIgnoreEnvs() {
+            return job.getIgnoreEnvs();
+        }
+
+        @Override
+        public Integer getShardingTotalCount() {
+            return job.getShardingTotalCount();
+        }
+
+        @Override
+        public String getShardingItemParameters() {
+            return job.getShardingItemParameters();
+        }
+    }
+
+    private record TraceWindElasticDataFlowJob<T>(WindElasticDataFlowJob job) implements WindElasticDataFlowJob<T> {
+        @Override
+        public String getCron() {
+            return job.getCron();
+        }
+
+        @Override
+        public String getName() {
+            return job.getName();
+        }
+
+
+        @Override
+        public List<T> fetchData(ShardingContext shardingContext) {
+            try {
+                return WindTracer.TRACER.call(() -> job.fetchData(shardingContext));
+            } catch (Exception cause) {
+                log.error("elastic job fetch data failed jobName = {}, errorType = {}, message= {}", getName(), cause.getClass().getSimpleName(), cause.getMessage(), cause);
+                throw cause;
+            }
+        }
+
+        @Override
+        public void processData(ShardingContext shardingContext, List<T> data) {
+            try {
+                WindTracer.TRACER.run(() -> job.processData(shardingContext, data));
+            } catch (Exception cause) {
+                log.error("elastic job execution failed jobName = {}, errorType = {}, message= {}", getName(), cause.getClass().getSimpleName(), cause.getMessage(), cause);
+                throw cause;
+            }
+        }
+
+        @Override
+        public ElasticJobListenerType getElasticJobListenerType() {
+            return job.getElasticJobListenerType();
+        }
+
+        @Override
+        public ElasticJobExecutorServiceHandlerType getJobExecutorServiceHandlerType() {
+            return job.getJobExecutorServiceHandlerType();
+        }
+
+        @Override
+        public boolean isMisFire() {
+            return job.isMisFire();
+        }
+
+        @Override
+        public boolean isFailover() {
+            return job.isFailover();
+        }
+
+        @Override
+        public boolean isOverwrite() {
+            return job.isOverwrite();
+        }
+
+        @Override
+        public List<String> getIgnoreEnvs() {
+            return job.getIgnoreEnvs();
+        }
+
+        @Override
+        public Integer getShardingTotalCount() {
+            return job.getShardingTotalCount();
+        }
+
+        @Override
+        public String getShardingItemParameters() {
+            return job.getShardingItemParameters();
+        }
+    }
+
 }

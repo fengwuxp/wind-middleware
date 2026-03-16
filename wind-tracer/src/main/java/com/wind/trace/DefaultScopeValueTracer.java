@@ -17,7 +17,7 @@
 // * @author wuxp
 // * @date 2026-03-13 10:04
 // **/
-//final class DefaultScopeValueTracer implements ScopeValueTracer {
+//final class DefaultScopeValueTracer implements WindTracer {
 //
 //    /**
 //     * 线程 trace context
@@ -25,6 +25,26 @@
 //     * @since 25
 //     */
 //    private static final ScopedValue<WindTraceContext> TRACE_CONTEXT = ScopedValue.newInstance();
+//
+//    @Override
+//    public void trace() {
+//        throw new UnsupportedOperationException("not support");
+//    }
+//
+//    @Override
+//    public void trace(String traceId, Map<String, Object> contextVariables) {
+//        throw new UnsupportedOperationException("not support");
+//    }
+//
+//    @Override
+//    public String getTraceId() {
+//        throw new UnsupportedOperationException("not support");
+//    }
+//
+//    @Override
+//    public void clear() {
+//        throw new UnsupportedOperationException("not support");
+//    }
 //
 //    @Override
 //    public void run(@NonNull Runnable runnable) {

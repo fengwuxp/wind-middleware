@@ -15,6 +15,7 @@ public enum ElasticJobListenerType {
     /**
      * 日志 trace 监听器
      */
+    @Deprecated(forRemoval = true)
     LOG_TRACE(ElasticJobLogTraceListener.class.getSimpleName());
 
     private final String typeName;

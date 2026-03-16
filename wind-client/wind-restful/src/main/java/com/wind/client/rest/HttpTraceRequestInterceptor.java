@@ -2,11 +2,11 @@ package com.wind.client.rest;
 
 import com.wind.common.WindConstants;
 import com.wind.trace.WindTracer;
+import org.jspecify.annotations.NonNull;
 import org.springframework.http.HttpRequest;
 import org.springframework.http.client.ClientHttpRequestExecution;
 import org.springframework.http.client.ClientHttpRequestInterceptor;
 import org.springframework.http.client.ClientHttpResponse;
-import org.jspecify.annotations.NonNull;
 import org.springframework.util.StringUtils;
 
 import java.io.IOException;
@@ -26,10 +26,12 @@ public record HttpTraceRequestInterceptor(String traceHeaderName) implements Cli
     @Override
     @NonNull
     public ClientHttpResponse intercept(@NonNull HttpRequest request, byte @NonNull [] body, @NonNull ClientHttpRequestExecution execution) throws IOException {
-        String traceId = WindTracer.TRACER.getTraceId();
-        if (StringUtils.hasText(traceId) && !request.getHeaders().containsHeader(traceHeaderName)) {
-            request.getHeaders().add(traceHeaderName, traceId);
-        }
-        return execution.execute(request, body);
+        return WindTracer.TRACER.call(() -> {
+            String traceId = WindTracer.TRACER.requireTraceId();
+            if (StringUtils.hasText(traceId) && !request.getHeaders().containsHeader(traceHeaderName)) {
+                request.getHeaders().add(traceHeaderName, traceId);
+            }
+            return execution.execute(request, body);
+        });
     }
 }

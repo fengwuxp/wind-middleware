@@ -16,6 +16,7 @@ import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Objects;
+import java.util.concurrent.Callable;
 
 /**
  * 统一打印请求日志，注意由于此拦截器读取了 ResponseBody 在设置 {@link org.springframework.http.client.ClientHttpRequestFactory} 时需要用
@@ -59,13 +60,14 @@ public class ClientHttpRequestLoggingInterceptor implements ClientHttpRequestInt
     @Override
     @SuppressWarnings("NullableProblems")
     public ClientHttpResponse intercept(HttpRequest request, byte[] body, ClientHttpRequestExecution execution) throws IOException {
-        StopWatch watch = new StopWatch();
-        watch.start();
-        ClientHttpResponse response = execution.execute(request, body);
-        watch.stop();
-        MediaType contentType = response.getHeaders().getContentType();
-        log(request, body, response, watch.getTotalTimeMillis());
-        return response;
+       return WindTracer.TRACER.call(() -> {
+           StopWatch watch = new StopWatch();
+           watch.start();
+           ClientHttpResponse response = execution.execute(request, body);
+           watch.stop();
+           log(request, body, response, watch.getTotalTimeMillis());
+           return response;
+       });
     }
 
     private void log(HttpRequest request, byte[] body, ClientHttpResponse response, long elapsed) throws IOException {

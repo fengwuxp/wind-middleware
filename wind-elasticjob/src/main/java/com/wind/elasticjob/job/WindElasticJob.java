@@ -70,6 +70,13 @@ public interface WindElasticJob {
     }
 
     /**
+     * @return 是否开启 trace
+     */
+    default boolean isTraceJob() {
+        return true;
+    }
+
+    /**
      * @return 执行器服务处理方式
      */
     default ElasticJobExecutorServiceHandlerType getJobExecutorServiceHandlerType() {
@@ -80,6 +87,7 @@ public interface WindElasticJob {
      * @return 作业监听器类型
      */
     @NotNull
+    @Deprecated
     default ElasticJobListenerType getElasticJobListenerType() {
         return ElasticJobListenerType.LOG_TRACE;
     }

@@ -27,6 +27,19 @@ public interface WritableContextVariables extends ReadonlyContextVariables {
     WritableContextVariables putVariable(@NonNull String name, @Nullable Object val);
 
     /**
+     * 添加变量
+     *
+     * @param name 变量名
+     * @param val  变量值
+     * @return this
+     */
+    @NonNull
+    default WritableContextVariables putVariables(@NonNull Map<String, Object> variables) {
+        variables.forEach(this::putVariable);
+        return this;
+    }
+
+    /**
      * 移除变量
      *
      * @param name 变量名

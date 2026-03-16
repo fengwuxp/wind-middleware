@@ -41,6 +41,16 @@ public record WindTraceContext(String traceId, String spanId, String parentSpanI
     }
 
     /**
+     * 尝试获取 trace
+     *
+     * @param traceId traceId
+     * @return trace
+     */
+    public static WindTraceContext tryTrace(@Nullable String traceId) {
+        return traceId == null || traceId.isBlank() ? root() : trace(traceId);
+    }
+
+    /**
      * 创建子 trace
      *
      * @param traceId traceId

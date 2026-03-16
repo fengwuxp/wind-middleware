@@ -13,6 +13,7 @@ import java.util.Properties;
  * @date 2025-10-14 13:57
  **/
 @Slf4j
+@Deprecated
 public class WindLogJobErrorHandler implements JobErrorHandler {
 
     @Override

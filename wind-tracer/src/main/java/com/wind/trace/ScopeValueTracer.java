@@ -2,7 +2,6 @@ package com.wind.trace;
 
 import com.wind.core.WritableContextVariables;
 import org.jspecify.annotations.NonNull;
-import org.jspecify.annotations.Nullable;
 
 import java.util.Optional;
 import java.util.concurrent.Callable;
@@ -81,7 +80,6 @@ public interface ScopeValueTracer extends WritableContextVariables {
      * @param <T>      返回值类型
      * @return 返回值
      */
-    @Nullable
     <T> T call(@NonNull Callable<T> callable);
 
     /**
@@ -91,7 +89,6 @@ public interface ScopeValueTracer extends WritableContextVariables {
      * @param callable 执行的函数
      * @see WindTraceContext#trace(String)
      */
-    @Nullable
     <T> T callWithTraceId(@NonNull String traceId, @NonNull Callable<T> callable);
 
     /**
@@ -101,7 +98,6 @@ public interface ScopeValueTracer extends WritableContextVariables {
      * @param callable 执行的函数
      * @see WindTraceContext#child(WindTraceContext)
      */
-    @Nullable
     <T> T callWithTraceContext(@NonNull WindTraceContext parent, @NonNull Callable<T> callable);
 
     /**

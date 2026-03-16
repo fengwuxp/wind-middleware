@@ -1,5 +1,6 @@
 package com.wind.common.util;
 
+import com.wind.common.WindConstants;
 import com.wind.trace.WindTracer;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Disabled;
@@ -9,6 +10,7 @@ import org.slf4j.MDC;
 import java.util.Arrays;
 import java.util.concurrent.Callable;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
 
@@ -33,19 +35,25 @@ class ExecutorServiceUtilsTests {
     }
 
     @Test
-    void testEnableTrace() throws Exception {
-        WindTracer.TRACER.trace();
-        final String traceId = WindTracer.TRACER.getTraceId();
-        ExecutorService traceExecutor = ExecutorServiceUtils.named("test-trace-").build();
-        Future<?> f1 = traceExecutor.submit(() -> {
-            Assertions.assertEquals(traceId, WindTracer.TRACER.getTraceId());
+    void testEnableTrace() {
+        WindTracer.TRACER.run(() -> {
+            final String traceId = WindTracer.TRACER.requireTraceId();
+            ExecutorService traceExecutor = ExecutorServiceUtils.named("test-trace-").build();
+            Future<?> f1 = traceExecutor.submit(() -> {
+                Assertions.assertEquals(traceId, WindTracer.TRACER.requireTraceId());
+            });
+            Future<?> f2 = ExecutorServiceUtils.named("test-").nativeBuild().submit(() -> {
+                Assertions.assertEquals(WindConstants.UNKNOWN, WindTracer.TRACER.currentTraceId().orElseGet(() -> WindConstants.UNKNOWN));
+            });
+            try {
+                for (Future<?> future : Arrays.asList(f1, f2)) {
+                    future.get();
+                }
+            } catch (InterruptedException | ExecutionException e) {
+                throw new RuntimeException(e);
+            }
         });
-        Future<?> f2 = ExecutorServiceUtils.named("test-").nativeBuild().submit(() -> {
-            Assertions.assertNotEquals(traceId, WindTracer.TRACER.getTraceId());
-        });
-        for (Future<?> future : Arrays.asList(f1, f2)) {
-            future.get();
-        }
+
     }
 
     @Test

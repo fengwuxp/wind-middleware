@@ -12,18 +12,19 @@ import org.apache.shardingsphere.elasticjob.infra.listener.ShardingContexts;
  * @date 2024-06-25 10:23
  **/
 @Slf4j
+@Deprecated(forRemoval = true)
 public class ElasticJobLogTraceListener implements ElasticJobListener {
 
     @Override
     public void beforeJobExecuted(ShardingContexts shardingContexts) {
-        WindTracer.TRACER.trace();
+//        WindTracer.TRACER.trace();
         log.info("jobName = {} beforeJobExecuted, shardingContexts = {}", shardingContexts.getJobName(), shardingContexts);
     }
 
     @Override
     public void afterJobExecuted(ShardingContexts shardingContexts) {
         log.info("jobName = {} afterJobExecuted", shardingContexts.getJobName());
-        WindTracer.TRACER.clear();
+//        WindTracer.TRACER.clear();
     }
 
     @Override

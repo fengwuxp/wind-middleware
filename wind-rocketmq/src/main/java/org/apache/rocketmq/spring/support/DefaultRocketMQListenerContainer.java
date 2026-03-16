@@ -294,18 +294,13 @@ public class DefaultRocketMQListenerContainer implements InitializingBean,
         String traceId = messageExt.getUserProperty(WindConstants.TRACE_ID_NAME);
         boolean traceMessage = StringUtils.hasText(traceId);
         if (traceMessage) {
-            // 设置 traceId
-            WindTracer.TRACER.trace(traceId);
-        }
-
-        try {
+            WindTracer.TRACER.call(() -> {
+                tryFlowControl(messageExt);
+                return null;
+            });
+        } else {
             tryFlowControl(messageExt);
-        } finally {
-            if (traceMessage) {
-                WindTracer.TRACER.clear();
-            }
         }
-
         if (debugEnabled) {
             long costTime = System.currentTimeMillis() - now;
             log.debug("consume {} cost: {} ms", messageExt.getMsgId(), costTime);
@@ -471,7 +466,8 @@ public class DefaultRocketMQListenerContainer implements InitializingBean,
             if (Objects.nonNull(interfaces)) {
                 for (Type type : interfaces) {
                     if (type instanceof ParameterizedType &&
-                            (Objects.equals(((ParameterizedType) type).getRawType(), RocketMQListener.class) || Objects.equals(((ParameterizedType) type).getRawType(), RocketMQReplyListener.class))) {
+                            (Objects.equals(((ParameterizedType) type).getRawType(), RocketMQListener.class) || Objects.equals(((ParameterizedType) type).getRawType(),
+                                    RocketMQReplyListener.class))) {
                         matchedGenericInterface = type;
                         break;
                     }

@@ -94,7 +94,7 @@ final class WindThreadTracer implements WindTracer {
 
     private void restore(WindTraceContext previous) {
         if (previous == null) {
-            TRACE_CONTEXT.remove();
+            clear();
             return;
         }
         TRACE_CONTEXT.set(previous);

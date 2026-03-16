@@ -5,6 +5,7 @@ import com.wind.common.exception.ExecutionWrapperException;
 import com.wind.common.util.IpAddressUtils;
 import com.wind.common.util.ServiceInfoUtils;
 import com.wind.server.web.restful.RestfulApiRespFactory;
+import com.wind.trace.WindTraceContext;
 import com.wind.trace.WindTracer;
 import com.wind.web.exception.GlobalExceptionLogDecisionMaker;
 import com.wind.web.util.HttpResponseMessageUtils;
@@ -67,45 +68,46 @@ public class TraceFilter extends OncePerRequestFilter {
 
     @Override
     protected void doFilterInternal(@NonNull HttpServletRequest request, @NonNull HttpServletResponse response, @NonNull FilterChain chain) {
-        try {
-            if (!ServiceInfoUtils.isOnline()) {
-                // 线下环境增加服务端 ip 返回
-                response.setHeader(REAL_SERVER_IP, IpAddressUtils.getLocalIpv4WithCache());
+        String traceId = request.getHeader(WIND_TRANCE_ID_HEADER_NAME);
+        WindTracer.TRACER.runWithTraceContext(WindTraceContext.tryTrace(traceId), () -> {
+            try {
+                Map<String, Object> traceVariables = getTraceVariables(request);
+                WindTracer.TRACER.putVariables(traceVariables);
+                if (!ServiceInfoUtils.isOnline()) {
+                    // 线下环境增加服务端 ip 返回
+                    response.setHeader(REAL_SERVER_IP, IpAddressUtils.getLocalIpv4WithCache());
+                }
+                // 提前写入 traceId 到响应头，避免 response committed 后无法写回
+                response.setHeader(WIND_TRANCE_ID_HEADER_NAME, WindTracer.TRACER.requireTraceId());
+                chain.doFilter(request, response);
+            } catch (Throwable throwable) {
+                // 统一错误捕获
+                Throwable th = throwable;
+                if (GlobalExceptionLogDecisionMaker.requiresPrintErrorLog(th)) {
+                    // 表明该异常未输出过 error 日志
+                    log.error("request error, cause by = {}", th.getMessage(), th);
+                }
+                if (th instanceof ExecutionWrapperException) {
+                    th = th.getCause();
+                }
+                HttpResponseMessageUtils.writeApiResp(response, RestfulApiRespFactory.withThrowable(th));
             }
-            // 提前写入 traceId 到响应头，避免 response committed 后无法写回
-            response.setHeader(WIND_TRANCE_ID_HEADER_NAME, trace(request));
-            chain.doFilter(request, response);
-        } catch (Throwable throwable) {
-            // 统一错误捕获
-            Throwable th = throwable;
-            if (GlobalExceptionLogDecisionMaker.requiresPrintErrorLog(th)) {
-                // 表明该异常未输出过 error 日志
-                log.error("request error, cause by = {}", th.getMessage(), th);
-            }
-            if (th instanceof ExecutionWrapperException) {
-                th = th.getCause();
-            }
-            HttpResponseMessageUtils.writeApiResp(response, RestfulApiRespFactory.withThrowable(th));
-        } finally {
-            WindTracer.TRACER.clear();
-        }
+        });
     }
 
-    private String trace(HttpServletRequest request) {
-        String traceId = request.getHeader(WIND_TRANCE_ID_HEADER_NAME);
-        Map<String, Object> contextVariables = new HashMap<>();
+    private Map<String, Object> getTraceVariables(HttpServletRequest request) {
+        Map<String, Object> result = new HashMap<>();
         // 将用户请求来源 ip 并设置到请求上下文中
         String requestSourceIp = getRequestSourceIp(request);
         request.setAttribute(HTTP_REQUEST_IP_ATTRIBUTE_NAME, requestSourceIp);
-        contextVariables.put(HTTP_REQUEST_IP_ATTRIBUTE_NAME, requestSourceIp);
-        contextVariables.put(HTTP_REQUEST_HOST_ATTRIBUTE_NAME, getRequestSourceHost(request));
-        contextVariables.put(HTTP_REQUEST_REFERER_ATTRIBUTE_NAME, getRequestSourceReferer(request));
-        contextVariables.put(HTTP_REQUEST_URL_TRACE_NAME, request.getRequestURI());
-        contextVariables.put(HTTP_USER_AGENT_HEADER_NAME, request.getHeader(HTTP_USER_AGENT_HEADER_NAME));
-        contextVariables.put(HTTP_REQUEST_CLIENT_ID_HEADER_NAME, request.getHeader(HTTP_REQUEST_CLIENT_ID_HEADER_NAME));
-        contextVariables.put(LOCALHOST_IP_V4, IpAddressUtils.getLocalIpv4WithCache());
-        WindTracer.TRACER.trace(traceId, contextVariables);
-        return WindTracer.TRACER.getTraceId();
+        result.put(HTTP_REQUEST_IP_ATTRIBUTE_NAME, requestSourceIp);
+        result.put(HTTP_REQUEST_HOST_ATTRIBUTE_NAME, getRequestSourceHost(request));
+        result.put(HTTP_REQUEST_REFERER_ATTRIBUTE_NAME, getRequestSourceReferer(request));
+        result.put(HTTP_REQUEST_URL_TRACE_NAME, request.getRequestURI());
+        result.put(HTTP_USER_AGENT_HEADER_NAME, request.getHeader(HTTP_USER_AGENT_HEADER_NAME));
+        result.put(HTTP_REQUEST_CLIENT_ID_HEADER_NAME, request.getHeader(HTTP_REQUEST_CLIENT_ID_HEADER_NAME));
+        result.put(LOCALHOST_IP_V4, IpAddressUtils.getLocalIpv4WithCache());
+        return result;
     }
 
     /**

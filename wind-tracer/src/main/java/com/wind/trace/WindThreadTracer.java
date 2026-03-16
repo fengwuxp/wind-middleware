@@ -2,6 +2,8 @@ package com.wind.trace;
 
 
 import com.wind.common.exception.AssertUtils;
+import com.wind.common.exception.BaseException;
+import com.wind.common.exception.DefaultExceptionCode;
 import com.wind.common.util.IpAddressUtils;
 import com.wind.core.WritableContextVariables;
 import com.wind.sequence.SequenceGenerator;
@@ -12,7 +14,8 @@ import org.slf4j.MDC;
 import java.util.Collections;
 import java.util.Map;
 import java.util.Objects;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.Optional;
+import java.util.concurrent.Callable;
 
 import static com.wind.common.WindConstants.LOCALHOST_IP_V4;
 import static com.wind.common.WindConstants.TRACE_ID_NAME;
@@ -33,7 +36,69 @@ final class WindThreadTracer implements WindTracer {
     /**
      * 线程 trace context
      */
-    private static final ThreadLocal<Map<String, Object>> TRACE_CONTEXT = ThreadLocal.withInitial(ConcurrentHashMap::new);
+    private static final ThreadLocal<WindTraceContext> TRACE_CONTEXT = ThreadLocal.withInitial(WindTraceContext::root);
+
+
+    @Override
+    public void run(@NonNull Runnable runnable) {
+        WindTraceContext parent = TRACE_CONTEXT.get();
+        WindTraceContext context = parent == null ? WindTraceContext.root() : WindTraceContext.child(parent);
+        runWithTraceContext(context, runnable);
+    }
+
+    @Override
+    public void runWithTraceId(@NonNull String traceId, @NonNull Runnable runnable) {
+        runWithTraceContext(WindTraceContext.trace(traceId), runnable);
+    }
+
+    @Override
+    public void runWithTraceContext(@NonNull WindTraceContext context, @NonNull Runnable runnable) {
+        WindTraceContext previous = TRACE_CONTEXT.get();
+        try {
+            TRACE_CONTEXT.set(context);
+            runnable.run();
+        } finally {
+            restore(previous);
+        }
+    }
+
+    @Override
+    public <T> T call(@NonNull Callable<T> callable) {
+        WindTraceContext parent = TRACE_CONTEXT.get();
+        WindTraceContext context = parent == null ? WindTraceContext.root() : WindTraceContext.child(parent);
+        return callWithTraceContext(context, callable);
+    }
+
+    @Override
+    public <T> T callWithTraceId(@NonNull  String traceId, @NonNull  Callable<T> callable) {
+        return callWithTraceContext(WindTraceContext.trace(traceId), callable);
+    }
+
+    @Override
+    public <T> T callWithTraceContext(@NonNull  WindTraceContext context, @NonNull  Callable<T> callable) {
+        WindTraceContext previous = TRACE_CONTEXT.get();
+        try {
+            TRACE_CONTEXT.set(context);
+            return callable.call();
+        } catch (Exception e) {
+            throw buildThrowsException(e);
+        } finally {
+            restore(previous);
+        }
+    }
+
+    @Override
+    public Optional<WindTraceContext> currentContext() {
+        return Optional.ofNullable(TRACE_CONTEXT.get());
+    }
+
+    private void restore(WindTraceContext previous) {
+        if (previous == null) {
+            TRACE_CONTEXT.remove();
+            return;
+        }
+        TRACE_CONTEXT.set(previous);
+    }
 
     @Override
     public void trace() {
@@ -101,11 +166,18 @@ final class WindThreadTracer implements WindTracer {
     }
 
     private Map<String, Object> requireVariables() {
-        Map<String, Object> variables = TRACE_CONTEXT.get();
-        if (variables == null) {
-            variables = new ConcurrentHashMap<>();
-            TRACE_CONTEXT.set(variables);
+        WindTraceContext context = TRACE_CONTEXT.get();
+        if (context == null) {
+            context = WindTraceContext.root();
+            TRACE_CONTEXT.set(context);
         }
-        return variables;
+        return context.getContextVariables();
+    }
+
+    private static @NonNull BaseException buildThrowsException(Exception e) {
+        if (e instanceof BaseException exception) {
+            return exception;
+        }
+        return new BaseException(DefaultExceptionCode.COMMON_ERROR, "trace call func exception", e);
     }
 }

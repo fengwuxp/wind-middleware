@@ -1,6 +1,5 @@
 package com.wind.trace;
 
-import com.wind.core.WritableContextVariables;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Null;
@@ -14,7 +13,7 @@ import java.util.Map;
  * @author wuxp
  * @date 2023-12-29 10:13
  **/
-public interface WindTracer extends WritableContextVariables {
+public interface WindTracer extends ScopeValueTracer {
 
     /**
      * 默认的 tracer
@@ -26,6 +25,7 @@ public interface WindTracer extends WritableContextVariables {
      *
      * @see #trace(String)
      */
+    @Deprecated(forRemoval = true, since = "java 25")
     void trace();
 
     /**
@@ -33,6 +33,7 @@ public interface WindTracer extends WritableContextVariables {
      *
      * @param traceId traceId 如果为空则生成新的 traceId
      */
+    @Deprecated(forRemoval = true, since = "java 25")
     default void trace(@Null String traceId) {
         trace(traceId, Collections.emptyMap());
     }
@@ -43,6 +44,7 @@ public interface WindTracer extends WritableContextVariables {
      * @param traceId          traceId 如果为空则生成新的 traceId
      * @param contextVariables trace 上下文变量
      */
+    @Deprecated(forRemoval = true, since = "java 25")
     void trace(@Null String traceId, @NotNull Map<String, Object> contextVariables);
 
     /**
@@ -50,12 +52,14 @@ public interface WindTracer extends WritableContextVariables {
      *
      * @return trace id
      */
+    @Deprecated(forRemoval = true, since = "java 25")
     @NotBlank
     String getTraceId();
 
     /**
      * 清除 trace 上下文
      */
+    @Deprecated(forRemoval = true, since = "java 25")
     void clear();
 }
 

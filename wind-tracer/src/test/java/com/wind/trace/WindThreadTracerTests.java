@@ -1,6 +1,5 @@
-package com.wind.trace.thread;
+package com.wind.trace;
 
-import com.wind.trace.WindTracer;
 import com.wind.trace.task.ContextPropagationTaskDecorator;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.junit.jupiter.api.Assertions;
@@ -120,5 +119,40 @@ class WindThreadTracerTests {
         Assertions.assertEquals("test", WindTracer.TRACER.getContextVariable("a"));
         WindTracer.TRACER.removeVariable("a");
         Assertions.assertNull(WindTracer.TRACER.getContextVariable("a"));
+    }
+
+    @Test
+    void testRequireTraceId() {
+        WindTracer.TRACER.run(() -> {
+            String traceId = WindTracer.TRACER.requireTraceId();
+            Assertions.assertNotNull(traceId);
+        });
+    }
+
+    @Test
+    void testMultipleTraces() {
+        WindTracer.TRACER.run(() -> {
+            String traceId = WindTracer.TRACER.requireTraceId();
+            WindTracer.TRACER.run(() -> {
+                Assertions.assertEquals(traceId, WindTracer.TRACER.requireTraceId());
+            });
+        });
+    }
+
+    @Test
+    void testPutVariable() {
+        String testKey = RandomStringUtils.secure().nextAlphanumeric(12);
+        WindTracer.TRACER.run(() -> {
+            String val = RandomStringUtils.secure().nextAlphanumeric(32);
+            WindTracer.TRACER.putVariable(testKey, val);
+            WindTracer.TRACER.run(() -> {
+                Assertions.assertEquals(val, WindTracer.TRACER.getContextVariable(testKey));
+                WindTracer.TRACER.removeVariable(testKey);
+                Assertions.assertNull(WindTracer.TRACER.getContextVariable(testKey));
+            });
+            Assertions.assertEquals(val, WindTracer.TRACER.getContextVariable(testKey));
+            WindTracer.TRACER.removeVariable(testKey);
+            Assertions.assertNull(WindTracer.TRACER.getContextVariable(testKey));
+        });
     }
 }

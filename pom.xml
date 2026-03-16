@@ -50,8 +50,8 @@
         <test.ignore.failure>true</test.ignore.failure>
 
         <java.version>21</java.version>
-        <maven.compiler.source>21</maven.compiler.source>
-        <maven.compiler.target>21</maven.compiler.target>
+        <maven.compiler.source>${java.version}</maven.compiler.source>
+        <maven.compiler.target>${java.version}</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <maven-source-plugin.attach>false</maven-source-plugin.attach>
@@ -62,7 +62,6 @@
         <jacoco-maven-plugin.version>0.8.13</jacoco-maven-plugin.version>
         <git-commit-id-plugin.version>4.9.10</git-commit-id-plugin.version>
 
-        <spring-boot.version>3.5.0</spring-boot.version>
         <spring-cloud-commons.version>5.0.1</spring-cloud-commons.version>
         <spring-cloud-albaba.version>2025.1.0.0</spring-cloud-albaba.version>
         <rocketmq-spring-boot-starter.version>2.3.5</rocketmq-spring-boot-starter.version>

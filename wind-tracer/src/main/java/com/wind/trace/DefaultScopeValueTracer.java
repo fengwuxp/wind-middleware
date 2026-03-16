@@ -118,7 +118,11 @@ final class DefaultScopeValueTracer implements WindTracer {
 
     @Override
     public <T> T callWithNewContext(@NonNull Callable<T> callable) {
-        return ScopedValue.where(TRACE_CONTEXT, WindTraceContext.root()).call(callable::call);
+        try {
+            return ScopedValue.where(TRACE_CONTEXT, WindTraceContext.root()).call(callable::call);
+        } catch (Exception e) {
+            throw buildThrowsException(e);
+        }
     }
 
     @Override

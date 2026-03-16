@@ -90,11 +90,11 @@ public @NonNull WindPagination<${name}DTO> query${name}s(@NonNull ${name}Query q
                 <#if f.type=='String'>
                     .and(${firstLowName}.${f.name}.eq(query.get${f.firstUpCaseName}()))<#if !f_has_next>;</#if>
                 <#elseif f.type=='Date' || f.type=='LocalDateTime' >
-                    <#if f.name?ends_with('min')>
-                        <#assign fieldName=f.name?replace("min","")/>
+                    <#if f.name?ends_with('Min')>
+                        <#assign fieldName=f.name?replace("Min","")/>
                         <#assign op="ge"/>
                     <#else >
-                        <#assign fieldName=f.name?replace("max","")/>
+                        <#assign fieldName=f.name?replace("Max","")/>
                         <#assign op="le"/>
                     </#if>
                     .and(${firstLowName}.${fieldName?uncap_first}.${op}(query.get${f.name?cap_first}()))<#if !f_has_next>;</#if>

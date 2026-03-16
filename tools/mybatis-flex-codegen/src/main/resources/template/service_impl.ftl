@@ -90,7 +90,7 @@ public @NonNull WindPagination<${name}DTO> query${name}s(@NonNull ${name}Query q
                 <#if f.type=='String'>
                     .and(${firstLowName}.${f.name}.eq(query.get${f.firstUpCaseName}()))<#if !f_has_next>;</#if>
                 <#elseif f.type=='Date' || f.type=='LocalDateTime' >
-                    <#if f.name?starts_with('min')>
+                    <#if f.name?ends_with('min')>
                         <#assign fieldName=f.name?replace("min","")/>
                         <#assign op="ge"/>
                     <#else >

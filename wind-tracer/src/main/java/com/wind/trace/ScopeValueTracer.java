@@ -44,7 +44,7 @@ import java.util.concurrent.Callable;
  * @author wuxp
  * @since 2026-03-13
  */
-public interface ScopeValueTracer extends WritableContextVariables {
+interface ScopeValueTracer extends WritableContextVariables {
 
     /**
      * 在当前 Scope 中，执行函数，
@@ -67,11 +67,18 @@ public interface ScopeValueTracer extends WritableContextVariables {
     /**
      * 在当前 Scope 中，执行函数
      *
-     * @param parent   父级 WindTraceContext
+     * @param context  当前 scope 使用的 trace context
      * @param runnable 执行的函数
      * @see WindTraceContext#child(WindTraceContext)
      */
-    void runWithTraceContext(@NonNull WindTraceContext parent, @NonNull Runnable runnable);
+    void runWithContext(@NonNull WindTraceContext context, @NonNull Runnable runnable);
+
+    /**
+     * 创建新的 Scope Context，并执行函数
+     *
+     * @param runnable 函数
+     */
+    void runWithNewContext(@NonNull Runnable runnable);
 
     /**
      * 在当前 Scope 中，执行函数
@@ -94,11 +101,18 @@ public interface ScopeValueTracer extends WritableContextVariables {
     /**
      * 在当前 Scope 中，执行函数
      *
-     * @param parent   父级 WindTraceContext
+     * @param context  当前 scope 使用的 trace context
      * @param callable 执行的函数
      * @see WindTraceContext#child(WindTraceContext)
      */
-    <T> T callWithTraceContext(@NonNull WindTraceContext parent, @NonNull Callable<T> callable);
+    <T> T callWithContext(@NonNull WindTraceContext context, @NonNull Callable<T> callable);
+
+    /**
+     * 创建新的 Scope Context，并执行函数
+     *
+     * @param callable 函数
+     */
+    <T> T callWithNewContext(@NonNull Callable<T> callable);
 
     /**
      * 获取当前 Scope 中的 trace context
@@ -133,7 +147,26 @@ public interface ScopeValueTracer extends WritableContextVariables {
      */
     @NonNull
     default WindTraceContext requireContext() {
-        return currentContext().orElseThrow(() -> new IllegalStateException("trace context is null"));
+        return currentContext().orElseThrow(() -> new IllegalStateException("No trace context bound to current scope"));
     }
 
+    /**
+     * 创建一个 {@link Runnable}，该 Runnable 在当前 Scope 中执行
+     *
+     * @param runnable 函数
+     * @return 包装后的函数
+     */
+    static Runnable wrap(Runnable runnable) {
+        return () -> WindTracer.TRACER.run(runnable);
+    }
+
+    /**
+     * 创建一个 {@link Callable}，该 Callable 在当前 Scope 中执行
+     *
+     * @param callable 函数
+     * @return 包装后的函数
+     */
+    static <T> Callable<T> wrap(Callable<T> callable) {
+        return () -> WindTracer.TRACER.call(callable);
+    }
 }

@@ -115,10 +115,14 @@ class WindThreadTracerTests {
     void testRemoveVariable() {
         Map<String, Object> contextVariables = new HashMap<>();
         contextVariables.put("a", "test");
-        WindTracer.TRACER.trace(null, contextVariables);
-        Assertions.assertEquals("test", WindTracer.TRACER.getContextVariable("a"));
-        WindTracer.TRACER.removeVariable("a");
-        Assertions.assertNull(WindTracer.TRACER.getContextVariable("a"));
+        WindTraceContext parent = WindTraceContext.tryTrace(null);
+        parent.putVariables(contextVariables);
+        WindTracer.TRACER.runWithContext(parent, () -> {
+            Assertions.assertEquals("test", WindTracer.TRACER.getContextVariable("a"));
+            WindTracer.TRACER.removeVariable("a");
+            Assertions.assertNull(WindTracer.TRACER.getContextVariable("a"));
+        });
+
     }
 
     @Test
@@ -140,6 +144,16 @@ class WindThreadTracerTests {
     }
 
     @Test
+    void testRunWithNewContext() {
+        WindTracer.TRACER.run(() -> {
+            String traceId = WindTracer.TRACER.requireTraceId();
+            WindTracer.TRACER.runWithNewContext(() -> {
+                Assertions.assertNotEquals(traceId, WindTracer.TRACER.requireTraceId());
+            });
+        });
+    }
+
+    @Test
     void testPutVariable() {
         String testKey = RandomStringUtils.secure().nextAlphanumeric(12);
         WindTracer.TRACER.run(() -> {
@@ -155,4 +169,5 @@ class WindThreadTracerTests {
             Assertions.assertNull(WindTracer.TRACER.getContextVariable(testKey));
         });
     }
+
 }

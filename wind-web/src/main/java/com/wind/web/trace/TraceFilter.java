@@ -69,7 +69,7 @@ public class TraceFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(@NonNull HttpServletRequest request, @NonNull HttpServletResponse response, @NonNull FilterChain chain) {
         String traceId = request.getHeader(WIND_TRANCE_ID_HEADER_NAME);
-        WindTracer.TRACER.runWithTraceContext(WindTraceContext.tryTrace(traceId), () -> {
+        WindTracer.TRACER.runWithContext(WindTraceContext.tryTrace(traceId), () -> {
             try {
                 Map<String, Object> traceVariables = getTraceVariables(request);
                 WindTracer.TRACER.putVariables(traceVariables);

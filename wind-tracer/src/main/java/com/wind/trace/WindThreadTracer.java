@@ -38,21 +38,20 @@ final class WindThreadTracer implements WindTracer {
      */
     private static final ThreadLocal<WindTraceContext> TRACE_CONTEXT = ThreadLocal.withInitial(WindTraceContext::root);
 
-
     @Override
     public void run(@NonNull Runnable runnable) {
         WindTraceContext parent = TRACE_CONTEXT.get();
         WindTraceContext context = parent == null ? WindTraceContext.root() : WindTraceContext.child(parent);
-        runWithTraceContext(context, runnable);
+        runWithContext(context, runnable);
     }
 
     @Override
     public void runWithTraceId(@NonNull String traceId, @NonNull Runnable runnable) {
-        runWithTraceContext(WindTraceContext.trace(traceId), runnable);
+        runWithContext(WindTraceContext.trace(traceId), runnable);
     }
 
     @Override
-    public void runWithTraceContext(@NonNull WindTraceContext context, @NonNull Runnable runnable) {
+    public void runWithContext(@NonNull WindTraceContext context, @NonNull Runnable runnable) {
         WindTraceContext previous = TRACE_CONTEXT.get();
         try {
             TRACE_CONTEXT.set(context);
@@ -63,19 +62,24 @@ final class WindThreadTracer implements WindTracer {
     }
 
     @Override
+    public void runWithNewContext(@NonNull Runnable runnable) {
+        runWithContext(WindTraceContext.root(), runnable);
+    }
+
+    @Override
     public <T> T call(@NonNull Callable<T> callable) {
         WindTraceContext parent = TRACE_CONTEXT.get();
         WindTraceContext context = parent == null ? WindTraceContext.root() : WindTraceContext.child(parent);
-        return callWithTraceContext(context, callable);
+        return callWithContext(context, callable);
     }
 
     @Override
-    public <T> T callWithTraceId(@NonNull  String traceId, @NonNull  Callable<T> callable) {
-        return callWithTraceContext(WindTraceContext.trace(traceId), callable);
+    public <T> T callWithTraceId(@NonNull String traceId, @NonNull Callable<T> callable) {
+        return callWithContext(WindTraceContext.trace(traceId), callable);
     }
 
     @Override
-    public <T> T callWithTraceContext(@NonNull  WindTraceContext context, @NonNull  Callable<T> callable) {
+    public <T> T callWithContext(@NonNull WindTraceContext context, @NonNull Callable<T> callable) {
         WindTraceContext previous = TRACE_CONTEXT.get();
         try {
             TRACE_CONTEXT.set(context);
@@ -85,6 +89,11 @@ final class WindThreadTracer implements WindTracer {
         } finally {
             restore(previous);
         }
+    }
+
+    @Override
+    public <T> T callWithNewContext(@NonNull Callable<T> callable) {
+        return callWithContext(WindTraceContext.root(), callable);
     }
 
     @Override

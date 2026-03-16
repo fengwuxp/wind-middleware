@@ -63,7 +63,7 @@ public abstract class ContextPropagationTaskDecorator implements TaskDecorator {
             if (traceContext == null) {
                 execution.run();
             } else {
-                WindTracer.TRACER.runWithTraceContext(traceContext, execution);
+                WindTracer.TRACER.runWithContext(traceContext, execution);
             }
         };
     }

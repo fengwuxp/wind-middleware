@@ -59,6 +59,11 @@ public final class WindHttpConstants {
      */
     public static final String HTTP_REQUEST_IDEMPOTENT_HEADER_NAME = "Wind-Idempotent-Key";
 
+    /**
+     * http request client timezone header name
+     */
+    private static final String HTTP_REQUEST_CLIENT_TIMEZONE_HEADER_NAME = "Wind-Client-Timezone";
+
     public static final String HTTP_REQUEST_IDEMPOTENT_RESULT_ATTRIBUTE_NAME = "http-request-idempotent-result";
 
     /**
@@ -67,10 +72,16 @@ public final class WindHttpConstants {
     public static final String HTTP_REQUEST_IDEMPOTENT_EXECUTE_PREFIX = "Wind-Http@";
 
     /**
-     * 匹配所有路径的 Ant pattern
+     * 匹配所有路径的 pattern
      */
-    public static final String ALL_PATH_ANT_PATTERN = "/**";
+    public static final String ALL_PATH_PATTERN = "/**";
 
+    /**
+     * 匹配所有路径的 Ant pattern
+     * @see #ALL_PATH_PATTERN
+     */
+    @Deprecated(forRemoval = true)
+    public static final String ALL_PATH_ANT_PATTERN = ALL_PATH_PATTERN;
 
     /**
      * 链路追踪 用户ID 属性名称
@@ -84,7 +95,8 @@ public final class WindHttpConstants {
 
     /**
      * api token bearer prefix
-     * @see  <a href="https://datatracker.ietf.org/doc/html/rfc6750 "> The OAuth 2.0 Authorization Framework: Bearer Token Usage</a>
+     *
+     * @see <a href="https://datatracker.ietf.org/doc/html/rfc6750 "> The OAuth 2.0 Authorization Framework: Bearer Token Usage</a>
      */
     public static final String API_TOKEN_BEARER_PREFIX = "Bearer ";
 

@@ -21,6 +21,8 @@
                         {
                         "date": "%d{yyyy-MM-dd HH:mm:ss.SSS}",
                         "A-TraceId": "%X{traceId:-}",
+                        "spanId": "%X{spanId:-}",
+                        "parentSpanId": "%X{parentSpanId:-}",
                         "tenant": "%X{tenant:-}",
                         "userId": "%X{userId:-}",
                         "appName": "${APP_NAME}",

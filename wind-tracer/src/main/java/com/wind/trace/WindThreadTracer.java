@@ -36,7 +36,7 @@ final class WindThreadTracer implements WindTracer {
     /**
      * 线程 trace context
      */
-    private static final ThreadLocal<WindTraceContext> TRACE_CONTEXT = ThreadLocal.withInitial(WindTraceContext::root);
+    private static final ThreadLocal<WindTraceContext> TRACE_CONTEXT = ThreadLocal.withInitial(() -> null);
 
     @Override
     public void run(@NonNull Runnable runnable) {
@@ -54,7 +54,7 @@ final class WindThreadTracer implements WindTracer {
     public void runWithContext(@NonNull WindTraceContext context, @NonNull Runnable runnable) {
         WindTraceContext previous = TRACE_CONTEXT.get();
         try {
-            TRACE_CONTEXT.set(context);
+            TRACE_CONTEXT.set(WindTraceContext.child(context));
             runnable.run();
         } finally {
             restore(previous);
@@ -82,7 +82,7 @@ final class WindThreadTracer implements WindTracer {
     public <T> T callWithContext(@NonNull WindTraceContext context, @NonNull Callable<T> callable) {
         WindTraceContext previous = TRACE_CONTEXT.get();
         try {
-            TRACE_CONTEXT.set(context);
+            TRACE_CONTEXT.set(WindTraceContext.child(context));
             return callable.call();
         } catch (Exception e) {
             throw buildThrowsException(e);
@@ -170,7 +170,6 @@ final class WindThreadTracer implements WindTracer {
     @Override
     public void clear() {
         MDC.clear();
-        requireVariables().clear();
         TRACE_CONTEXT.remove();
     }
 

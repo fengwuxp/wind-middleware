@@ -237,6 +237,16 @@ public final class WindConstants {
     public static final String TRACE_ID_NAME = "traceId";
 
     /**
+     * spanId 变量名称
+     */
+    public static final String SPAND_ID_NAME = "spanId";
+
+    /**
+     * parentSpanId 变量名称
+     */
+    public static final String PARENT_SPAND_ID_NAME = "parentSpanId";
+
+    /**
      * trace id http header name
      */
     public static final String WIND_TRANCE_ID_HEADER_NAME = "Wind-Trace-Id";

@@ -1,5 +1,6 @@
 package com.wind.trace;
 
+import com.wind.common.WindConstants;
 import com.wind.trace.task.ContextPropagationTaskDecorator;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.junit.jupiter.api.Assertions;
@@ -130,6 +131,25 @@ class WindThreadTracerTests {
         WindTracer.TRACER.run(() -> {
             String traceId = WindTracer.TRACER.requireTraceId();
             Assertions.assertNotNull(traceId);
+        });
+    }
+
+    @Test
+    void testSpandId() {
+        WindTracer.TRACER.run(() -> {
+            String spanId = WindTracer.TRACER.requireContext().spanId();
+            Assertions.assertEquals(spanId, WindTracer.TRACER.getContextVariable(WindConstants.SPAND_ID_NAME));
+            Assertions.assertNull(WindTracer.TRACER.getContextVariable(WindConstants.PARENT_SPAND_ID_NAME));
+        });
+    }
+
+    @Test
+    void testParentSpanId() {
+        WindTracer.TRACER.run(() -> {
+            String spanId = WindTracer.TRACER.requireContext().spanId();
+            WindTracer.TRACER.runWithContext(WindTracer.TRACER.requireContext(), () -> {
+                Assertions.assertEquals(spanId,  WindTracer.TRACER.requireContext().parentSpanId());
+            });
         });
     }
 

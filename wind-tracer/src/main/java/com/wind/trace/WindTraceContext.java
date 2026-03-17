@@ -1,5 +1,6 @@
 package com.wind.trace;
 
+import com.wind.common.WindConstants;
 import com.wind.common.exception.AssertUtils;
 import com.wind.core.WritableContextVariables;
 import com.wind.sequence.SequenceGenerator;
@@ -23,7 +24,18 @@ import java.util.concurrent.ConcurrentHashMap;
  * @docs <a href="https://opentelemetry.io/docs/reference/specification/overview">Specification Overview</a>
  * @docs <a href="https://opentelemetry.io/docs/specs/otel/trace/api">Tracing API</a>
  **/
-public record WindTraceContext(String traceId, String spanId, String parentSpanId, Map<String, Object> variables) implements WritableContextVariables {
+public record WindTraceContext(@NonNull String traceId,
+                               @NonNull String spanId,
+                               @Nullable String parentSpanId,
+                               @NonNull Map<String, Object> variables) implements WritableContextVariables {
+
+    public WindTraceContext {
+        addVariable(variables, WindConstants.TRACE_ID_NAME, traceId);
+        addVariable(variables, WindConstants.SPAND_ID_NAME, spanId);
+        if (parentSpanId != null) {
+            addVariable(variables, WindConstants.PARENT_SPAND_ID_NAME, parentSpanId);
+        }
+    }
 
     /**
      * traceId 生成器
@@ -85,11 +97,7 @@ public record WindTraceContext(String traceId, String spanId, String parentSpanI
 
     @Override
     public @NonNull WritableContextVariables putVariable(@NonNull String name, @Nullable Object val) {
-        variables.put(name, val);
-        if (val instanceof String str) {
-            // 字符传类型变量同步到 MDC 中   TODO MDC Scope 兼容问题
-            MDC.put(name, str);
-        }
+        addVariable(variables, name, val);
         return this;
     }
 
@@ -103,5 +111,13 @@ public record WindTraceContext(String traceId, String spanId, String parentSpanI
     @Override
     public @NonNull Map<String, Object> getContextVariables() {
         return variables;
+    }
+
+    private static void addVariable(@NonNull Map<String, Object> variables, @NonNull String name, @Nullable Object val) {
+        variables.put(name, val);
+        if (val instanceof String str) {
+            // 字符传类型变量同步到 MDC 中   TODO MDC Scope 兼容问题
+            MDC.put(name, str);
+        }
     }
 }

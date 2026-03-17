@@ -40,9 +40,17 @@ final class WindThreadTracer implements WindTracer {
 
     @Override
     public void run(@NonNull Runnable runnable) {
-        WindTraceContext parent = TRACE_CONTEXT.get();
-        WindTraceContext context = parent == null ? WindTraceContext.root() : WindTraceContext.child(parent);
-        runWithContext(context, runnable);
+        try {
+            Optional<WindTraceContext> context = currentContext();
+            if (context.isPresent()) {
+                // 创建子 trace
+                runWithContext(context.get(), runnable);
+            } else {
+                runWithNewContext(runnable);
+            }
+        } catch (Exception e) {
+            throw buildThrowsException(e);
+        }
     }
 
     @Override
@@ -68,9 +76,17 @@ final class WindThreadTracer implements WindTracer {
 
     @Override
     public <T> T call(@NonNull Callable<T> callable) {
-        WindTraceContext parent = TRACE_CONTEXT.get();
-        WindTraceContext context = parent == null ? WindTraceContext.root() : WindTraceContext.child(parent);
-        return callWithContext(context, callable);
+        try {
+            Optional<WindTraceContext> context = currentContext();
+            if (context.isPresent()) {
+                // 创建子 trace
+                return callWithContext(context.get(), callable);
+            } else {
+                return callWithNewContext(callable);
+            }
+        } catch (Exception e) {
+            throw buildThrowsException(e);
+        }
     }
 
     @Override

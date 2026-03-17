@@ -47,8 +47,8 @@
 //
 //    @Override
 //    public void run(@NonNull Runnable runnable) {
-//        Optional<WindTraceContext> context = currentContext();
 //        try {
+//            Optional<WindTraceContext> context = currentContext();
 //            if (context.isPresent()) {
 //                // 创建子 trace
 //                runWithContext(context.get(), runnable);

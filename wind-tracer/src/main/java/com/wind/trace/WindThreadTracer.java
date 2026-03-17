@@ -5,7 +5,6 @@ import com.wind.common.exception.AssertUtils;
 import com.wind.common.exception.BaseException;
 import com.wind.common.exception.DefaultExceptionCode;
 import com.wind.common.util.IpAddressUtils;
-import com.wind.core.WritableContextVariables;
 import com.wind.sequence.SequenceGenerator;
 import jakarta.validation.constraints.NotNull;
 import org.jspecify.annotations.NonNull;
@@ -54,15 +53,10 @@ final class WindThreadTracer implements WindTracer {
     }
 
     @Override
-    public void runWithTraceId(@NonNull String traceId, @NonNull Runnable runnable) {
-        runWithContext(WindTraceContext.trace(traceId), runnable);
-    }
-
-    @Override
     public void runWithContext(@NonNull WindTraceContext context, @NonNull Runnable runnable) {
         WindTraceContext previous = TRACE_CONTEXT.get();
         try {
-            TRACE_CONTEXT.set(WindTraceContext.child(context));
+            bindContext(WindTraceContext.child(context));
             runnable.run();
         } finally {
             restore(previous);
@@ -73,7 +67,7 @@ final class WindThreadTracer implements WindTracer {
     public void runWithNewContext(@NonNull Runnable runnable) {
         WindTraceContext previous = TRACE_CONTEXT.get();
         try {
-            TRACE_CONTEXT.set(WindTraceContext.root());
+            bindContext(WindTraceContext.root());
             runnable.run();
         } finally {
             restore(previous);
@@ -96,15 +90,10 @@ final class WindThreadTracer implements WindTracer {
     }
 
     @Override
-    public <T> T callWithTraceId(@NonNull String traceId, @NonNull Callable<T> callable) {
-        return callWithContext(WindTraceContext.trace(traceId), callable);
-    }
-
-    @Override
     public <T> T callWithContext(@NonNull WindTraceContext context, @NonNull Callable<T> callable) {
         WindTraceContext previous = TRACE_CONTEXT.get();
         try {
-            TRACE_CONTEXT.set(WindTraceContext.child(context));
+            bindContext(WindTraceContext.child(context));
             return callable.call();
         } catch (Exception e) {
             throw buildThrowsException(e);
@@ -117,7 +106,7 @@ final class WindThreadTracer implements WindTracer {
     public <T> T callWithNewContext(@NonNull Callable<T> callable) {
         WindTraceContext previous = TRACE_CONTEXT.get();
         try {
-            TRACE_CONTEXT.set(WindTraceContext.root());
+            bindContext(WindTraceContext.root());
             return callable.call();
         } catch (Exception e) {
             throw buildThrowsException(e);
@@ -131,12 +120,17 @@ final class WindThreadTracer implements WindTracer {
         return Optional.ofNullable(TRACE_CONTEXT.get());
     }
 
+    private static void bindContext(WindTraceContext context) {
+        TRACE_CONTEXT.set(context);
+        TraceMdcBridge.rebind(context);
+    }
+
     private void restore(WindTraceContext previous) {
         if (previous == null) {
             clear();
             return;
         }
-        TRACE_CONTEXT.set(previous);
+        bindContext(previous);
     }
 
     @Override
@@ -176,40 +170,37 @@ final class WindThreadTracer implements WindTracer {
         return Map.copyOf(requireVariables());
     }
 
-    @Override
-    @NonNull
-    public WritableContextVariables putVariable(@NonNull String name, Object val) {
+    private void putVariable(@NonNull String name, Object val) {
         AssertUtils.hasText(name, "argument name must not empty");
         if (val != null) {
-            requireVariables().put(name, val);
-            if (val instanceof String str) {
-                // 字符传类型变量同步到 MDC 中
-                MDC.put(name, str);
-            }
+            TRACE_CONTEXT.set(getContext().withVariable(name, val));
         }
-        return this;
-    }
+        if (val instanceof String str) {
+            // 字符传类型变量同步到 MDC 中
+            MDC.put(name, str);
+        }
 
-    @Override
-    @NonNull
-    public WritableContextVariables removeVariable(@NonNull String name) {
-        requireVariables().remove(name);
-        return this;
     }
 
     @Override
     public void clear() {
-        MDC.clear();
+        TraceMdcBridge.clear();
         TRACE_CONTEXT.remove();
     }
 
     private Map<String, Object> requireVariables() {
+        WindTraceContext context = getContext();
+        return context.getContextVariables();
+    }
+
+    @Deprecated
+    private static @NonNull WindTraceContext getContext() {
         WindTraceContext context = TRACE_CONTEXT.get();
         if (context == null) {
             context = WindTraceContext.root();
-            TRACE_CONTEXT.set(context);
+            bindContext(context);
         }
-        return context.getContextVariables();
+        return context;
     }
 
     private static @NonNull BaseException buildThrowsException(Exception e) {

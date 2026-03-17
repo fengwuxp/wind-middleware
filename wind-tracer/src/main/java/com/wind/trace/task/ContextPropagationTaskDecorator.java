@@ -38,28 +38,26 @@ public abstract class ContextPropagationTaskDecorator implements TaskDecorator {
         WindTraceContext context = WindTracer.TRACER.currentContext().orElse(null);
         // 捕获业务上下文
         Map<String, Object> businessContext = snapshotContextVariables();
-        return () -> {
-            Runnable execution = () -> {
-                try {
-                    if (log.isDebugEnabled()) {
-                        log.debug("task decorate, parent context = {}", context);
-                    }
-                    restoreContextVariables(businessContext);
-                    task.run();
-                } catch (Throwable throwable) {
-                    if (printExceptionLog) {
-                        log.error("execute task exception", throwable);
-                    }
-                    throw throwable;
-                } finally {
-                    if (log.isDebugEnabled()) {
-                        log.debug("task decorate, clear context variables");
-                    }
-                    clearContextVariables();
+        Runnable execution = () -> {
+            try {
+                if (log.isDebugEnabled()) {
+                    log.debug("task decorate, parent context = {}", context);
                 }
-            };
-            WindTracer.TRACER.run(execution);
+                restoreContextVariables(businessContext);
+                task.run();
+            } catch (Throwable throwable) {
+                if (printExceptionLog) {
+                    log.error("execute task exception", throwable);
+                }
+                throw throwable;
+            } finally {
+                if (log.isDebugEnabled()) {
+                    log.debug("task decorate, clear context contextVariables");
+                }
+                clearContextVariables();
+            }
         };
+        return WindTracer.wrap(execution);
     }
 
     /**

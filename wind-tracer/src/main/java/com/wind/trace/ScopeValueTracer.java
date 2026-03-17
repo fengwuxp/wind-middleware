@@ -1,9 +1,7 @@
 package com.wind.trace;
 
-import com.wind.core.WritableContextVariables;
 import org.jspecify.annotations.NonNull;
 
-import java.util.Optional;
 import java.util.concurrent.Callable;
 
 /**
@@ -44,7 +42,7 @@ import java.util.concurrent.Callable;
  * @author wuxp
  * @since 2026-03-13
  */
-interface ScopeValueTracer extends WritableContextVariables {
+public interface ScopeValueTracer  {
 
     /**
      * 在当前 Scope 中，执行函数，
@@ -54,15 +52,6 @@ interface ScopeValueTracer extends WritableContextVariables {
      * @param runnable 执行的函数
      */
     void run(@NonNull Runnable runnable);
-
-    /**
-     * 在当前 Scope 中，执行函数
-     *
-     * @param traceId  traceId
-     * @param runnable 执行的函数
-     * @see WindTraceContext#trace(String)
-     */
-    void runWithTraceId(@NonNull String traceId, @NonNull Runnable runnable);
 
     /**
      * 在当前 Scope 中，执行函数
@@ -92,15 +81,6 @@ interface ScopeValueTracer extends WritableContextVariables {
     /**
      * 在当前 Scope 中，执行函数
      *
-     * @param traceId  traceId
-     * @param callable 执行的函数
-     * @see WindTraceContext#trace(String)
-     */
-    <T> T callWithTraceId(@NonNull String traceId, @NonNull Callable<T> callable);
-
-    /**
-     * 在当前 Scope 中，执行函数
-     *
      * @param context  当前 scope 使用的 trace context
      * @param callable 执行的函数
      * @see WindTraceContext#child(WindTraceContext)
@@ -114,59 +94,4 @@ interface ScopeValueTracer extends WritableContextVariables {
      */
     <T> T callWithNewContext(@NonNull Callable<T> callable);
 
-    /**
-     * 获取当前 Scope 中的 trace context
-     *
-     * @return trace context
-     */
-    Optional<WindTraceContext> currentContext();
-
-    /**
-     * 获取当前 Scope 中的 traceId
-     *
-     * @return traceId
-     */
-    default Optional<String> currentTraceId() {
-        return currentContext().map(WindTraceContext::traceId);
-    }
-
-    /**
-     * 获取当前 Scope 中的 traceId
-     *
-     * @return traceId
-     */
-    @NonNull
-    default String requireTraceId() {
-        return requireContext().traceId();
-    }
-
-    /**
-     * 获取当前 Scope 中的 trace context
-     *
-     * @return trace context
-     */
-    @NonNull
-    default WindTraceContext requireContext() {
-        return currentContext().orElseThrow(() -> new IllegalStateException("No trace context bound to current scope"));
-    }
-
-    /**
-     * 创建一个 {@link Runnable}，该 Runnable 在当前 Scope 中执行
-     *
-     * @param runnable 函数
-     * @return 包装后的函数
-     */
-    static Runnable wrap(Runnable runnable) {
-        return () -> WindTracer.TRACER.run(runnable);
-    }
-
-    /**
-     * 创建一个 {@link Callable}，该 Callable 在当前 Scope 中执行
-     *
-     * @param callable 函数
-     * @return 包装后的函数
-     */
-    static <T> Callable<T> wrap(Callable<T> callable) {
-        return () -> WindTracer.TRACER.call(callable);
-    }
 }

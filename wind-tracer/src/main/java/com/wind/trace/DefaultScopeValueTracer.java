@@ -2,7 +2,6 @@
 //
 //import com.wind.common.exception.BaseException;
 //import com.wind.common.exception.DefaultExceptionCode;
-//import com.wind.core.WritableContextVariables;
 //import org.jspecify.annotations.NonNull;
 //import org.jspecify.annotations.Nullable;
 //
@@ -61,15 +60,6 @@
 //    }
 //
 //    @Override
-//    public void runWithTraceId(@NonNull String traceId, @NonNull Runnable runnable) {
-//        try {
-//            ScopedValue.where(TRACE_CONTEXT, WindTraceContext.trace(traceId)).run(runnable);
-//        } catch (Exception e) {
-//            throw buildThrowsException(e);
-//        }
-//    }
-//
-//    @Override
 //    public void runWithContext(@NonNull WindTraceContext context, @NonNull Runnable runnable) {
 //        try {
 //            ScopedValue.where(TRACE_CONTEXT, WindTraceContext.child(context)).run(runnable);
@@ -93,15 +83,6 @@
 //            } else {
 //                return callWithNewContext(callable);
 //            }
-//        } catch (Exception e) {
-//            throw buildThrowsException(e);
-//        }
-//    }
-//
-//    @Override
-//    public @Nullable <T> T callWithTraceId(@NonNull String traceId, @NonNull Callable<T> callable) {
-//        try {
-//            return ScopedValue.where(TRACE_CONTEXT, WindTraceContext.trace(traceId)).call(callable::call);
 //        } catch (Exception e) {
 //            throw buildThrowsException(e);
 //        }
@@ -143,17 +124,6 @@
 //            return exception;
 //        }
 //        return new BaseException(DefaultExceptionCode.COMMON_ERROR, "trace call func exception", e);
-//    }
-//
-//    @Override
-//    public @NonNull WritableContextVariables putVariable(@NonNull String name, @Nullable Object val) {
-//        return requireContext().putVariable(name, val);
-//    }
-//
-//    @Override
-//    public @NonNull WritableContextVariables removeVariable(@NonNull String name) {
-//        requireContext().removeVariable(name);
-//        return this;
 //    }
 //
 //    @Override

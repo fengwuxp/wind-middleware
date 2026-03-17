@@ -22,7 +22,7 @@ public record TraceTaskDecorator(boolean printExceptionLog) implements TaskDecor
     @Override
     @NonNull
     public Runnable decorate(@NonNull Runnable runnable) {
-        return () -> WindTracer.TRACER.run(() -> {
+        return WindTracer.wrap(() -> {
             try {
                 runnable.run();
             } catch (Exception throwable) {

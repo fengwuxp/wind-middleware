@@ -69,10 +69,9 @@ public class TraceFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(@NonNull HttpServletRequest request, @NonNull HttpServletResponse response, @NonNull FilterChain chain) {
         String traceId = request.getHeader(WIND_TRANCE_ID_HEADER_NAME);
-        WindTracer.TRACER.runWithContext(WindTraceContext.tryTrace(traceId), () -> {
+        Map<String, Object> traceVariables = getTraceVariables(request);
+        WindTracer.TRACER.runWithContext(WindTraceContext.withTrace(traceId, traceVariables), () -> {
             try {
-                Map<String, Object> traceVariables = getTraceVariables(request);
-                WindTracer.TRACER.putVariables(traceVariables);
                 if (!ServiceInfoUtils.isOnline()) {
                     // 线下环境增加服务端 ip 返回
                     response.setHeader(REAL_SERVER_IP, IpAddressUtils.getLocalIpv4WithCache());

@@ -1,23 +1,21 @@
 package com.wind.trace;
 
-import com.wind.common.WindConstants;
 import com.wind.common.exception.AssertUtils;
-import com.wind.core.WritableContextVariables;
+import com.wind.core.ReadonlyContextVariables;
 import com.wind.sequence.SequenceGenerator;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
-import org.slf4j.MDC;
 
+import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * wind trace 上下文
  *
- * @param traceId      traceId
- * @param spanId       spanId
- * @param parentSpanId parentSpanId
- * @param variables    上下文变量
+ * @param traceId          traceId
+ * @param spanId           spanId
+ * @param parentSpanId     parentSpanId
+ * @param contextVariables 上下文变量
  * @author wuxp
  * @date 2026-03-13 10:18
  * @docs <a href="https://opentelemetry.io/docs/concepts/signals/traces">Traces</a>
@@ -27,16 +25,7 @@ import java.util.concurrent.ConcurrentHashMap;
 public record WindTraceContext(@NonNull String traceId,
                                @NonNull String spanId,
                                @Nullable String parentSpanId,
-                               @NonNull Map<String, Object> variables) implements WritableContextVariables {
-
-    public WindTraceContext {
-        addVariable(variables, WindConstants.TRACE_ID_NAME, traceId);
-        addVariable(variables, WindConstants.SPAND_ID_NAME, spanId);
-        if (parentSpanId != null) {
-            addVariable(variables, WindConstants.PARENT_SPAND_ID_NAME, parentSpanId);
-        }
-    }
-
+                               @NonNull Map<String, Object> contextVariables) implements ReadonlyContextVariables {
     /**
      * traceId 生成器
      */
@@ -49,17 +38,7 @@ public record WindTraceContext(@NonNull String traceId,
      */
     public static WindTraceContext root() {
         String traceId = TRACE_GENERATOR.next();
-        return new WindTraceContext(traceId, TRACE_GENERATOR.next(), null, new ConcurrentHashMap<>());
-    }
-
-    /**
-     * 尝试获取 trace
-     *
-     * @param traceId traceId
-     * @return trace
-     */
-    public static WindTraceContext tryTrace(@Nullable String traceId) {
-        return traceId == null || traceId.isBlank() ? root() : trace(traceId);
+        return new WindTraceContext(traceId, TRACE_GENERATOR.next(), null, Map.of());
     }
 
     /**
@@ -68,9 +47,21 @@ public record WindTraceContext(@NonNull String traceId,
      * @param traceId traceId
      * @return trace
      */
-    public static WindTraceContext trace(@NonNull String traceId) {
-        AssertUtils.hasText(traceId, "argument traceId must not empty");
-        return new WindTraceContext(traceId, TRACE_GENERATOR.next(), null, new ConcurrentHashMap<>());
+    public static WindTraceContext withTrace(@Nullable String traceId) {
+        return withTrace(traceId, Map.of());
+    }
+
+    /**
+     * 创建子 trace
+     *
+     * @param traceId          traceId
+     * @param contextVariables 上下文变量
+     * @return trace
+     */
+    public static WindTraceContext withTrace(@Nullable String traceId, @Nullable Map<String, Object> contextVariables) {
+        traceId = (traceId == null || traceId.isBlank()) ? TRACE_GENERATOR.next() : traceId;
+        Map<String, Object> variables = contextVariables == null ? Map.of() : Map.copyOf(contextVariables);
+        return new WindTraceContext(traceId, TRACE_GENERATOR.next(), null, variables);
     }
 
     /**
@@ -81,8 +72,8 @@ public record WindTraceContext(@NonNull String traceId,
      */
     public static WindTraceContext child(@NonNull WindTraceContext parent) {
         AssertUtils.notNull(parent, "argument parent must not null");
-        Map<String, Object> parentVariables = parent.variables();
-        return new WindTraceContext(parent.traceId, TRACE_GENERATOR.next(), parent.spanId, new ConcurrentHashMap<>(parentVariables));
+        Map<String, Object> parentVariables = parent.contextVariables();
+        return new WindTraceContext(parent.traceId, TRACE_GENERATOR.next(), parent.spanId, Map.copyOf(parentVariables));
     }
 
     /**
@@ -92,32 +83,38 @@ public record WindTraceContext(@NonNull String traceId,
      * @return trace
      */
     public WindTraceContext nextSpan(String newSpanId) {
-        return new WindTraceContext(traceId, newSpanId, this.parentSpanId, variables);
+        return new WindTraceContext(traceId, newSpanId, this.spanId, contextVariables);
     }
 
-    @Override
-    public @NonNull WritableContextVariables putVariable(@NonNull String name, @Nullable Object val) {
-        addVariable(variables, name, val);
-        return this;
+    /**
+     * 添加 contextVariables（返回新对象）
+     */
+    public WindTraceContext withVariable(@NonNull String key, @Nullable Object value) {
+        Map<String, Object> newVariables = new HashMap<>(this.contextVariables);
+        if (value == null) {
+            newVariables.remove(key);
+        } else {
+            newVariables.put(key, value);
+        }
+        return new WindTraceContext(traceId, spanId, parentSpanId, Map.copyOf(newVariables));
     }
 
-    @Override
-    public @NonNull WritableContextVariables removeVariable(@NonNull String name) {
-        variables.remove(name);
-        MDC.remove(name);
-        return this;
+    /**
+     * 批量添加 contextVariables
+     *
+     * @param variables contextVariables
+     */
+    @NonNull
+    public WindTraceContext withVariables(@NonNull Map<String, ?> variables) {
+        Map<String, Object> newVariables = new HashMap<>(this.contextVariables);
+        newVariables.putAll(variables);
+        return new WindTraceContext(traceId, spanId, parentSpanId, newVariables);
     }
+
 
     @Override
     public @NonNull Map<String, Object> getContextVariables() {
-        return variables;
+        return contextVariables;
     }
 
-    private static void addVariable(@NonNull Map<String, Object> variables, @NonNull String name, @Nullable Object val) {
-        variables.put(name, val);
-        if (val instanceof String str) {
-            // 字符传类型变量同步到 MDC 中   TODO MDC Scope 兼容问题
-            MDC.put(name, str);
-        }
-    }
 }

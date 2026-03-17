@@ -35,14 +35,14 @@ public abstract class ContextPropagationTaskDecorator implements TaskDecorator {
     public Runnable decorate(@NonNull Runnable task) {
         AssertUtils.notNull(task, "argument task must not null");
         // 捕获当前 trace context
-        WindTraceContext traceContext = WindTracer.TRACER.currentContext().orElse(null);
+        WindTraceContext context = WindTracer.TRACER.currentContext().orElse(null);
         // 捕获业务上下文
         Map<String, Object> businessContext = snapshotContextVariables();
         return () -> {
             Runnable execution = () -> {
                 try {
                     if (log.isDebugEnabled()) {
-                        log.debug("task decorate, trace context: {}", traceContext);
+                        log.debug("task decorate, parent context = {}", context);
                     }
                     restoreContextVariables(businessContext);
                     task.run();
@@ -57,14 +57,8 @@ public abstract class ContextPropagationTaskDecorator implements TaskDecorator {
                     }
                     clearContextVariables();
                 }
-
             };
-            // 如果存在 trace context，则进入新的 scope
-            if (traceContext == null) {
-                execution.run();
-            } else {
-                WindTracer.TRACER.runWithContext(traceContext, execution);
-            }
+            WindTracer.TRACER.run(execution);
         };
     }
 

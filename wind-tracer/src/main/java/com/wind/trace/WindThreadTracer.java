@@ -71,7 +71,13 @@ final class WindThreadTracer implements WindTracer {
 
     @Override
     public void runWithNewContext(@NonNull Runnable runnable) {
-        runWithContext(WindTraceContext.root(), runnable);
+        WindTraceContext previous = TRACE_CONTEXT.get();
+        try {
+            TRACE_CONTEXT.set(WindTraceContext.root());
+            runnable.run();
+        } finally {
+            restore(previous);
+        }
     }
 
     @Override
@@ -109,7 +115,15 @@ final class WindThreadTracer implements WindTracer {
 
     @Override
     public <T> T callWithNewContext(@NonNull Callable<T> callable) {
-        return callWithContext(WindTraceContext.root(), callable);
+        WindTraceContext previous = TRACE_CONTEXT.get();
+        try {
+            TRACE_CONTEXT.set(WindTraceContext.root());
+            return callable.call();
+        } catch (Exception e) {
+            throw buildThrowsException(e);
+        } finally {
+            restore(previous);
+        }
     }
 
     @Override

@@ -5,6 +5,7 @@ import com.wind.common.exception.AssertUtils;
 import com.wind.common.exception.BaseException;
 import com.wind.common.exception.DefaultExceptionCode;
 import com.wind.common.util.IpAddressUtils;
+import com.wind.core.WritableContextVariables;
 import com.wind.sequence.SequenceGenerator;
 import jakarta.validation.constraints.NotNull;
 import org.jspecify.annotations.NonNull;
@@ -166,20 +167,29 @@ final class WindThreadTracer implements WindTracer {
 
     @Override
     public Map<String, Object> getContextVariables() {
-        // 返回一个快照，避免外部遍历时内部修改引发 ConcurrentModificationException
-        return Map.copyOf(requireVariables());
+
+        return writeView().getContextVariables();
     }
 
-    private void putVariable(@NonNull String name, Object val) {
+    @Override
+    @NonNull
+    public WritableContextVariables putVariable(@NonNull String name, Object val) {
         AssertUtils.hasText(name, "argument name must not empty");
         if (val != null) {
-            TRACE_CONTEXT.set(getContext().withVariable(name, val));
+            writeView().putVariable(name, val);
+            if (val instanceof String str) {
+                // 字符传类型变量同步到 MDC 中
+                MDC.put(name, str);
+            }
         }
-        if (val instanceof String str) {
-            // 字符传类型变量同步到 MDC 中
-            MDC.put(name, str);
-        }
+        return this;
+    }
 
+    @Override
+    @NonNull
+    public WritableContextVariables removeVariable(@NonNull String name) {
+        writeView().removeVariable(name);
+        return this;
     }
 
     @Override
@@ -188,20 +198,15 @@ final class WindThreadTracer implements WindTracer {
         TRACE_CONTEXT.remove();
     }
 
-    private Map<String, Object> requireVariables() {
-        WindTraceContext context = getContext();
-        return context.getContextVariables();
-    }
-
-    @Deprecated
-    private static @NonNull WindTraceContext getContext() {
+    private WritableContextVariables writeView() {
         WindTraceContext context = TRACE_CONTEXT.get();
         if (context == null) {
             context = WindTraceContext.root();
             bindContext(context);
         }
-        return context;
+        return context.writeView();
     }
+
 
     private static @NonNull BaseException buildThrowsException(Exception e) {
         if (e instanceof BaseException exception) {

@@ -7,6 +7,7 @@ import com.wind.sequence.SequenceGenerator;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
+import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -37,11 +38,11 @@ public final class WindTraceContext implements ReadonlyContextVariables {
      * @param parentSpanId     父 spanId
      * @param contextVariables 上下文变量
      */
-    private WindTraceContext(@NonNull String traceId, @NonNull String spanId, @Nullable String parentSpanId, @NonNull Map<String, Object> contextVariables) {
+    private WindTraceContext(@NonNull String traceId, @NonNull String spanId, @Nullable String parentSpanId, @Nullable Map<String, Object> contextVariables) {
         this.traceId = traceId;
         this.spanId = spanId;
         this.parentSpanId = parentSpanId;
-        this.contextVariables = new ScopedWritableView(contextVariables);
+        this.contextVariables = new ScopedWritableView(contextVariables == null ? new HashMap<>() : new HashMap<>(contextVariables));
     }
 
     /**
@@ -78,8 +79,7 @@ public final class WindTraceContext implements ReadonlyContextVariables {
      */
     public static WindTraceContext withTrace(@Nullable String traceId, @Nullable Map<String, Object> contextVariables) {
         traceId = (traceId == null || traceId.isBlank()) ? TRACE_GENERATOR.next() : traceId;
-        Map<String, Object> variables = contextVariables == null ? Map.of() : contextVariables;
-        return new WindTraceContext(traceId, TRACE_GENERATOR.next(), null, variables);
+        return new WindTraceContext(traceId, TRACE_GENERATOR.next(), null, contextVariables);
     }
 
     /**
@@ -135,7 +135,7 @@ public final class WindTraceContext implements ReadonlyContextVariables {
     private record ScopedWritableView(Map<String, Object> variables) implements WritableContextVariables {
 
         private ScopedWritableView(Map<String, Object> variables) {
-            this.variables = variables == null ? new ConcurrentHashMap<>() : new ConcurrentHashMap<>(variables);
+            this.variables = variables;
         }
 
         @Override

@@ -7,9 +7,9 @@ import com.wind.sequence.SequenceGenerator;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * wind trace 上下文
@@ -134,10 +134,6 @@ public final class WindTraceContext implements ReadonlyContextVariables {
 
     private record ScopedWritableView(Map<String, Object> variables) implements WritableContextVariables {
 
-        private ScopedWritableView(Map<String, Object> variables) {
-            this.variables = variables;
-        }
-
         @Override
         public @NonNull WritableContextVariables putVariable(@NonNull String name, @Nullable Object val) {
             if (val == null) {
@@ -157,7 +153,7 @@ public final class WindTraceContext implements ReadonlyContextVariables {
         @Override
         public @NonNull Map<String, Object> getContextVariables() {
             // 返回一个快照，避免外部遍历时内部修改引发 ConcurrentModificationException
-            return Map.copyOf(variables);
+            return Collections.unmodifiableMap(variables);
         }
     }
 }

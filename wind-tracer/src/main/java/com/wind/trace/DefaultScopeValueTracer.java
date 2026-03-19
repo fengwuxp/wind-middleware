@@ -11,7 +11,7 @@
 //import java.util.concurrent.Callable;
 //
 ///**
-// * 基于 {@link ScopedValue} 的 Tracer
+// * 基于 {@link java.lang.ScopedValue} 的 Tracer
 // *
 // * @author wuxp
 // * @date 2026-03-13 10:04
@@ -63,7 +63,7 @@
 //    @Override
 //    public void runWithContext(@NonNull WindTraceContext context, @NonNull Runnable runnable) {
 //        try {
-//            ScopedValue.where(TRACE_CONTEXT, WindTraceContext.child(context)).run(runnable);
+//            ScopedValue.where(TRACE_CONTEXT, WindTraceContext.child(context)).run(warpMdcBridge(runnable));
 //        } catch (Exception e) {
 //            throw buildThrowsException(e);
 //        }
@@ -71,7 +71,7 @@
 //
 //    @Override
 //    public void runWithNewContext(@NonNull Runnable runnable) {
-//        ScopedValue.where(TRACE_CONTEXT, WindTraceContext.root()).run(runnable);
+//        ScopedValue.where(TRACE_CONTEXT, WindTraceContext.root()).run(warpMdcBridge(runnable));
 //    }
 //
 //    @Override
@@ -92,7 +92,7 @@
 //    @Override
 //    public @Nullable <T> T callWithContext(@NonNull WindTraceContext context, @NonNull Callable<T> callable) {
 //        try {
-//            return ScopedValue.where(TRACE_CONTEXT, WindTraceContext.child(context)).call(callable::call);
+//            return ScopedValue.where(TRACE_CONTEXT, WindTraceContext.child(context)).call(warpMdcBridge(callable));
 //        } catch (Exception e) {
 //            throw buildThrowsException(e);
 //        }
@@ -101,7 +101,7 @@
 //    @Override
 //    public <T> T callWithNewContext(@NonNull Callable<T> callable) {
 //        try {
-//            return ScopedValue.where(TRACE_CONTEXT, WindTraceContext.root()).call(callable::call);
+//            return ScopedValue.where(TRACE_CONTEXT, WindTraceContext.root()).call(warpMdcBridge(callable));
 //        } catch (Exception e) {
 //            throw buildThrowsException(e);
 //        }
@@ -140,5 +140,27 @@
 //    @Override
 //    public @NonNull Map<String, Object> getContextVariables() {
 //        return requireContext().getContextVariables();
+//    }
+//
+//    private Runnable warpMdcBridge(Runnable runnable) {
+//        return () -> {
+//            try {
+//                TraceMdcBridge.rebind(requireContext());
+//                runnable.run();
+//            } finally {
+//                TraceMdcBridge.clear();
+//            }
+//        };
+//    }
+//
+//    private <T> Callable<T> warpMdcBridge(Callable<T> callable) {
+//        return () -> {
+//            try {
+//                TraceMdcBridge.rebind(requireContext());
+//                return callable.call();
+//            } finally {
+//                TraceMdcBridge.clear();
+//            }
+//        };
 //    }
 //}

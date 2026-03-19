@@ -1,8 +1,8 @@
 package com.wind.trace.task;
 
 import lombok.AllArgsConstructor;
-import org.springframework.core.task.TaskDecorator;
 import org.jspecify.annotations.NonNull;
+import org.springframework.core.task.TaskDecorator;
 
 /**
  * 默认任务装饰器枚举

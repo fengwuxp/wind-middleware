@@ -1,6 +1,5 @@
 package com.wind.trace;
 
-import com.wind.core.ReadonlyContextVariables;
 import com.wind.core.WritableContextVariables;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -13,7 +12,7 @@ import java.util.Optional;
 import java.util.concurrent.Callable;
 
 /**
- *  上下文 tracer
+ * 上下文 tracer
  *
  * @author wuxp
  * @date 2023-12-29 10:13

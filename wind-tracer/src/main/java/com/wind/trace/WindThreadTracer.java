@@ -206,8 +206,7 @@ final class WindThreadTracer implements WindTracer {
         }
         return context.writeView();
     }
-
-
+    
     private static @NonNull BaseException buildThrowsException(Exception e) {
         if (e instanceof BaseException exception) {
             return exception;

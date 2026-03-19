@@ -42,7 +42,7 @@ import java.util.concurrent.Callable;
  * @author wuxp
  * @since 2026-03-13
  */
-public interface ScopeValueTracer  {
+public interface ScopeValueTracer {
 
     /**
      * 在当前 Scope 中，执行函数，

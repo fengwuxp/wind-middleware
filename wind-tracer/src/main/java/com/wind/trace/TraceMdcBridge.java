@@ -9,7 +9,7 @@ import org.slf4j.MDC;
  **/
 final class TraceMdcBridge {
 
-    public TraceMdcBridge() {
+    private TraceMdcBridge() {
         throw new AssertionError();
     }
 

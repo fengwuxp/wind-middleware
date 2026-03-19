@@ -47,7 +47,7 @@ public abstract class ContextPropagationTaskDecorator implements TaskDecorator {
                 task.run();
             } catch (Throwable throwable) {
                 if (printExceptionLog) {
-                    log.error("execute task exception", throwable);
+                    log.error("execute task exception, message = {}", throwable.getMessage(), throwable);
                 }
                 throw throwable;
             } finally {

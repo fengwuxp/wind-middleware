@@ -62,8 +62,11 @@ public final class WindHttpConstants {
     /**
      * http request client timezone header name
      */
-    private static final String HTTP_REQUEST_CLIENT_TIMEZONE_HEADER_NAME = "Wind-Client-Timezone";
+    public static final String HTTP_REQUEST_CLIENT_TIMEZONE_HEADER_NAME = "Wind-Client-Timezone";
 
+    /**
+     * http request Idempotent result attribute name
+     */
     public static final String HTTP_REQUEST_IDEMPOTENT_RESULT_ATTRIBUTE_NAME = "http-request-idempotent-result";
 
     /**

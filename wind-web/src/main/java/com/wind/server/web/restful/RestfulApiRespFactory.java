@@ -151,7 +151,7 @@ public final class RestfulApiRespFactory {
     }
 
     private static <T> ApiResp<T> of(HttpStatus httpStatus, T data, ExceptionCode code, String errorMessage) {
-        return new ImmutableWebApiResponse<>(httpStatus, data, code, errorMessage, WindTracer.TRACER.getTraceId());
+        return new ImmutableWebApiResponse<>(httpStatus, data, code, errorMessage, WindTracer.TRACER.requireTraceId());
     }
 
     public static void configureFriendlyExceptionMessageConverter(FriendlyExceptionMessageConverter converter) {

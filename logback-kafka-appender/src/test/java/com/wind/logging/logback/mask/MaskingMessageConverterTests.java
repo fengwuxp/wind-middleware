@@ -27,15 +27,6 @@ class MaskingMessageConverterTests {
 
     private static final Logger LOG = LoggerFactory.getLogger(MaskingMessageConverterTests.class);
 
-    static {
-        WindTracer.TRACER.trace();
-    }
-
-    @AfterEach
-    void after() {
-        WindTracer.TRACER.clear();
-    }
-
     @Test
     void testLogin() {
         List<MaskRuleGroup> groups = MaskRuleGroup.builder().form(LogbackMaskUser.class)

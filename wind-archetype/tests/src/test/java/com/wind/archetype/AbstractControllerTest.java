@@ -33,7 +33,7 @@ public abstract class AbstractControllerTest {
     }
 
     @Configuration
-    @SpringBootApplication(scanBasePackages = {"com.capte.**"})
+    @SpringBootApplication(scanBasePackages = {"com.wind.example.controller.**"})
     static class TestConfig {
 
         public static void main(String[] args) {

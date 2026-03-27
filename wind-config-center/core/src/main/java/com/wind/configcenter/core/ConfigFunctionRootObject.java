@@ -8,8 +8,8 @@ import com.wind.common.jul.WindJulLogFactory;
 import com.wind.common.util.ServiceInfoUtils;
 import com.wind.core.WindCredentialsProvider;
 import com.wind.security.crypto.symmetric.AesTextEncryptor;
-import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 import org.springframework.security.crypto.encrypt.TextEncryptor;
 import org.springframework.util.StringUtils;
@@ -83,12 +83,14 @@ record ConfigFunctionRootObject(TextEncryptor encryptor, WindCredentialsProvider
         }
         return new TextEncryptor() {
             @Override
-            public String encrypt(String text) {
+            @NonNull
+            public String encrypt(@NonNull String text) {
                 return text;
             }
 
             @Override
-            public String decrypt(String encryptedText) {
+            @NonNull
+            public String decrypt(@NonNull String encryptedText) {
                 return encryptedText;
             }
         };
@@ -97,14 +99,6 @@ record ConfigFunctionRootObject(TextEncryptor encryptor, WindCredentialsProvider
     @NotNull
     private static WindCredentialsProvider getCredentialsProvider() {
         ServiceLoader<WindCredentialsProvider> services = ServiceLoader.load(WindCredentialsProvider.class);
-        for (WindCredentialsProvider e : services) {
-            LOGGER.info("Active WindCredentialsProvider " + WindCredentialsProvider.class.getName());
-            return e;
-        }
-        return ConfigFunctionRootObject::getCredentials;
-    }
-
-    private static String getCredentials(@NotBlank String credentialsName) {
-        throw new UnsupportedOperationException("un supported");
+        return services.findFirst().orElseThrow(() -> new UnsupportedOperationException("No Found WindCredentialsProvider"));
     }
 }

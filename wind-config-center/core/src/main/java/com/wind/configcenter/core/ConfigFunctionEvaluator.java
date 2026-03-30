@@ -1,6 +1,6 @@
 package com.wind.configcenter.core;
 
-import com.google.common.collect.ImmutableSet;
+import com.wind.common.WindConstants;
 import com.wind.common.jul.WindJulLogFactory;
 import com.wind.script.spring.SpringExpressionEvaluator;
 import org.springframework.boot.origin.OriginTrackedValue;
@@ -13,6 +13,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.logging.Logger;
 
 import static org.springframework.core.env.StandardEnvironment.SYSTEM_PROPERTIES_PROPERTY_SOURCE_NAME;
@@ -32,11 +33,11 @@ public record ConfigFunctionEvaluator(Object rootObject) {
 
     private static final Logger LOGGER = WindJulLogFactory.getLogger(ConfigFunctionEvaluator.class);
 
-    private static final Set<String> REQUIRES_DECRYPT_NAMES = ImmutableSet.of(SYSTEM_PROPERTIES_PROPERTY_SOURCE_NAME);
+    private static final Set<String> REQUIRES_DECRYPT_NAMES = Set.of(SYSTEM_PROPERTIES_PROPERTY_SOURCE_NAME);
 
     private static final SpringExpressionEvaluator EVALUATOR = new SpringExpressionEvaluator(new TemplateParserContext("@{", "}"));
 
-    private static final ConfigFunctionEvaluator INSTANCE = new ConfigFunctionEvaluator(new ConfigFunctionRootObject());
+    private static final AtomicReference<ConfigFunctionEvaluator> INSTANCE = new AtomicReference<>();
 
     /**
      * 执行配置内容中的函数
@@ -49,7 +50,7 @@ public record ConfigFunctionEvaluator(Object rootObject) {
         try {
             return EVALUATOR.eval(content, new StandardEvaluationContext(rootObject));
         } catch (Exception exception) {
-            LOGGER.info("eval config content exception, config name = " + name + ", message = " + exception.getMessage());
+            LOGGER.info("eval config content exception, config name = " + name + ", content = " + content + ", message = " + exception.getMessage());
             return content;
         }
     }
@@ -64,7 +65,7 @@ public record ConfigFunctionEvaluator(Object rootObject) {
         if (requiresDecrypt(source)) {
             Map<String, Object> keyValues = ((MapPropertySource) source).getSource();
             Map<String, Object> result = new HashMap<>(keyValues);
-            keyValues.forEach((key, value) -> result.put(key, eval(source.getName(), asText(value))));
+            keyValues.forEach((key, value) -> result.put(key, eval(source.getName() + WindConstants.SHARP + key, asText(value))));
             return new MapPropertySource(source.getName(), Collections.unmodifiableMap(result));
         }
         return source;
@@ -92,6 +93,13 @@ public record ConfigFunctionEvaluator(Object rootObject) {
     }
 
     public static ConfigFunctionEvaluator getInstance() {
-        return INSTANCE;
+        if (INSTANCE.get() == null) {
+            synchronized (ConfigFunctionEvaluator.class) {
+                if (INSTANCE.get() == null) {
+                    INSTANCE.set(new ConfigFunctionEvaluator(new ConfigFunctionRootObject()));
+                }
+            }
+        }
+        return INSTANCE.get();
     }
 }

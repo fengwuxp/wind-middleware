@@ -3,7 +3,6 @@ package com.wind.configcenter.core;
 import com.alibaba.fastjson2.JSON;
 import com.alibaba.fastjson2.JSONObject;
 import com.wind.common.WindConstants;
-import com.wind.common.annotations.VisibleForTesting;
 import com.wind.common.jul.WindJulLogFactory;
 import com.wind.common.util.ServiceInfoUtils;
 import com.wind.core.WindCredentialsProvider;
@@ -27,8 +26,10 @@ record ConfigFunctionRootObject(TextEncryptor encryptor, WindCredentialsProvider
 
     private static final Logger LOGGER = WindJulLogFactory.getLogger(ConfigFunctionRootObject.class);
 
-    @VisibleForTesting
-    static final String SECRET_KEY = "WIND_SAE_KEY";
+    @Deprecated(forRemoval = true)
+    private static final String SECRET_KEY = "WIND_SAE_KEY";
+
+    private static final String WIND_CONFIG_SECRET_KEY_NAME = "WIND_CONFIG_SECRET_KEY";
 
     public ConfigFunctionRootObject() {
         this(getDefaultEncryptor(), getCredentialsProvider());
@@ -77,7 +78,10 @@ record ConfigFunctionRootObject(TextEncryptor encryptor, WindCredentialsProvider
     }
 
     private static TextEncryptor getDefaultEncryptor() {
-        String secret = ServiceInfoUtils.getSystemProperty(SECRET_KEY);
+        String secret = ServiceInfoUtils.getSystemProperty(WIND_CONFIG_SECRET_KEY_NAME);
+        if (!StringUtils.hasText(secret)) {
+            secret = ServiceInfoUtils.getSystemProperty(SECRET_KEY);
+        }
         if (StringUtils.hasText(secret)) {
             return new AesTextEncryptor(secret, WindConstants.WIND);
         }

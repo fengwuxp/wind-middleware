@@ -2,7 +2,6 @@ package com.wind.elasticjob.job;
 
 import com.wind.common.WindConstants;
 import com.wind.elasticjob.enums.ElasticJobExecutorServiceHandlerType;
-import com.wind.elasticjob.enums.ElasticJobListenerType;
 import jakarta.validation.constraints.NotNull;
 
 import java.util.Collections;
@@ -83,12 +82,4 @@ public interface WindElasticJob {
         return ElasticJobExecutorServiceHandlerType.CPU;
     }
 
-    /**
-     * @return 作业监听器类型
-     */
-    @NotNull
-    @Deprecated
-    default ElasticJobListenerType getElasticJobListenerType() {
-        return ElasticJobListenerType.LOG_TRACE;
-    }
 }

@@ -58,12 +58,6 @@ public final class SpringEventPublishUtils {
         EXECUTOR.execute(ContextPropagationTaskDecorator.of().decorate(() -> publishEvent(event)));
     }
 
-
-    @Deprecated(forRemoval = true)
-    public static void publishEventIfInTransaction(@NonNull Object event) {
-        publishWithTransactionCommitOrImmediately(event);
-    }
-
     /**
      * 如果在事务内，事件推迟到事务提交后发送。如果 {@param event} 实现了 {@link SpringTransactionEvent} 接口，
      * 无论事务中发送了多少次相同的{@link SpringTransactionEvent#getEventId()}事件，在事务结束后只会发送最后一次事件。

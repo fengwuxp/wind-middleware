@@ -80,13 +80,6 @@ public final class WindHttpConstants {
     public static final String ALL_PATH_PATTERN = "/**";
 
     /**
-     * 匹配所有路径的 Ant pattern
-     * @see #ALL_PATH_PATTERN
-     */
-    @Deprecated(forRemoval = true)
-    public static final String ALL_PATH_ANT_PATTERN = ALL_PATH_PATTERN;
-
-    /**
      * 链路追踪 用户ID 属性名称
      */
     public static final String TRACE_USER_ID_ATTRIBUTE_NAME = "userId";

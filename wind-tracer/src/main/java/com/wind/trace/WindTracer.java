@@ -1,13 +1,8 @@
 package com.wind.trace;
 
 import com.wind.core.WritableContextVariables;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Null;
 import org.jspecify.annotations.NonNull;
 
-import java.util.Collections;
-import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.Callable;
 
@@ -84,7 +79,7 @@ public interface WindTracer extends ScopeValueTracer, WritableContextVariables {
      * @return spanId
      */
     @NonNull
-    default String requreSpanId() {
+    default String requireSpanId() {
         return requireContext().spanId();
     }
 
@@ -109,49 +104,6 @@ public interface WindTracer extends ScopeValueTracer, WritableContextVariables {
     static <T> Callable<T> wrap(Callable<T> callable) {
         return () -> WindTracer.TRACER.call(callable);
     }
-
-    /**
-     * 如果上下文中不存在 traceId 则生成
-     *
-     * @see #trace(String)
-     */
-    @Deprecated(forRemoval = true, since = "java 25")
-    void trace();
-
-    /**
-     * 通过传入的 traceId 设置到上下文中，如果 traceId 为空，则生成新的 traceId
-     *
-     * @param traceId traceId 如果为空则生成新的 traceId
-     */
-    @Deprecated(forRemoval = true, since = "java 25")
-    default void trace(@Null String traceId) {
-        trace(traceId, Collections.emptyMap());
-    }
-
-    /**
-     * 通过传入的 traceId、 contextVariables 设置到上下文中，如果 traceId 为空，则生成新的 traceId
-     *
-     * @param traceId          traceId 如果为空则生成新的 traceId
-     * @param contextVariables trace 上下文变量
-     */
-    @Deprecated(forRemoval = true, since = "java 25")
-    void trace(@Null String traceId, @NotNull Map<String, Object> contextVariables);
-
-    /**
-     * 获取线程上下文中的 traceId，若不存在则创建
-     *
-     * @return trace id
-     */
-    @Deprecated(forRemoval = true, since = "java 25")
-    @NotBlank
-    String getTraceId();
-
-    /**
-     * 清除 trace 上下文
-     */
-    @Deprecated(forRemoval = true, since = "java 25")
-    void clear();
-
 
 }
 

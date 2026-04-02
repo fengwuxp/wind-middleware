@@ -2,7 +2,6 @@ package com.wind.elasticjob;
 
 import com.wind.common.util.ServiceInfoUtils;
 import com.wind.elasticjob.enums.ElasticJobExecutorServiceHandlerType;
-import com.wind.elasticjob.enums.ElasticJobListenerType;
 import com.wind.elasticjob.enums.ElasticJobShardingStrategyType;
 import com.wind.elasticjob.job.WindElasticDataFlowJob;
 import com.wind.elasticjob.job.WindElasticJob;
@@ -123,11 +122,6 @@ public class WindElasticJobRegistrar {
         }
 
         @Override
-        public ElasticJobListenerType getElasticJobListenerType() {
-            return job.getElasticJobListenerType();
-        }
-
-        @Override
         public ElasticJobExecutorServiceHandlerType getJobExecutorServiceHandlerType() {
             return job.getJobExecutorServiceHandlerType();
         }
@@ -193,11 +187,6 @@ public class WindElasticJobRegistrar {
                 log.error("elastic job execution failed jobName = {}, errorType = {}, message= {}", getName(), cause.getClass().getSimpleName(), cause.getMessage(), cause);
                 throw cause;
             }
-        }
-
-        @Override
-        public ElasticJobListenerType getElasticJobListenerType() {
-            return job.getElasticJobListenerType();
         }
 
         @Override

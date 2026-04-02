@@ -26,26 +26,6 @@
 //    private static final ScopedValue<WindTraceContext> TRACE_CONTEXT = ScopedValue.newInstance();
 //
 //    @Override
-//    public void trace() {
-//        throw new UnsupportedOperationException("not support");
-//    }
-//
-//    @Override
-//    public void trace(String traceId, Map<String, Object> contextVariables) {
-//        throw new UnsupportedOperationException("not support");
-//    }
-//
-//    @Override
-//    public String getTraceId() {
-//        throw new UnsupportedOperationException("not support");
-//    }
-//
-//    @Override
-//    public void clear() {
-//        throw new UnsupportedOperationException("not support");
-//    }
-//
-//    @Override
 //    public void run(@NonNull Runnable runnable) {
 //        try {
 //            Optional<WindTraceContext> context = currentContext();

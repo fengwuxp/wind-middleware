@@ -155,8 +155,8 @@ final class WindThreadTracer implements WindTracer {
         return context.writeView();
     }
 
-    private static @NonNull BaseException buildThrowsException(Exception e) {
-        if (e instanceof BaseException exception) {
+    private static @NonNull RuntimeException buildThrowsException(Exception e) {
+        if (e instanceof RuntimeException exception) {
             return exception;
         }
         return new BaseException(DefaultExceptionCode.COMMON_ERROR, "wrap trace run func exception", e);

@@ -34,9 +34,9 @@ public abstract class ContextPropagationTaskDecorator implements TaskDecorator {
     @NonNull
     public Runnable decorate(@NonNull Runnable task) {
         AssertUtils.notNull(task, "argument task must not null");
-        // 捕获当前 trace context
-        WindTraceContext context = WindTracer.TRACER.currentContext().orElse(null);
-        // 捕获业务上下文
+        // 获取当前 trace context
+        WindTraceContext context = WindTracer.TRACER.currentContext().orElseGet(WindTraceContext::root);
+        // 获取业务上下文
         Map<String, Object> businessContext = snapshotContextVariables();
         Runnable execution = () -> {
             try {
@@ -57,7 +57,7 @@ public abstract class ContextPropagationTaskDecorator implements TaskDecorator {
                 clearContextVariables();
             }
         };
-        return WindTracer.wrap(execution);
+        return WindTracer.wrap(context, execution);
     }
 
     /**

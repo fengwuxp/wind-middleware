@@ -90,8 +90,22 @@ public interface WindTracer extends ScopeValueTracer, WritableContextVariables {
      * @return 包装后的函数
      * @see #run(Runnable)
      */
-    static Runnable wrap(Runnable runnable) {
+    @NonNull
+    static Runnable wrap(@NonNull Runnable runnable) {
         return () -> WindTracer.TRACER.run(runnable);
+    }
+
+    /**
+     * 创建一个 {@link Runnable}，该 Runnable 在 Parent Scope 中执行
+     *
+     * @param parent   父 trace context
+     * @param runnable 函数
+     * @return 包装后的函数
+     * @see #runWithContext(WindTraceContext, Runnable)
+     */
+    @NonNull
+    static Runnable wrap(@NonNull WindTraceContext parent, @NonNull Runnable runnable) {
+        return () -> WindTracer.TRACER.runWithContext(parent, runnable);
     }
 
     /**
@@ -101,9 +115,24 @@ public interface WindTracer extends ScopeValueTracer, WritableContextVariables {
      * @return 包装后的函数
      * @see #call(Callable)
      */
-    static <T> Callable<T> wrap(Callable<T> callable) {
+    @NonNull
+    static <T> Callable<T> wrap(@NonNull Callable<T> callable) {
         return () -> WindTracer.TRACER.call(callable);
     }
+
+    /**
+     * 创建一个 {@link Callable}，该 Callable 在 Parent Scope 中执行
+     *
+     * @param parent   父 trace context
+     * @param callable 函数
+     * @return 包装后的函数
+     * @see #callWithContext(WindTraceContext, Callable)
+     */
+    @NonNull
+    static <T> Callable<T> wrap(@NonNull WindTraceContext parent, @NonNull Callable<T> callable) {
+        return () -> WindTracer.TRACER.callWithContext(parent, callable);
+    }
+
 
 }
 

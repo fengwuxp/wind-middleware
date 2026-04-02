@@ -6,7 +6,7 @@ import org.jspecify.annotations.NonNull;
 import org.springframework.core.task.TaskDecorator;
 
 /**
- * 仅 trace 任务，不做线程之间的上下文传递
+ * 仅 trace 当前任务，不做线程之间的上下文传递
  *
  * @author wuxp
  * @date 2025-11-18 13:48

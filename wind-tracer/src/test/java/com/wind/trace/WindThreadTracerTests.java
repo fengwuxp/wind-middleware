@@ -4,6 +4,7 @@ import com.wind.common.WindConstants;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+import org.slf4j.MDC;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -40,8 +41,8 @@ class WindThreadTracerTests {
     void testSpandId() {
         WindTracer.TRACER.run(() -> {
             String spanId = WindTracer.TRACER.requireContext().spanId();
-            Assertions.assertEquals(spanId, WindTracer.TRACER.getContextVariable(WindConstants.SPAND_ID_NAME));
-            Assertions.assertNull(WindTracer.TRACER.getContextVariable(WindConstants.PARENT_SPAND_ID_NAME));
+            Assertions.assertEquals(spanId, MDC.get(WindConstants.SPAND_ID_NAME));
+            Assertions.assertNull(MDC.get(WindConstants.PARENT_SPAND_ID_NAME));
         });
     }
 

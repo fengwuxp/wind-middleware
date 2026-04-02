@@ -27,16 +27,12 @@
 //
 //    @Override
 //    public void run(@NonNull Runnable runnable) {
-//        try {
-//            Optional<WindTraceContext> context = currentContext();
-//            if (context.isPresent()) {
-//                // 创建子 trace
-//                runWithContext(context.get(), runnable);
-//            } else {
-//                runWithNewContext(runnable);
-//            }
-//        } catch (Exception e) {
-//            throw buildThrowsException(e);
+//        Optional<WindTraceContext> context = currentContext();
+//        if (context.isPresent()) {
+//            // 创建子 trace
+//            runWithContext(context.get(), runnable);
+//        } else {
+//            runWithNewContext(runnable);
 //        }
 //    }
 //
@@ -51,21 +47,21 @@
 //
 //    @Override
 //    public void runWithNewContext(@NonNull Runnable runnable) {
-//        ScopedValue.where(TRACE_CONTEXT, WindTraceContext.root()).run(warpMdcBridge(runnable));
+//        try {
+//            ScopedValue.where(TRACE_CONTEXT, WindTraceContext.root()).run(warpMdcBridge(runnable));
+//        } catch (Exception e) {
+//            throw buildThrowsException(e);
+//        }
 //    }
 //
 //    @Override
 //    public <T> T call(@NonNull Callable<T> callable) {
-//        try {
-//            Optional<WindTraceContext> context = currentContext();
-//            if (context.isPresent()) {
-//                // 创建子 trace
-//                return callWithContext(context.get(), callable);
-//            } else {
-//                return callWithNewContext(callable);
-//            }
-//        } catch (Exception e) {
-//            throw buildThrowsException(e);
+//        Optional<WindTraceContext> context = currentContext();
+//        if (context.isPresent()) {
+//            // 创建子 trace
+//            return callWithContext(context.get(), callable);
+//        } else {
+//            return callWithNewContext(callable);
 //        }
 //    }
 //

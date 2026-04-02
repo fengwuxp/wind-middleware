@@ -27,16 +27,12 @@ final class WindThreadTracer implements WindTracer {
 
     @Override
     public void run(@NonNull Runnable runnable) {
-        try {
-            Optional<WindTraceContext> context = currentContext();
-            if (context.isPresent()) {
-                // 创建子 trace
-                runWithContext(context.get(), runnable);
-            } else {
-                runWithNewContext(runnable);
-            }
-        } catch (Exception e) {
-            throw buildThrowsException(e);
+        Optional<WindTraceContext> context = currentContext();
+        if (context.isPresent()) {
+            // 创建子 trace
+            runWithContext(context.get(), runnable);
+        } else {
+            runWithNewContext(runnable);
         }
     }
 
@@ -46,6 +42,8 @@ final class WindThreadTracer implements WindTracer {
         try {
             bindContext(WindTraceContext.child(context));
             runnable.run();
+        } catch (Exception e) {
+            throw buildThrowsException(e);
         } finally {
             restore(previous);
         }
@@ -57,6 +55,8 @@ final class WindThreadTracer implements WindTracer {
         try {
             bindContext(WindTraceContext.root());
             runnable.run();
+        } catch (Exception e) {
+            throw buildThrowsException(e);
         } finally {
             restore(previous);
         }
@@ -64,16 +64,12 @@ final class WindThreadTracer implements WindTracer {
 
     @Override
     public <T> T call(@NonNull Callable<T> callable) {
-        try {
-            Optional<WindTraceContext> context = currentContext();
-            if (context.isPresent()) {
-                // 创建子 trace
-                return callWithContext(context.get(), callable);
-            } else {
-                return callWithNewContext(callable);
-            }
-        } catch (Exception e) {
-            throw buildThrowsException(e);
+        Optional<WindTraceContext> context = currentContext();
+        if (context.isPresent()) {
+            // 创建子 trace
+            return callWithContext(context.get(), callable);
+        } else {
+            return callWithNewContext(callable);
         }
     }
 
@@ -115,6 +111,7 @@ final class WindThreadTracer implements WindTracer {
 
     private void restore(WindTraceContext previous) {
         if (previous == null) {
+            TRACE_CONTEXT.remove();
             return;
         }
         bindContext(previous);
@@ -160,6 +157,6 @@ final class WindThreadTracer implements WindTracer {
         if (e instanceof BaseException exception) {
             return exception;
         }
-        return new BaseException(DefaultExceptionCode.COMMON_ERROR, "trace call func exception", e);
+        return new BaseException(DefaultExceptionCode.COMMON_ERROR, "wrap trace run func exception", e);
     }
 }

@@ -16,6 +16,7 @@ import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.time.OffsetTime;
 import java.time.ZoneOffset;
 import java.time.temporal.ChronoField;
 import java.time.temporal.TemporalAccessor;
@@ -209,21 +210,44 @@ public final class WindObjectDigestUtils {
     }
 
     private static long getTemporalAccessorTimestamp(TemporalAccessor accessor) {
+        // 1. 如果能直接获取到 Instant（包括 ZonedDateTime、OffsetDateTime、Instant）
+        if (accessor.isSupported(ChronoField.INSTANT_SECONDS)) {
+            Instant instant = Instant.from(accessor);
+            return instant.toEpochMilli();
+        }
+        // 2. 处理 LocalDateTime、LocalDate（没有时区信息，按 UTC 处理）
         switch (accessor) {
             case LocalDateTime localDateTime -> {
-                Instant instant = localDateTime.toInstant(ZoneOffset.UTC);
-                return instant.toEpochMilli();
+                return localDateTime.toInstant(ZoneOffset.UTC).toEpochMilli();
             }
             case LocalDate localDate -> {
-                Instant instant = localDate.atStartOfDay().toInstant(ZoneOffset.UTC);
-                return instant.toEpochMilli();
+                return localDate.atStartOfDay(ZoneOffset.UTC).toInstant().toEpochMilli();
             }
+            // 3. 处理纯时间类型：LocalTime、OffsetTime
             case LocalTime localTime -> {
-                // 计算从当天零点（午夜）开始到该时间点的 纳秒数
-                return localTime.toNanoOfDay();
+                // 返回当天从 UTC 午夜开始的毫秒数（不构成绝对时间戳，仅作为时间差值）
+                return localTime.toNanoOfDay() / 1_000_000L;
+                // 返回当天从 UTC 午夜开始的毫秒数（不构成绝对时间戳，仅作为时间差值）
+            }
+            case OffsetTime offsetTime -> {
+                // OffsetTime 没有日期，无法获得绝对时间戳。这里返回从当天 UTC 午夜开始的毫秒数，
+                // 并应用偏移量调整（偏移量会影响实际的时间线上的时刻，但因为没有日期，只能相对处理）
+                long millisOfDay = offsetTime.get(ChronoField.MILLI_OF_DAY);
+                int offsetSeconds = offsetTime.getOffset().getTotalSeconds();
+                // 将偏移量转换为毫秒并调整（注意：偏移量可能为负）
+                return millisOfDay - offsetSeconds * 1000L;
+                // 将偏移量转换为毫秒并调整（注意：偏移量可能为负）
             }
             default -> {
-                return accessor.getLong(ChronoField.MILLI_OF_DAY);
+                // 4. 回退：尝试获取毫秒精度的时间戳（仅限那些支持 EPOCH_DAY + MILLI_OF_DAY 的组合，如 JapaneseDate 等）
+                if (accessor.isSupported(ChronoField.EPOCH_DAY) && accessor.isSupported(ChronoField.MILLI_OF_DAY)) {
+                    long epochDay = accessor.getLong(ChronoField.EPOCH_DAY);
+                    long millisOfDay = accessor.getLong(ChronoField.MILLI_OF_DAY);
+                    return epochDay * 24 * 3600 * 1000L + millisOfDay;
+                }
+
+                // 5. 完全无法处理的情况
+                throw new IllegalArgumentException("Unsupported TemporalAccessor type: " + accessor.getClass());
             }
         }
     }

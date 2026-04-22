@@ -15,7 +15,10 @@ import org.junit.jupiter.api.Test;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.time.OffsetDateTime;
+import java.time.OffsetTime;
+import java.time.ZonedDateTime;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
@@ -65,11 +68,13 @@ class WindObjectDigestUtilsTests {
                 "myTags={name=a&value=a1},{name=b&value=b1}\n" +
                 "name=\n" +
                 "names=a,b,c\n" +
-                "offset=1776843000000\n"+
+                "offset=1776843000000\n" +
+                "offsetTime=27000000\n" +
                 "sex=M\n" +
                 "tags={a1=test&c1=1&zh={name=001&value=exampleTag}}\n" +
                 "timeOfBirth=1581379975000\n" +
-                "yes=false", text);
+                "yes=false\n" +
+                "zonedDateTime=1776843000000", text);
     }
 
     @Test
@@ -110,7 +115,7 @@ class WindObjectDigestUtilsTests {
         Assertions.assertEquals(expected, WindObjectDigestUtils.sha256WithNames(target, names));
         target.setFees(new int[]{1});
         Assertions.assertEquals(expected, WindObjectDigestUtils.sha256WithNames(target, names));
-        target.setId(RandomUtils.nextLong());
+        target.setId(RandomUtils.secure().randomLong());
         Assertions.assertNotEquals(expected, WindObjectDigestUtils.sha256WithNames(target, names));
     }
 
@@ -125,6 +130,8 @@ class WindObjectDigestUtilsTests {
         result.setBirthday(LocalDate.parse("2020-02-11", WindDateFormater.YYYY_MM_DD.getFormatter()));
         result.setMyDate(DateUtils.parseDate("2020-02-11", WindDateFormatPatterns.YYYY_MM_DD));
         result.setOffset(OffsetDateTime.parse("2026-04-22T15:30:00+08:00"));
+        result.setOffsetTime(OffsetTime.parse("15:30:00+08:00"));
+        result.setZonedDateTime(ZonedDateTime.parse("2026-04-22T15:30:00+08:00[Asia/Shanghai]"));
         result.setMyTags(Arrays.asList(new WindObjectDigestTag("a", "a1"), new WindObjectDigestTag("b", "b1")));
         result.setNames(new String[]{"a", "b", "c"});
         result.setFees(new int[]{0, 23, 99});
@@ -198,6 +205,10 @@ class WindObjectDigestUtilsTests {
         private LocalDate birthday;
 
         private OffsetDateTime offset;
+
+        private OffsetTime offsetTime;
+
+        private ZonedDateTime zonedDateTime;
 
         private Date myDate;
 

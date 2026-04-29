@@ -148,4 +148,17 @@ public final class WindBigDecimalUtils {
         return BigDecimal.valueOf(fen).scaleByPowerOfTen(-2);
     }
 
+    /**
+     * 两数相除
+     */
+    public static BigDecimal divide(long dividend, long divisor, int scale) {
+        return divide(BigDecimal.valueOf(dividend), BigDecimal.valueOf(divisor), scale);
+    }
+
+    /**
+     * 两数相除
+     */
+    public static BigDecimal divide(BigDecimal dividend, BigDecimal divisor, int scale) {
+        return dividend.divide(divisor, scale, RoundingMode.HALF_UP);
+    }
 }

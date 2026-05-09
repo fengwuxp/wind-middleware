@@ -11,6 +11,7 @@ import com.wind.server.web.exception.RestfulErrorAttributes;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.aop.aspectj.AspectJExpressionPointcut;
 import org.springframework.aop.support.DefaultBeanFactoryPointcutAdvisor;
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -84,15 +85,9 @@ public class WindServerAutoConfiguration {
 
     @Bean
     @ConditionalOnProperty(prefix = CONTROLLER_METHOD_ASPECT_NAME, name = ENABLED_NAME, havingValue = TRUE, matchIfMissing = true)
-    public WindControllerMethodInterceptor windControllerMethodInterceptor(ApplicationContext context,
+    public WindControllerMethodInterceptor windControllerMethodInterceptor(ObjectProvider<ScriptAuditLogRecorder> recorderProvider,
                                                                            Collection<MethodParameterInjector> injectors) {
-        ScriptAuditLogRecorder recorder = null;
-        try {
-            recorder = context.getBean(ScriptAuditLogRecorder.class);
-        } catch (NestedRuntimeException exception) {
-            log.info("un enable audit log");
-        }
-        return new WindControllerMethodInterceptor(recorder, MethodParameterInjector.composite(injectors));
+        return new WindControllerMethodInterceptor(recorderProvider.getIfAvailable(), MethodParameterInjector.composite(injectors));
     }
 
     @Bean

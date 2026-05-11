@@ -3,7 +3,6 @@ package com.wind.web.util;
 import com.wind.common.WindConstants;
 import com.wind.common.util.WindReflectUtils;
 import com.wind.core.ProtocolValueFormatter;
-import jakarta.validation.constraints.NotNull;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 import org.springframework.core.annotation.AnnotationUtils;
@@ -117,7 +116,9 @@ public final class HttpQueryUtils {
         if (queryParams == null) {
             return WindConstants.EMPTY;
         }
-
+        if (queryParams instanceof String queryString) {
+            return queryString;
+        }
         CollectionParamMode mode = collectionMode == null ? CollectionParamMode.REPEAT : collectionMode;
         List<String> pairs = new ArrayList<>();
         appendParams(pairs, toParamMap(queryParams), mode);
@@ -180,7 +181,7 @@ public final class HttpQueryUtils {
     }
 
     private static void appendParam(List<String> pairs, String key, Object value, CollectionParamMode collectionMode) {
-        if (!StringUtils.hasText(key)) {
+        if (!StringUtils.hasText(key) || value == null) {
             return;
         }
 

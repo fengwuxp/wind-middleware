@@ -377,4 +377,36 @@ public final class WindReflectUtils {
             throw new BaseException(DefaultExceptionCode.COMMON_ERROR, "Cannot access method  = " + method.getDeclaringClass().getName() + "#" + method.getName(), e);
         }
     }
+
+    /**
+     * 获取方法句柄
+     *
+     * @param method 方法
+     * @return MethodHandle
+     */
+    @NotNull
+    public static Object invokeMethod(Method method, Object param) {
+        try {
+            return exchangeMethodHandle(method).invoke(param);
+        } catch (Throwable e) {
+            throw new BaseException(DefaultExceptionCode.COMMON_ERROR, "Invoke method exception  = " + method.getDeclaringClass().getName() + "#" + method.getName(), e);
+        }
+    }
+
+    public static String normalGetSetMethodNameToFiledName(String methodName) {
+        if (methodName == null) {
+            return null;
+        }
+        boolean isGet = methodName.startsWith("get") && methodName.length() > 3;
+        boolean isSet = methodName.startsWith("set") && methodName.length() > 3;
+        if (isGet || isSet) {
+            return firstCharToLowerCase(methodName.substring(isGet ? 3 : 2));
+        }
+        boolean isBooleanGet = methodName.startsWith("is") && methodName.length() > 2;
+        return isBooleanGet ? firstCharToLowerCase(methodName.substring(2)) : methodName;
+    }
+
+    private static String firstCharToLowerCase(String substring) {
+        return Character.toLowerCase(substring.charAt(0)) + substring.substring(1);
+    }
 }

@@ -113,6 +113,19 @@ public final class HttpQueryUtils {
      */
     @NonNull
     public static String formatQueryString(Object queryParams, CollectionParamMode collectionMode) {
+        return formatQueryString(queryParams, collectionMode, true);
+    }
+
+    /**
+     * 格式化查询参数
+     *
+     * @param queryParams    查询参数
+     * @param collectionMode 集合参数序列化模式
+     * @param encoding       是否编码
+     * @return 格式化后的查询参数
+     */
+    @NonNull
+    public static String formatQueryString(Object queryParams, CollectionParamMode collectionMode, boolean encoding) {
         if (queryParams == null) {
             return WindConstants.EMPTY;
         }
@@ -121,8 +134,8 @@ public final class HttpQueryUtils {
         }
         CollectionParamMode mode = collectionMode == null ? CollectionParamMode.REPEAT : collectionMode;
         List<String> pairs = new ArrayList<>();
-        appendParams(pairs, toParamMap(queryParams), mode);
-        return String.join("&", pairs);
+        appendParams(pairs, toParamMap(queryParams), mode, encoding);
+        return String.join(WindConstants.AND, pairs);
     }
 
     private static Map<String, Object> toParamMap(Object source) {
@@ -174,13 +187,13 @@ public final class HttpQueryUtils {
         return result;
     }
 
-    private static void appendParams(List<String> pairs, Map<String, Object> params, CollectionParamMode collectionMode) {
+    private static void appendParams(List<String> pairs, Map<String, Object> params, CollectionParamMode collectionMode, boolean encoding) {
         for (Map.Entry<String, Object> entry : params.entrySet()) {
-            appendParam(pairs, entry.getKey(), entry.getValue(), collectionMode);
+            appendParam(pairs, entry.getKey(), entry.getValue(), collectionMode, encoding);
         }
     }
 
-    private static void appendParam(List<String> pairs, String key, Object value, CollectionParamMode collectionMode) {
+    private static void appendParam(List<String> pairs, String key, Object value, CollectionParamMode collectionMode, boolean encoding) {
         if (!StringUtils.hasText(key) || value == null) {
             return;
         }
@@ -193,16 +206,16 @@ public final class HttpQueryUtils {
             switch (collectionMode) {
                 case REPEAT:
                     for (String item : values) {
-                        pairs.add(buildPair(key, item));
+                        pairs.add(buildPair(key, item, encoding));
                     }
                     return;
                 case BRACKETS:
                     for (String item : values) {
-                        pairs.add(buildPair(key + "[]", item));
+                        pairs.add(buildPair(key + "[]", item, encoding));
                     }
                     return;
                 case COMMA_SEPARATED:
-                    pairs.add(buildPair(key, String.join(",", values)));
+                    pairs.add(buildPair(key, String.join(",", values), encoding));
                     return;
                 default:
                     throw new IllegalArgumentException("Unsupported collection mode: " + collectionMode);
@@ -211,7 +224,7 @@ public final class HttpQueryUtils {
 
         String formattedValue = formatSingleValue(value);
         if (formattedValue != null) {
-            pairs.add(buildPair(key, formattedValue));
+            pairs.add(buildPair(key, formattedValue, encoding));
         }
     }
 
@@ -254,8 +267,11 @@ public final class HttpQueryUtils {
         return String.valueOf(value);
     }
 
-    private static String buildPair(String key, String value) {
-        return urlEncode(key) + "=" + urlEncode(value);
+    private static String buildPair(String key, String value, boolean encoding) {
+        if (encoding) {
+            return urlEncode(key) + "=" + urlEncode(value);
+        }
+        return key + "=" + value;
     }
 
     private static String resolveParamName(String defaultName, AnnotatedElement annotatedElement) {

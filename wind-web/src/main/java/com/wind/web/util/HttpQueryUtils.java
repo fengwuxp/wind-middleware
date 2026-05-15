@@ -285,7 +285,7 @@ public final class HttpQueryUtils {
             }
             Map<String, @Nullable Object> attributes = AnnotationUtils.getAnnotationAttributes(annotation);
             Object value = attributes.get("value");
-            if (!String.class.isInstance(value)) {
+            if (!(value instanceof String)) {
                 if (value.getClass().isArray()) {
                     return (String) Array.get(value, 0);
                 }

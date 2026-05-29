@@ -1,5 +1,6 @@
 package com.wind.trace;
 
+import com.wind.common.WindConstants;
 import com.wind.common.exception.AssertUtils;
 import com.wind.core.ReadonlyContextVariables;
 import com.wind.core.WritableContextVariables;
@@ -58,6 +59,17 @@ public final class WindTraceContext implements ReadonlyContextVariables {
     public static WindTraceContext root() {
         String traceId = TRACE_GENERATOR.next();
         return new WindTraceContext(traceId, TRACE_GENERATOR.next(), null, Map.of());
+    }
+
+    /**
+     * 创建根 trace
+     *
+     * @param contextVariables 上下文变量
+     * @return trace
+     */
+    public static WindTraceContext root(@NonNull Map<String, Object> contextVariables) {
+        String traceId = (String) contextVariables.get(WindConstants.TRACE_ID_NAME);
+        return withTrace(traceId, contextVariables);
     }
 
     /**
@@ -127,7 +139,7 @@ public final class WindTraceContext implements ReadonlyContextVariables {
      * @return 可写变量
      */
     @NonNull
-    WritableContextVariables writeView() {
+    public WritableContextVariables writeView() {
         return contextVariables;
     }
 

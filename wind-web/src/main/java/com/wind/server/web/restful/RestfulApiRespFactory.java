@@ -1,5 +1,6 @@
 package com.wind.server.web.restful;
 
+import com.wind.common.WindConstants;
 import com.wind.common.exception.AssertUtils;
 import com.wind.common.exception.BaseException;
 import com.wind.common.exception.DefaultExceptionCode;
@@ -151,7 +152,7 @@ public final class RestfulApiRespFactory {
     }
 
     private static <T> ApiResp<T> of(HttpStatus httpStatus, T data, ExceptionCode code, String errorMessage) {
-        return new ImmutableWebApiResponse<>(httpStatus, data, code, errorMessage, WindTracer.TRACER.requireTraceId());
+        return new ImmutableWebApiResponse<>(httpStatus, data, code, errorMessage, WindTracer.TRACER.currentTraceId().orElse(WindConstants.UNKNOWN));
     }
 
     public static void configureFriendlyExceptionMessageConverter(FriendlyExceptionMessageConverter converter) {

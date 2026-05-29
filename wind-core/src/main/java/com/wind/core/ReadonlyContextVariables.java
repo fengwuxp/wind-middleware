@@ -38,7 +38,7 @@ public interface ReadonlyContextVariables {
     default <T> T getContextVariable(@NonNull String name, @Nullable T defaultValue) {
         AssertUtils.hasText(name, "argument context variable name must not empty");
         Map<String, Object> contextVariables = getContextVariables();
-        return contextVariables == null ? null : (T) contextVariables.getOrDefault(name, defaultValue);
+        return (T) contextVariables.getOrDefault(name, defaultValue);
     }
 
     /**

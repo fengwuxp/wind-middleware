@@ -4,19 +4,21 @@ import com.wind.common.annotations.VisibleForTesting;
 import com.wind.common.exception.AssertUtils;
 import com.wind.common.exception.BaseException;
 import com.wind.common.exception.DefaultExceptionCode;
+import com.wind.trace.WindTraceContext;
+import com.wind.trace.WindTracer;
 import com.wind.trace.task.WindTaskDecorators;
 import io.micrometer.core.instrument.Metrics;
 import io.micrometer.core.instrument.binder.jvm.ExecutorServiceMetrics;
 import jakarta.validation.constraints.NotBlank;
 import lombok.extern.slf4j.Slf4j;
 import org.jspecify.annotations.NonNull;
-import org.slf4j.MDC;
 import org.springframework.core.task.TaskDecorator;
 import org.springframework.scheduling.concurrent.CustomizableThreadFactory;
 
 import java.time.Duration;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.Callable;
@@ -440,21 +442,14 @@ public final class ExecutorServiceUtils {
          */
         public static TaskDecorator composite(String prefix, TaskDecorator delegate) {
             TaskDecorator decorator = VirtualThreadMdcTaskDecorator.of(prefix);
-            return runnable -> decorator.decorate(delegate.decorate(runnable));
+            return runnable -> decorator.decorate(() -> delegate.decorate(runnable).run());
         }
 
         @Override
         @NonNull
         public Runnable decorate(@NonNull Runnable runnable) {
             String id = prefix + "-" + VIRTUAL_THREAD_ID.getAndIncrement();
-            return () -> {
-                MDC.put(VIRTUAL_THREAD_MDC_KEY, id);
-                try {
-                    runnable.run();
-                } finally {
-                    MDC.remove(VIRTUAL_THREAD_MDC_KEY);
-                }
-            };
+            return WindTracer.wrap(WindTraceContext.root(Map.of(VIRTUAL_THREAD_MDC_KEY, id)), runnable);
         }
     }
 

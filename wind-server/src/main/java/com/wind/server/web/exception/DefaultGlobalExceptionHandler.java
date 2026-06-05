@@ -27,6 +27,7 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.multipart.MaxUploadSizeExceededException;
 import org.springframework.web.multipart.MultipartException;
 import org.springframework.web.servlet.NoHandlerFoundException;
+import org.springframework.web.servlet.resource.NoResourceFoundException;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.UndeclaredThrowableException;
@@ -125,6 +126,16 @@ public class DefaultGlobalExceptionHandler {
     @ResponseStatus(HttpStatus.NOT_FOUND)
     @ResponseBody
     public ApiResp<Void> handleNotFoundError(Exception exception) {
+        return RestfulApiRespFactory.notFound(exception.getMessage());
+    }
+
+    /**
+     * 资源不存在
+     */
+    @ExceptionHandler(NoResourceFoundException.class)
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    @ResponseBody
+    public ApiResp<Void> handleNoResourceFoundException(NoResourceFoundException exception) {
         return RestfulApiRespFactory.notFound(exception.getMessage());
     }
 

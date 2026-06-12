@@ -3,6 +3,10 @@ package com.wind.common.util;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
+import java.util.Collections;
+import java.util.IdentityHashMap;
+import java.util.Set;
+
 /**
  * 异常工具类
  *
@@ -12,7 +16,7 @@ import org.jspecify.annotations.Nullable;
 public final class WindThrowableUtils {
 
     private WindThrowableUtils() {
-        throw new AssertionError();
+        throw new AssertionError("No instances");
     }
 
     /**
@@ -23,13 +27,7 @@ public final class WindThrowableUtils {
      * @return true: 是指定类型的异常
      */
     public static boolean isCausedBy(@Nullable Throwable throwable, @NonNull Class<? extends Throwable> causeClass) {
-        while (throwable != null) {
-            if (causeClass.isInstance(throwable)) {
-                return true;
-            }
-            throwable = throwable.getCause();
-        }
-        return false;
+        return findCauseOfType(throwable, causeClass) != null;
     }
 
     /**
@@ -41,7 +39,10 @@ public final class WindThrowableUtils {
     @NonNull
     public static Throwable getRootCause(@NonNull Throwable throwable) {
         Throwable current = throwable;
-        while (current.getCause() != null) {
+        Set<Throwable> visited = Collections.newSetFromMap(new IdentityHashMap<>());
+        visited.add(current);
+
+        while (current.getCause() != null && visited.add(current.getCause())) {
             current = current.getCause();
         }
         return current;
@@ -55,13 +56,39 @@ public final class WindThrowableUtils {
      * @return 链中第一个匹配的异常，如果不存在则返回 null
      */
     @Nullable
-    public static Throwable findCauseOfType(@NonNull Throwable throwable, @NonNull Class<? extends Throwable> causeClass) {
-        while (throwable != null) {
+    public static <T extends Throwable> T findCauseOfType(@Nullable Throwable throwable, @NonNull Class<T> causeClass) {
+        Set<Throwable> visited = Collections.newSetFromMap(new IdentityHashMap<>());
+
+        while (throwable != null && visited.add(throwable)) {
             if (causeClass.isInstance(throwable)) {
-                return throwable;
+                return causeClass.cast(throwable);
             }
             throwable = throwable.getCause();
         }
         return null;
+    }
+
+    /**
+     * 判断异常或异常 cause 的 message 是否包含指定字符串
+     *
+     * @param throwable       待判断的异常
+     * @param expectedMessage 预期的消息
+     * @return true: 包含
+     */
+    public static boolean containsExceptionMessage(@Nullable Throwable throwable, @NonNull String expectedMessage) {
+        if (expectedMessage.isBlank()) {
+            return false;
+        }
+
+        Set<Throwable> visited = Collections.newSetFromMap(new IdentityHashMap<>());
+
+        while (throwable != null && visited.add(throwable)) {
+            String throwableMessage = throwable.getMessage();
+            if (throwableMessage != null && throwableMessage.contains(expectedMessage)) {
+                return true;
+            }
+            throwable = throwable.getCause();
+        }
+        return false;
     }
 }

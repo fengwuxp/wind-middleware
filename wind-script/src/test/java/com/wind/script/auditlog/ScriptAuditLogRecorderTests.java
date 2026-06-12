@@ -12,7 +12,7 @@ import java.lang.reflect.Method;
 import java.util.concurrent.atomic.AtomicReference;
 
 @Slf4j
-class ScriptAuditLogRecorderTest {
+class ScriptAuditLogRecorderTests {
 
     private final SimpleScriptAuditLogRecorder logAspectRecorder = new SimpleScriptAuditLogRecorder();
 

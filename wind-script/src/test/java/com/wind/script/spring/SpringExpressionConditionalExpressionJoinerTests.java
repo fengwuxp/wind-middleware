@@ -10,7 +10,7 @@ import org.junit.jupiter.api.Test;
 
 import java.util.Arrays;
 
-class SpringExpressionConditionalExpressionJoinerTest {
+class SpringExpressionConditionalExpressionJoinerTests {
 
     private final SpringExpressionConditionalExpressionJoiner joiner = new SpringExpressionConditionalExpressionJoiner();
 

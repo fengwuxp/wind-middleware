@@ -38,6 +38,7 @@ public final class WindSecurityReflectiveMethodResolver extends ReflectiveMethod
             "java.util.ArrayList",
             "java.util.HashMap",
             "java.util.Arrays",
+            "java.util.ImmutableCollections",
             "java.util.Objects",
             "java.lang.Class",
             "org.springframework.util.CollectionUtils",

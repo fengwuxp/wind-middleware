@@ -64,12 +64,12 @@ public interface CursorPagination<T> extends WindPagination<T> {
      * @param <E>     分页数据类型
      * @return 分页对象
      */
-    static <E> CursorPagination<E> of(List<E> records, AbstractCursorQuery<? extends QueryOrderField> query) {
-        return of(-1, records, query);
+    static <E> CursorPagination<E> withQuery(List<E> records, AbstractCursorQuery<? extends QueryOrderField> query) {
+        return withQuery(-1, records, query);
     }
 
     /**
-     * 创建游标分页对象
+     * 在查询中创建游标分页对象，对于向上翻页时，数据需要翻转
      *
      * @param total   总记录数
      * @param records 分页数据
@@ -77,7 +77,7 @@ public interface CursorPagination<T> extends WindPagination<T> {
      * @param <E>     分页数据类型
      * @return 分页对象
      */
-    static <E> CursorPagination<E> of(long total, List<E> records, AbstractCursorQuery<? extends QueryOrderField> query) {
+    static <E> CursorPagination<E> withQuery(long total, List<E> records, AbstractCursorQuery<? extends QueryOrderField> query) {
         if (records == null || records.isEmpty()) {
             return empty();
         }
@@ -90,7 +90,27 @@ public interface CursorPagination<T> extends WindPagination<T> {
         return of(total, records, query.getQuerySize(), query.getQueryType(), cursors[0], cursors[1]);
     }
 
+    static <E> CursorPagination<E> of(long total, List<E> records, AbstractCursorQuery<? extends QueryOrderField> query) {
+        String[] cursors = CursorQueryUtils.generateCursors(query, records);
+        return of(total, records, query.getQuerySize(), query.getQueryType(), cursors[0], cursors[1]);
+    }
+
     static <E> CursorPagination<E> of(long total, List<E> records, int querySize, QueryType queryType, String prevCursor, String nextCursor) {
         return new ImmutableCursorPagination<>(total, records, querySize, queryType, prevCursor, nextCursor);
+    }
+
+    /**
+     * 替换分页数据
+     *
+     * @param pagination 原分页数据
+     * @param records    分页数据
+     * @param <E>        分页数据类型
+     * @return 分页对象
+     */
+    static <E> CursorPagination<E> withRecords(WindPagination<?> pagination, List<E> records) {
+        if (pagination instanceof CursorPagination<?> cursorPagination) {
+            return of(pagination.getTotal(), records, pagination.getQuerySize(), pagination.getQueryType(), cursorPagination.getPrevCursor(), cursorPagination.getNextCursor());
+        }
+        throw new IllegalArgumentException("pagination must be CursorPagination");
     }
 }

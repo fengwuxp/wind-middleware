@@ -62,7 +62,7 @@
         <jacoco-maven-plugin.version>0.8.13</jacoco-maven-plugin.version>
         <git-commit-id-plugin.version>4.9.10</git-commit-id-plugin.version>
 
-        <spring-cloud-commons.version>5.0.1</spring-cloud-commons.version>
+        <spring-cloud-commons.version>5.0.2</spring-cloud-commons.version>
         <spring-cloud-albaba.version>2025.1.0.0</spring-cloud-albaba.version>
         <rocketmq-spring-boot-starter.version>2.3.5</rocketmq-spring-boot-starter.version>
         <sentinel.version>1.8.8</sentinel.version>
@@ -91,8 +91,8 @@
         <zookeeper.version>3.9.3</zookeeper.version>
         <nacos.version>3.1.0</nacos.version>
 
-        <swagger-openapiv3.version>2.2.36</swagger-openapiv3.version>
-        <springdoc-openapi.version>2.8.12</springdoc-openapi.version>
+        <swagger-openapiv3.version>2.2.49</swagger-openapiv3.version>
+        <springdoc-openapi.version>3.0.3</springdoc-openapi.version>
         <googleauth.version>1.5.0</googleauth.version>
         <bucket4j.version>8.10.1</bucket4j.version>
         <uap-java.version>1.6.1</uap-java.version>

@@ -50,7 +50,7 @@ public final class ImmutableCursorPagination<T> implements CursorPagination<T> {
                                      @JsonProperty("prevCursor") String prevCursor,
                                      @JsonProperty("nextCursor") String nextCursor) {
         this.total = total;
-        this.records = records;
+        this.records = records == null ? Collections.emptyList() : records;
         this.querySize = querySize;
         this.queryType = queryType;
         this.prevCursor = prevCursor;

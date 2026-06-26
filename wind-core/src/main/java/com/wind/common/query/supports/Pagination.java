@@ -58,4 +58,18 @@ public interface Pagination<T> extends WindPagination<T> {
         return new ImmutablePagination<>(total, records == null ? Collections.emptyList() : records, queryPage, querySize, queryType);
     }
 
+    /**
+     * 替换分页数据
+     *
+     * @param pagination 原分页数据
+     * @param records    分页数据
+     * @param <E>        分页数据类型
+     * @return 分页对象
+     */
+    static <E> Pagination<E> withRecords(WindPagination<?> pagination, List<E> records) {
+        if (pagination instanceof Pagination<?> page) {
+            return of(records, page.getQueryPage(), pagination.getQuerySize(), pagination.getQueryType(), pagination.getTotal());
+        }
+        throw new IllegalArgumentException("pagination must be instance of Pagination");
+    }
 }

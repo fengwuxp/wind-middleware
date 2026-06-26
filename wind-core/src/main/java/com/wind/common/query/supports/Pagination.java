@@ -66,10 +66,7 @@ public interface Pagination<T> extends WindPagination<T> {
      * @param <E>        分页数据类型
      * @return 分页对象
      */
-    static <E> Pagination<E> withRecords(WindPagination<?> pagination, List<E> records) {
-        if (pagination instanceof Pagination<?> page) {
-            return of(records, page.getQueryPage(), pagination.getQuerySize(), pagination.getQueryType(), pagination.getTotal());
-        }
-        throw new IllegalArgumentException("pagination must be instance of Pagination");
+    static <E> Pagination<E> withRecords(Pagination<?> pagination, List<E> records) {
+        return of(records, pagination.getQueryPage(), pagination.getQuerySize(), pagination.getQueryType(), pagination.getTotal());
     }
 }

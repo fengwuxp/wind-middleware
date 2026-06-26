@@ -107,10 +107,7 @@ public interface CursorPagination<T> extends WindPagination<T> {
      * @param <E>        分页数据类型
      * @return 分页对象
      */
-    static <E> CursorPagination<E> withRecords(WindPagination<?> pagination, List<E> records) {
-        if (pagination instanceof CursorPagination<?> cursorPagination) {
-            return of(pagination.getTotal(), records, pagination.getQuerySize(), pagination.getQueryType(), cursorPagination.getPrevCursor(), cursorPagination.getNextCursor());
-        }
-        throw new IllegalArgumentException("pagination must be CursorPagination");
+    static <E> CursorPagination<E> withRecords(CursorPagination<?> pagination, List<E> records) {
+        return of(pagination.getTotal(), records, pagination.getQuerySize(), pagination.getQueryType(), pagination.getPrevCursor(), pagination.getNextCursor());
     }
 }

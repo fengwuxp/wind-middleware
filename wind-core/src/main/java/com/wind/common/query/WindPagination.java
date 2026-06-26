@@ -75,7 +75,24 @@ public interface WindPagination<T> extends Serializable {
         } else if (options instanceof CursorBasedQuery<?>) {
             return CursorPagination.empty();
         } else {
-            throw new IllegalArgumentException("不支持的分页类型, class = " + options.getClass().getName());
+            throw new IllegalArgumentException("不支持的分页查询类型, class = " + options.getClass().getName());
         }
+    }
+
+    /**
+     * 替换分页数据
+     *
+     * @param pagination 原分页数据
+     * @param records    分页数据
+     * @param <E>        分页数据类型
+     * @return 分页对象
+     */
+    static <E> WindPagination<E> withRecords(WindPagination<?> pagination, List<E> records) {
+        if (pagination instanceof Pagination<?> page) {
+            return Pagination.withRecords(page, records);
+        } else if (pagination instanceof CursorPagination<?> cursor) {
+            return CursorPagination.withRecords(cursor, records);
+        }
+        throw new IllegalArgumentException("不支持的分页类型, class = " + pagination.getClass().getName());
     }
 }

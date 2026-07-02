@@ -91,6 +91,9 @@ public interface CursorPagination<T> extends WindPagination<T> {
     }
 
     static <E> CursorPagination<E> of(long total, List<E> records, AbstractCursorQuery<? extends QueryOrderField> query) {
+        if (records == null || records.isEmpty()) {
+            return empty();
+        }
         String[] cursors = CursorQueryUtils.generateCursors(query, records);
         return of(total, records, query.getQuerySize(), query.getQueryType(), cursors[0], cursors[1]);
     }

@@ -1,142 +1,142 @@
-//package com.wind.trace;
-//
-//import com.wind.common.exception.BaseException;
-//import com.wind.common.exception.DefaultExceptionCode;
-//import com.wind.core.WritableContextVariables;
-//import org.jspecify.annotations.NonNull;
-//import org.jspecify.annotations.Nullable;
-//
-//import java.util.Map;
-//import java.util.Optional;
-//import java.util.concurrent.Callable;
-//
-///**
-// * 基于 {@link java.lang.ScopedValue} 的 Tracer
-// *
-// * @author wuxp
-// * @date 2026-03-13 10:04
-// **/
-//final class DefaultScopeValueTracer implements WindTracer {
-//
-//    /**
-//     * 线程 trace context
-//     *
-//     * @since 25
-//     */
-//    private static final ScopedValue<WindTraceContext> TRACE_CONTEXT = ScopedValue.newInstance();
-//
-//    @Override
-//    public void run(@NonNull Runnable runnable) {
-//        Optional<WindTraceContext> context = currentContext();
-//        if (context.isPresent()) {
-//            // 创建子 trace
-//            runWithContext(context.get(), runnable);
-//        } else {
-//            runWithNewContext(runnable);
-//        }
-//    }
-//
-//    @Override
-//    public void runWithContext(@NonNull WindTraceContext context, @NonNull Runnable runnable) {
-//        try {
-//            ScopedValue.where(TRACE_CONTEXT, WindTraceContext.child(context)).run(warpMdcBridge(runnable));
-//        } catch (Exception e) {
-//            throw buildThrowsException(e);
-//        }
-//    }
-//
-//    @Override
-//    public void runWithNewContext(@NonNull Runnable runnable) {
-//        try {
-//            ScopedValue.where(TRACE_CONTEXT, WindTraceContext.root()).run(warpMdcBridge(runnable));
-//        } catch (Exception e) {
-//            throw buildThrowsException(e);
-//        }
-//    }
-//
-//    @Override
-//    public <T> T call(@NonNull Callable<T> callable) {
-//        Optional<WindTraceContext> context = currentContext();
-//        if (context.isPresent()) {
-//            // 创建子 trace
-//            return callWithContext(context.get(), callable);
-//        } else {
-//            return callWithNewContext(callable);
-//        }
-//    }
-//
-//    @Override
-//    public @Nullable <T> T callWithContext(@NonNull WindTraceContext context, @NonNull Callable<T> callable) {
-//        try {
-//            return ScopedValue.where(TRACE_CONTEXT, WindTraceContext.child(context)).call(warpMdcBridge(callable));
-//        } catch (Exception e) {
-//            throw buildThrowsException(e);
-//        }
-//    }
-//
-//    @Override
-//    public <T> T callWithNewContext(@NonNull Callable<T> callable) {
-//        try {
-//            return ScopedValue.where(TRACE_CONTEXT, WindTraceContext.root()).call(warpMdcBridge(callable));
-//        } catch (Exception e) {
-//            throw buildThrowsException(e);
-//        }
-//    }
-//
-//    @Override
-//    public Optional<String> currentTraceId() {
-//        return currentContext().map(WindTraceContext::traceId);
-//    }
-//
-//    @Override
-//    public Optional<WindTraceContext> currentContext() {
-//        if (TRACE_CONTEXT.isBound()) {
-//            return Optional.of(TRACE_CONTEXT.get());
-//        }
-//        return Optional.empty();
-//    }
-//
-//    @Override
-//    public @NonNull WritableContextVariables putVariable(@NonNull String name, @Nullable Object val) {
-//        return requireContext().writeView().putVariable(name, val);
-//    }
-//
-//    @Override
-//    public @NonNull WritableContextVariables removeVariable(@NonNull String name) {
-//        return requireContext().writeView().removeVariable(name);
-//    }
-//
-//    private static @NonNull RuntimeException buildThrowsException(Exception e) {
-//        if (e instanceof RuntimeException exception) {
-//            return exception;
-//        }
-//        return new BaseException(DefaultExceptionCode.COMMON_ERROR, "wrap trace run func exception", e);
-//    }
-//
-//    @Override
-//    public @NonNull Map<String, Object> getContextVariables() {
-//        return requireContext().getContextVariables();
-//    }
-//
-//    private Runnable warpMdcBridge(Runnable runnable) {
-//        return () -> {
-//            try {
-//                TraceMdcBridge.rebind(requireContext());
-//                runnable.run();
-//            } finally {
-//                TraceMdcBridge.clear();
-//            }
-//        };
-//    }
-//
-//    private <T> Callable<T> warpMdcBridge(Callable<T> callable) {
-//        return () -> {
-//            try {
-//                TraceMdcBridge.rebind(requireContext());
-//                return callable.call();
-//            } finally {
-//                TraceMdcBridge.clear();
-//            }
-//        };
-//    }
-//}
+package com.wind.trace;
+
+import com.wind.common.exception.BaseException;
+import com.wind.common.exception.DefaultExceptionCode;
+import com.wind.core.WritableContextVariables;
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
+
+import java.util.Map;
+import java.util.Optional;
+import java.util.concurrent.Callable;
+
+/**
+ * 基于 {@link java.lang.ScopedValue} 的 Tracer
+ *
+ * @author wuxp
+ * @date 2026-03-13 10:04
+ **/
+final class DefaultScopeValueTracer implements WindTracer {
+
+    /**
+     * 线程 trace context
+     *
+     * @since 25
+     */
+    private static final ScopedValue<WindTraceContext> TRACE_CONTEXT = ScopedValue.newInstance();
+
+    @Override
+    public void run(@NonNull Runnable runnable) {
+        Optional<WindTraceContext> context = currentContext();
+        if (context.isPresent()) {
+            // 创建子 trace
+            runWithContext(context.get(), runnable);
+        } else {
+            runWithNewContext(runnable);
+        }
+    }
+
+    @Override
+    public void runWithContext(@NonNull WindTraceContext context, @NonNull Runnable runnable) {
+        try {
+            ScopedValue.where(TRACE_CONTEXT, WindTraceContext.child(context)).run(warpMdcBridge(runnable));
+        } catch (Exception e) {
+            throw buildThrowsException(e);
+        }
+    }
+
+    @Override
+    public void runWithNewContext(@NonNull Runnable runnable) {
+        try {
+            ScopedValue.where(TRACE_CONTEXT, WindTraceContext.root()).run(warpMdcBridge(runnable));
+        } catch (Exception e) {
+            throw buildThrowsException(e);
+        }
+    }
+
+    @Override
+    public <T> T call(@NonNull Callable<T> callable) {
+        Optional<WindTraceContext> context = currentContext();
+        if (context.isPresent()) {
+            // 创建子 trace
+            return callWithContext(context.get(), callable);
+        } else {
+            return callWithNewContext(callable);
+        }
+    }
+
+    @Override
+    public @Nullable <T> T callWithContext(@NonNull WindTraceContext context, @NonNull Callable<T> callable) {
+        try {
+            return ScopedValue.where(TRACE_CONTEXT, WindTraceContext.child(context)).call(warpMdcBridge(callable));
+        } catch (Exception e) {
+            throw buildThrowsException(e);
+        }
+    }
+
+    @Override
+    public <T> T callWithNewContext(@NonNull Callable<T> callable) {
+        try {
+            return ScopedValue.where(TRACE_CONTEXT, WindTraceContext.root()).call(warpMdcBridge(callable));
+        } catch (Exception e) {
+            throw buildThrowsException(e);
+        }
+    }
+
+    @Override
+    public Optional<String> currentTraceId() {
+        return currentContext().map(WindTraceContext::traceId);
+    }
+
+    @Override
+    public Optional<WindTraceContext> currentContext() {
+        if (TRACE_CONTEXT.isBound()) {
+            return Optional.of(TRACE_CONTEXT.get());
+        }
+        return Optional.empty();
+    }
+
+    @Override
+    public @NonNull WritableContextVariables putVariable(@NonNull String name, @Nullable Object val) {
+        return requireContext().writeView().putVariable(name, val);
+    }
+
+    @Override
+    public @NonNull WritableContextVariables removeVariable(@NonNull String name) {
+        return requireContext().writeView().removeVariable(name);
+    }
+
+    private static @NonNull RuntimeException buildThrowsException(Exception e) {
+        if (e instanceof RuntimeException exception) {
+            return exception;
+        }
+        return new BaseException(DefaultExceptionCode.COMMON_ERROR, "wrap trace run func exception", e);
+    }
+
+    @Override
+    public @NonNull Map<String, Object> getContextVariables() {
+        return requireContext().getContextVariables();
+    }
+
+    private Runnable warpMdcBridge(Runnable runnable) {
+        return () -> {
+            try {
+                TraceMdcBridge.rebind(requireContext());
+                runnable.run();
+            } finally {
+                TraceMdcBridge.clear();
+            }
+        };
+    }
+
+    private <T> ScopedValue.CallableOp<T, Exception> warpMdcBridge(Callable<T> callable) {
+        return () -> {
+            try {
+                TraceMdcBridge.rebind(requireContext());
+                return callable.call();
+            } finally {
+                TraceMdcBridge.clear();
+            }
+        };
+    }
+}

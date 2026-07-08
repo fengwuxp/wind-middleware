@@ -45,6 +45,7 @@ public class SpringApplicationContextUtils implements ApplicationContextAware {
         if (!STARTED.get()) {
             // 设置 ApplicationEventPublisher
             SpringEventPublishUtils.setApplicationEventPublisher(applicationContext);
+            SpringProgrammaticTransactions.initialize(applicationContext);
         }
         log.info("set spring application context, contextType = {}, start date = {}", applicationContext.getClass().getName(), new Date(applicationContext.getStartupDate()));
         CONTEXT_HOLDER.set(applicationContext);

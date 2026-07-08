@@ -2,6 +2,7 @@ package com.wind.server.configuration;
 
 import com.wind.common.i18n.SpringI18nMessageUtils;
 import com.wind.common.spring.SpringApplicationContextUtils;
+import com.wind.common.spring.SpringProgrammaticTransactions;
 import com.wind.common.util.WindClassUtils;
 import com.wind.middleware.idempotent.WindIdempotentExecuteUtils;
 import com.wind.middleware.idempotent.WindIdempotentKeyStorage;
@@ -19,6 +20,7 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.MessageSource;
 import org.springframework.core.OrderComparator;
+import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.util.StopWatch;
 import org.springframework.web.servlet.LocaleResolver;
 
@@ -133,6 +135,7 @@ public class WindServerApplicationStartedEventListener implements ApplicationLis
             INITIALIZED.set(true);
             // 标记应用已启动
             SpringApplicationContextUtils.markStarted();
+            SpringProgrammaticTransactions.configureTransactionManager(applicationContext.getBean(PlatformTransactionManager.class));
             try {
                 // 执行系统初始化器
                 execSystemInitializers(applicationContext);

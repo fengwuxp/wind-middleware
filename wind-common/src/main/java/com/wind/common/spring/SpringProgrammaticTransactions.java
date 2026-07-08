@@ -2,7 +2,6 @@ package com.wind.common.spring;
 
 import com.wind.common.exception.AssertUtils;
 import org.jspecify.annotations.NonNull;
-import org.springframework.context.ApplicationContext;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.TransactionDefinition;
 import org.springframework.transaction.support.TransactionTemplate;
@@ -113,8 +112,4 @@ public final class SpringProgrammaticTransactions {
         SpringProgrammaticTransactions.transactionManager.set(transactionManager);
     }
 
-
-    static void initialize(ApplicationContext applicationContext) {
-        configureTransactionManager(applicationContext.getBean(PlatformTransactionManager.class));
-    }
 }

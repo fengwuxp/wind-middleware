@@ -2,10 +2,11 @@ package com.wind.common.spring;
 
 import com.wind.common.exception.AssertUtils;
 import lombok.extern.slf4j.Slf4j;
+import org.jspecify.annotations.NonNull;
 import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
-import org.jspecify.annotations.NonNull;
+import org.springframework.context.support.GenericApplicationContext;
 
 import java.util.Date;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -37,6 +38,19 @@ public class SpringApplicationContextUtils implements ApplicationContextAware {
      */
     public static String resolvePlaceholders(String text) {
         return requireApplicationContext().getEnvironment().resolvePlaceholders(text);
+    }
+
+    /**
+     * 获取 Bean，非常规用法，使用者必须清楚 Spring Context 的生命周期，避免非预期的异常或不稳定的运行结果
+     *
+     * @param clazz bean class
+     * @return bean
+     */
+    @NonNull
+    public static <T> T getBean(Class<T> clazz) {
+        ApplicationContext applicationContext = requireApplicationContext();
+        AssertUtils.isInstanceOf(GenericApplicationContext.class, applicationContext, "argument applicationContext must be GenericApplicationContext");
+        return applicationContext.getBean(clazz);
     }
 
     @Override

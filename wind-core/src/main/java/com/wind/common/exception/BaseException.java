@@ -113,6 +113,18 @@ public class BaseException extends RuntimeException {
         return new BaseException(DefaultExceptionCode.NOT_FOUND, message);
     }
 
+    public static BaseException toManyRequests(String message) {
+        return toManyRequests(message, null);
+    }
+
+    public static BaseException toManyRequests(MessagePlaceholder message) {
+        return new BaseException(DefaultExceptionCode.TO_MANY_REQUESTS, message);
+    }
+
+    public static BaseException toManyRequests(String message, Throwable cause) {
+        return new BaseException(DefaultExceptionCode.TO_MANY_REQUESTS, message, cause);
+    }
+
     public static BaseException common(String message) {
         return new BaseException(message);
     }

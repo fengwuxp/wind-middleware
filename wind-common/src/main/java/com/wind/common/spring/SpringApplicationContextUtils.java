@@ -1,5 +1,6 @@
 package com.wind.common.spring;
 
+import com.google.common.annotations.Beta;
 import com.wind.common.exception.AssertUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.jspecify.annotations.NonNull;
@@ -47,7 +48,8 @@ public class SpringApplicationContextUtils implements ApplicationContextAware {
      * @return bean
      */
     @NonNull
-    public static <T> T getBean(Class<T> clazz) {
+    @Beta
+    static <T> T getBean(Class<T> clazz) {
         ApplicationContext applicationContext = requireApplicationContext();
         AssertUtils.isInstanceOf(GenericApplicationContext.class, applicationContext, "argument applicationContext must be GenericApplicationContext");
         return applicationContext.getBean(clazz);

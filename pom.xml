@@ -42,7 +42,7 @@
     </modules>
 
     <properties>
-        <revision>4.0.0-jdk25-SNAPSHOT</revision>
+        <revision>4.1.0-SNAPSHOT</revision>
 
         <java.version>25</java.version>
         <maven.compiler.source>${java.version}</maven.compiler.source>

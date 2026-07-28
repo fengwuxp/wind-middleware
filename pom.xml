@@ -80,7 +80,7 @@
         <elasticjob.version>3.0.4</elasticjob.version>
         <dynamic-tp.version>1.2.2-x</dynamic-tp.version>
         <guava.version>33.5.0-jre</guava.version>
-        <fastjson2.version>2.0.59</fastjson2.version>
+        <fastjson2.version>2.0.62</fastjson2.version>
         <javet.version>4.0.0</javet.version>
         <google-zxing.version>3.5.3</google-zxing.version>
         <logback-encoder.version>8.1</logback-encoder.version>

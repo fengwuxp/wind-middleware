@@ -66,7 +66,7 @@
         <spring-cloud-commons.version>5.0.2</spring-cloud-commons.version>
         <spring-cloud-albaba.version>2025.1.0.0</spring-cloud-albaba.version>
         <rocketmq-spring-boot-starter.version>2.3.6</rocketmq-spring-boot-starter.version>
-        <sentinel.version>1.8.10</sentinel.version>
+        <sentinel.version>1.8.9</sentinel.version>
         <mybatis-flex.version>1.11.5</mybatis-flex.version>
         <mybatis.version>3.5.19</mybatis.version>
         <commons-io.version>2.20.0</commons-io.version>
@@ -352,32 +352,6 @@
             </dependency>
             <dependency>
                 <groupId>com.alibaba.csp</groupId>
-                <artifactId>sentinel-transport-simple-http</artifactId>
-                <version>${sentinel.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>com.alibaba.csp</groupId>
-                <artifactId>sentinel-transport-common</artifactId>
-                <version>${sentinel.version}</version>
-                <exclusions>
-                    <exclusion>
-                        <groupId>com.alibaba</groupId>
-                        <artifactId>fastjson</artifactId>
-                    </exclusion>
-                </exclusions>
-            </dependency>
-            <dependency>
-                <groupId>com.alibaba.csp</groupId>
-                <artifactId>sentinel-datasource-extension</artifactId>
-                <version>${sentinel.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>com.alibaba.csp</groupId>
-                <artifactId>sentinel-parameter-flow-control</artifactId>
-                <version>${sentinel.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>com.alibaba.csp</groupId>
                 <artifactId>sentinel-prometheus-metric-exporter</artifactId>
                 <version>${sentinel.version}</version>
             </dependency>
@@ -465,6 +439,11 @@
             <dependency>
                 <groupId>com.alibaba.fastjson2</groupId>
                 <artifactId>fastjson2</artifactId>
+                <version>${fastjson2.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.alibaba</groupId>
+                <artifactId>fastjson</artifactId>
                 <version>${fastjson2.version}</version>
             </dependency>
             <!-- Linux and Windows (x86_64) -->

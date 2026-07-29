@@ -61,6 +61,12 @@ public class TraceFilter extends OncePerRequestFilter {
     );
 
     @Override
+    protected boolean shouldNotFilterErrorDispatch() {
+        // 允许在错误分派阶段再次执行
+        return false;
+    }
+
+    @Override
     protected boolean shouldNotFilterAsyncDispatch() {
         // 允许在异步分派阶段再次执行
         return false;

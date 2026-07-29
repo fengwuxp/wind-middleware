@@ -5,6 +5,7 @@ import com.wind.common.exception.DefaultExceptionCode;
 import com.wind.core.WritableContextVariables;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
+import org.springframework.util.StringUtils;
 
 import java.util.Map;
 import java.util.Optional;
@@ -110,7 +111,7 @@ final class DefaultScopeValueTracer implements WindTracer {
         if (e instanceof RuntimeException exception) {
             return exception;
         }
-        return new BaseException(DefaultExceptionCode.COMMON_ERROR, "wrap trace run func exception", e);
+        return new BaseException(DefaultExceptionCode.COMMON_ERROR, StringUtils.hasText(e.getMessage()) ? e.getMessage() : "wrap trace run func exception", e);
     }
 
     @Override

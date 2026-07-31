@@ -10,12 +10,14 @@ import com.wind.trace.WindTracer;
 import com.wind.web.exception.GlobalExceptionLogDecisionMaker;
 import com.wind.web.util.HttpResponseMessageUtils;
 import jakarta.servlet.FilterChain;
+import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.jspecify.annotations.NonNull;
 import org.springframework.web.filter.OncePerRequestFilter;
 
+import java.io.IOException;
 import java.net.URI;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -70,6 +72,11 @@ public class TraceFilter extends OncePerRequestFilter {
     protected boolean shouldNotFilterAsyncDispatch() {
         // 允许在异步分派阶段再次执行
         return false;
+    }
+
+    @Override
+    protected void doFilterNestedErrorDispatch(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
+        doFilterInternal(request, response, filterChain);
     }
 
     @Override

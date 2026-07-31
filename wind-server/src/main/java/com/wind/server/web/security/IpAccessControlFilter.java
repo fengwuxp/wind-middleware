@@ -3,23 +3,24 @@ package com.wind.server.web.security;
 import com.wind.server.web.restful.RestfulApiRespFactory;
 import com.wind.web.util.HttpResponseMessageUtils;
 import com.wind.web.util.HttpServletRequestUtils;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.extern.slf4j.Slf4j;
-import org.jspecify.annotations.NonNull;
-import org.springframework.security.web.util.matcher.IpAddressMatcher;
-import org.springframework.util.CollectionUtils;
-import org.springframework.web.filter.OncePerRequestFilter;
-
+import com.wind.web.util.HttpTraceVariableUtils;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.extern.slf4j.Slf4j;
+import org.jspecify.annotations.NonNull;
+import org.springframework.http.HttpHeaders;
+import org.springframework.security.web.util.matcher.IpAddressMatcher;
+import org.springframework.util.CollectionUtils;
+import org.springframework.web.filter.OncePerRequestFilter;
+
 import java.io.IOException;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.function.Function;
-import java.util.stream.Collectors;
 
 import static com.wind.common.WindHttpConstants.HTTP_REQUEST_IP_ATTRIBUTE_NAME;
 
@@ -44,6 +45,8 @@ public class IpAccessControlFilter extends OncePerRequestFilter {
         if (isAllow(request)) {
             chain.doFilter(request, response);
         } else {
+            log.error("client source ip not allow access, request ip = {}, request host = {}",
+                    HttpTraceVariableUtils.getRequestSourceIp(), HttpServletRequestUtils.getHeader(HttpHeaders.HOST));
             HttpResponseMessageUtils.writeApiResp(response, RestfulApiRespFactory.badRequest("client source ip not allow access"));
         }
     }

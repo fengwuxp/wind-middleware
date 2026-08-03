@@ -80,10 +80,10 @@ public record RateLimiterTaskDecorator(String resourceKey, WindExecutionLimiter 
                 runnable.run();
             } else {
                 if (THROW_EXCEPTION_WITH_LIMIT.get()) {
-                    throw new BaseException(DefaultExceptionCode.TO_MANY_REQUESTS, "resource key  = %s rate limit exceeded".formatted(resourceKey));
+                    throw new BaseException(DefaultExceptionCode.TO_MANY_REQUESTS, "resource key  = %s request to many".formatted(resourceKey));
                 } else {
                     // 仅打印警告
-                    log.warn("task name  = {} rate limit exceeded", resourceKey);
+                    log.warn("task name  = {} request to many", resourceKey);
                 }
             }
         };

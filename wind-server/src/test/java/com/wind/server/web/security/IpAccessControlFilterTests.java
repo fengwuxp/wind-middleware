@@ -9,6 +9,9 @@ import org.junit.jupiter.api.Test;
 import org.springframework.mock.web.MockFilterChain;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockHttpServletResponse;
+import org.springframework.web.context.request.FacesRequestAttributes;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 
 import static com.wind.common.WindHttpConstants.HTTP_REQUEST_IP_ATTRIBUTE_NAME;
 
@@ -36,6 +39,7 @@ class IpAccessControlFilterTests {
     private static MockHttpServletRequest mockHttpRequest() {
         MockHttpServletRequest request = new MockHttpServletRequest();
         request.setAttribute(HTTP_REQUEST_IP_ATTRIBUTE_NAME, "192.168.0.102");
+        RequestContextHolder.setRequestAttributes(new ServletRequestAttributes( request));
         return request;
     }
 

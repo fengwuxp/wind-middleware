@@ -133,7 +133,7 @@ class ConcurrencyLimiterTaskDecoratorTests {
         executor.execute(task);
         // 第三个任务可能因为 token 或并发限制失败
         BaseException exception = Assertions.assertThrows(BaseException.class, task::run);
-        Assertions.assertEquals("resource key  = " + resourceKey + " rate limit exceeded", exception.getMessage());
+        Assertions.assertEquals("resource key  = " + resourceKey + " request to many", exception.getMessage());
     }
 
     @Test

@@ -29,7 +29,7 @@ class RateLimiterTaskDecoratorTests {
             Runnable runnable = decorator.decorate(() -> System.out.println("执行任务"));
             if (i > 0) {
                 BaseException exception = Assertions.assertThrows(BaseException.class, runnable::run);
-                Assertions.assertEquals("resource key  = test.token rate limit exceeded", exception.getMessage());
+                Assertions.assertEquals("resource key  = test.token request to many", exception.getMessage());
             } else {
                 runnable.run();
             }
@@ -43,7 +43,7 @@ class RateLimiterTaskDecoratorTests {
             Runnable runnable = decorator.decorate(() -> System.out.println("执行任务"));
             if (i > 0) {
                 BaseException exception = Assertions.assertThrows(BaseException.class, runnable::run);
-                Assertions.assertEquals("resource key  = test.leaky rate limit exceeded", exception.getMessage());
+                Assertions.assertEquals("resource key  = test.leaky request to many", exception.getMessage());
             } else {
                 // 等待下一个令牌补充完成
                 await().atMost(Duration.ofSeconds(2))

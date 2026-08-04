@@ -17,6 +17,10 @@
             <artifactId>wind-core</artifactId>
         </dependency>
         <dependency>
+            <groupId>com.wind.middleware</groupId>
+            <artifactId>wind-jackson</artifactId>
+        </dependency>
+        <dependency>
             <groupId>com.google.guava</groupId>
             <artifactId>guava</artifactId>
         </dependency>

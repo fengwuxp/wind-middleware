@@ -19,6 +19,7 @@
     <modules>
         <module>wind-server</module>
         <module>wind-core</module>
+        <module>wind-jackson</module>
         <module>wind-common</module>
         <module>wind-config-center</module>
         <module>wind-web</module>
@@ -241,6 +242,11 @@
             <dependency>
                 <groupId>com.wind.middleware</groupId>
                 <artifactId>wind-core</artifactId>
+                <version>${revision}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.wind.middleware</groupId>
+                <artifactId>wind-jackson</artifactId>
                 <version>${revision}</version>
             </dependency>
             <dependency>

@@ -66,6 +66,11 @@
             </dependency>
             <dependency>
                 <groupId>com.wind.middleware</groupId>
+                <artifactId>wind-jackson</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.wind.middleware</groupId>
                 <artifactId>wind-crypto</artifactId>
                 <version>${project.version}</version>
             </dependency>

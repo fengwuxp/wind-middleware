@@ -1,7 +1,7 @@
 package com.wind.mask;
 
-import com.alibaba.fastjson2.JSON;
 import com.google.common.collect.ImmutableMap;
+import com.wind.jackson.WindJson;
 import com.wind.mask.annotation.Sensitive;
 import com.wind.mask.masker.json.JsonStringMasker;
 import com.wind.mask.masker.json.MapObjectMasker;
@@ -193,7 +193,7 @@ class ObjectMaskPrinterTests {
 
     @Test
     void testJsonString() {
-        example.setSensitiveText(JSON.toJSONString(buildSensitiveMaps()));
+        example.setSensitiveText(WindJson.toJsonString(buildSensitiveMaps()));
         String val = printer.mask(example);
         Assertions.assertTrue(val.contains("****"));
     }

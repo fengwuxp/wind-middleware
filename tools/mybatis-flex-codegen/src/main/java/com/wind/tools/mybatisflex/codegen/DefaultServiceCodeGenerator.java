@@ -1,12 +1,11 @@
 package com.wind.tools.mybatisflex.codegen;
 
-import com.alibaba.fastjson2.JSON;
-import com.alibaba.fastjson2.TypeReference;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.wind.common.WindConstants;
 import com.wind.common.exception.BaseException;
 import com.wind.common.exception.DefaultExceptionCode;
+import com.wind.jackson.WindJson;
 import com.wind.tools.mybatisflex.codegen.model.CodegenOutPutType;
 import com.wind.tools.mybatisflex.codegen.model.GenCodeInfo;
 import com.wind.tools.mybatisflex.codegen.parser.JavaEntityParser;
@@ -18,6 +17,7 @@ import freemarker.template.TemplateException;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
+import tools.jackson.core.type.TypeReference;
 
 import java.io.File;
 import java.io.IOException;
@@ -128,7 +128,7 @@ public class DefaultServiceCodeGenerator {
         String fileName = String.format("%s/%s.java", dir, entity.getJavaClassName());
         Path path = Paths.get(normalizePath(fileName));
         Writer writer = new OutputStreamWriter(Files.newOutputStream(path), StandardCharsets.UTF_8);
-        Map<String, Object> params = JSON.parseObject(JSON.toJSONString(entity), new TypeReference<Map<String, Object>>() {
+        Map<String, Object> params = WindJson.convertValue(entity, new TypeReference<Map<String, Object>>() {
         });
         params.put("outPutType", entity.getCodegenOutPutType());
         params.putAll(configuration.getConfigVariables());

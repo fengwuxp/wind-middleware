@@ -1,8 +1,8 @@
 package com.wind.script.spring;
 
-import com.alibaba.fastjson2.JSON;
 import com.google.common.collect.ImmutableMap;
 import com.wind.common.exception.BaseException;
+import com.wind.jackson.WindJson;
 import com.wind.script.expression.ExpressionDescriptor;
 import com.wind.script.expression.Op;
 import com.wind.script.expression.Operand;
@@ -40,7 +40,7 @@ class SpringExpressionGeneratorTests {
     void generate() throws Exception {
         URI filepath = ResourceUtils.getURL("classpath:conditional-nodes.json").toURI();
         String json = IOUtils.toString(Files.newInputStream(Paths.get(filepath)), StandardCharsets.UTF_8);
-        ExpressionDescriptor descriptor = JSON.parseObject(json, ExpressionDescriptor.class);
+        ExpressionDescriptor descriptor = WindJson.parseObject(json, ExpressionDescriptor.class);
         String spel = SpringExpressionGenerator.generate(descriptor);
         Assertions.assertEquals(EXPECTED_EXPRESSION, spel);
         Expression expression = expressionParser.parseExpression(spel);
@@ -111,11 +111,11 @@ class SpringExpressionGeneratorTests {
         args.add("{'a':'b'}");
         Map<String, String> config = ImmutableMap.of(
                 "cmd", "test-cmd",
-                "args", JSON.toJSONString(args),
+                "args", WindJson.toJsonString(args),
                 "result", expression
         );
-        result.setRight(new Operand(JSON.toJSONString(config), OperandType.EXPRESSION));
-        String jsonString = JSON.toJSONString(result);
+        result.setRight(new Operand(WindJson.toJsonString(config), OperandType.EXPRESSION));
+        String jsonString = WindJson.toJsonString(result);
         Assertions.assertNotNull(jsonString);
         return result;
     }

@@ -121,6 +121,18 @@ class JavaScriptExecutorTests {
     }
 
     @Test
+    void testOmitNullObjectPropertiesWhenPassingArguments() {
+        Map<String, Object> argument = new HashMap<>();
+        argument.put("value", "test");
+        argument.put("optional", null);
+
+        boolean hasOptional = JavaScriptExecutor.executeFunctionUseClosure(
+                "function(value){return Object.prototype.hasOwnProperty.call(value,'optional')}", argument);
+
+        Assertions.assertFalse(hasOptional);
+    }
+
+    @Test
     void testEsNextFeatures() {
         Assertions.assertTrue(() -> JavaScriptExecutor.executeFunctionUseClosure("function test(){return [1,2].includes(1);}"));
         Assertions.assertTrue(() -> JavaScriptExecutor.executeFunctionUseClosure("function test(){return `${1+2}` ==='3'; }"));

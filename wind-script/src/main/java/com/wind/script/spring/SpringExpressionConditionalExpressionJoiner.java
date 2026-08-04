@@ -1,16 +1,16 @@
 package com.wind.script.spring;
 
-import com.alibaba.fastjson2.JSON;
-import com.alibaba.fastjson2.TypeReference;
 import com.google.common.collect.ImmutableSet;
 import com.wind.common.WindConstants;
 import com.wind.common.exception.AssertUtils;
+import com.wind.jackson.WindJson;
 import com.wind.script.ConditionalExpressionJoiner;
 import com.wind.script.expression.ExpressionDescriptor;
 import com.wind.script.expression.Op;
 import com.wind.script.expression.Operand;
 import com.wind.script.expression.OperandType;
 import org.springframework.util.StringUtils;
+import tools.jackson.core.type.TypeReference;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -59,7 +59,7 @@ public class SpringExpressionConditionalExpressionJoiner implements ConditionalE
         JOINERS.put(Op.IN_RANG, (left, right, op) -> String.format(SPRING_IN_RANGE_OP_EXPRESSION, left, right));
         JOINERS.put(Op.NOT_IN_RANG, (left, right, op) -> "!" + JOINERS.get(Op.IN_RANG).join(left, right, Op.CONTAINS));
         JOINERS.put(Op.GLOBAL_METHOD, (left, right, op) -> {
-            Map<String, String> configs = JSON.parseObject(right, new TypeReference<Map<String, String>>() {
+            Map<String, String> configs = WindJson.parseObject(right, new TypeReference<Map<String, String>>() {
             });
             String result = configs.get("result");
             if (StringUtils.hasText(result)) {
@@ -80,7 +80,7 @@ public class SpringExpressionConditionalExpressionJoiner implements ConditionalE
             return result;
         }
         try {
-            result.addAll(JSON.parseArray(argsJson, String.class));
+            result.addAll(WindJson.parseArray(argsJson, String.class));
         } catch (Exception e) {
             // 忽略 json 解析异常
             return result;

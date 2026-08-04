@@ -1,8 +1,7 @@
 package com.wind.logging.logback.mask;
 
-import com.alibaba.fastjson2.JSON;
-import com.alibaba.fastjson2.JSONArray;
 import com.wind.common.exception.BaseException;
+import com.wind.jackson.WindJson;
 import com.wind.mask.MaskRuleGroup;
 import com.wind.mask.masker.StringRangMasker;
 import com.wind.trace.WindTracer;
@@ -46,7 +45,7 @@ class MaskingMessageConverterTests {
     @Test
     void testException() {
         try {
-            JSONArray objects = JSON.parseArray("[" + RandomStringUtils.secure().nextAlphabetic(2000) + "]");
+            WindJson.parseArray("[" + RandomStringUtils.secure().nextAlphabetic(2000) + "]", Object.class);
         } catch (Exception exception) {
             LOG.error("test info  = {},parse json error, message  = {}", RandomStringUtils.secure().nextAlphabetic(200), exception.getMessage(), exception);
         }

@@ -1,18 +1,19 @@
 package com.wind.configcenter.core;
 
-import com.alibaba.fastjson2.JSON;
-import com.alibaba.fastjson2.JSONObject;
 import com.wind.common.WindConstants;
 import com.wind.common.jul.WindJulLogFactory;
 import com.wind.common.util.ServiceInfoUtils;
 import com.wind.core.WindCredentialsProvider;
+import com.wind.jackson.WindJson;
 import com.wind.security.crypto.symmetric.AesTextEncryptor;
 import jakarta.validation.constraints.NotNull;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 import org.springframework.security.crypto.encrypt.TextEncryptor;
 import org.springframework.util.StringUtils;
+import tools.jackson.core.type.TypeReference;
 
+import java.util.Map;
 import java.util.ServiceLoader;
 import java.util.logging.Logger;
 
@@ -71,7 +72,8 @@ record ConfigFunctionRootObject(TextEncryptor encryptor, WindCredentialsProvider
         String credentials = windCredentialsProvider.getCredentials(name);
         if (StringUtils.hasText(key)) {
             // 有配置 key 则认为是 json
-            JSONObject values = JSON.parseObject(credentials);
+            Map<String, Object> values = WindJson.parseObject(credentials, new TypeReference<>() {
+            });
             return (String) values.get(key);
         }
         return credentials;

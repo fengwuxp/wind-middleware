@@ -6,7 +6,7 @@ import com.alibaba.csp.sentinel.slots.block.degrade.DegradeRule;
 import com.alibaba.csp.sentinel.slots.block.flow.FlowRule;
 import com.alibaba.csp.sentinel.slots.block.flow.param.ParamFlowRule;
 import com.alibaba.csp.sentinel.slots.system.SystemRule;
-import com.alibaba.fastjson2.JSON;
+import com.wind.jackson.WindJson;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.List;
@@ -29,7 +29,7 @@ public class StorageSentinelRefreshDataSource<T> extends AutoRefreshDataSource<S
     }
 
     public StorageSentinelRefreshDataSource(Supplier<String> configRepository, Class<T> configType, long recommendRefreshMs) {
-        super(source -> JSON.parseArray(source, configType), recommendRefreshMs);
+        super(source -> WindJson.parseArray(source, configType), recommendRefreshMs);
         this.configRepository = configRepository;
         SentinelRuleListenRegister.registerListen(configType, this);
         initConfig();

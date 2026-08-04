@@ -1,10 +1,10 @@
 package com.wind.common.config;
 
-import com.alibaba.fastjson2.JSON;
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
 import com.github.benmanes.caffeine.cache.Scheduler;
 import com.wind.common.exception.AssertUtils;
+import com.wind.jackson.WindJson;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.core.convert.support.DefaultConversionService;
@@ -94,7 +94,7 @@ public class WindSystemConfigRepository implements SystemConfigRepository {
         if (json == null) {
             return null;
         }
-        return JSON.parseObject(json, targetType);
+        return WindJson.parseObject(json, targetType);
     }
 
     @Nullable
@@ -104,7 +104,7 @@ public class WindSystemConfigRepository implements SystemConfigRepository {
         if (json == null) {
             return null;
         }
-        return JSON.parseObject(json, targetType.getType());
+        return WindJson.parseObject(json, targetType.getType());
     }
 
     private SystemConfigStorage delegate(SystemConfigStorage storage) {

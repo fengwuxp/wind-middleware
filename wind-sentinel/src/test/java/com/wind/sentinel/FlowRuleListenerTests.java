@@ -2,7 +2,7 @@ package com.wind.sentinel;
 
 import com.alibaba.csp.sentinel.slots.block.flow.FlowRule;
 import com.alibaba.csp.sentinel.slots.block.flow.FlowRuleManager;
-import com.alibaba.fastjson2.JSON;
+import com.wind.jackson.WindJson;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -37,7 +37,7 @@ class FlowRuleListenerTests {
             first.setCount(100);
             rules.add(first);
         }
-        return JSON.toJSONString(rules);
+        return WindJson.toJsonString(rules);
 
     }, FlowRule.class, 100);
 
@@ -45,8 +45,9 @@ class FlowRuleListenerTests {
     @Test
     void testReadSource() throws Exception {
         String text = dataSource.readSource();
-        Assertions.assertEquals("[{\"clusterMode\":false,\"controlBehavior\":0,\"count\":100.0,\"grade\":1,\"limitApp\":\"default\"," +
-                "\"maxQueueingTimeMs\":500,\"regex\":false,\"resource\":\"/a/b/c\",\"strategy\":0,\"warmUpPeriodSec\":10}]", text);
+        Assertions.assertEquals("[{\"clusterConfig\":null,\"clusterMode\":false,\"controlBehavior\":0,\"count\":100.0,\"grade\":1," +
+                "\"id\":null,\"limitApp\":\"default\",\"maxQueueingTimeMs\":500,\"refResource\":null,\"regex\":false," +
+                "\"resource\":\"/a/b/c\",\"strategy\":0,\"warmUpPeriodSec\":10}]", text);
     }
 
     @Test

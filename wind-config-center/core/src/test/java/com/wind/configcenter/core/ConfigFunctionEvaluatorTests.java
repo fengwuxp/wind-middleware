@@ -1,8 +1,8 @@
 package com.wind.configcenter.core;
 
-import com.alibaba.fastjson2.JSON;
 import com.google.common.collect.ImmutableMap;
 import com.wind.common.WindConstants;
+import com.wind.jackson.WindJson;
 import com.wind.security.crypto.symmetric.AesTextEncryptor;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.junit.jupiter.api.Assertions;
@@ -28,7 +28,7 @@ class ConfigFunctionEvaluatorTests {
         }
         Map<String, String> config = ImmutableMap.of("userName", "a", "password", "abc",
                 "name", "zhans", "accountPassword", "abc2", "rsaPublic", "1");
-        return JSON.toJSONString(config);
+        return WindJson.toJsonString(config);
     }));
 
     @Test

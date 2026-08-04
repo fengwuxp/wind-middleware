@@ -1,7 +1,7 @@
 package com.wind.mask;
 
-import com.alibaba.fastjson2.JSON;
 import com.wind.common.util.WindDeepCopyUtils;
+import com.wind.jackson.WindJson;
 import com.wind.mask.annotation.Sensitive;
 import com.wind.mask.masker.json.JsonStringMasker;
 import com.wind.mask.masker.json.MapObjectMasker;
@@ -31,7 +31,7 @@ class ObjectDataMaskerTests {
     void setup() {
         demo1 = new DefaultObjectSanitizerDemo1();
         demo1.setSensitiveMaps(ObjectMaskPrinterTests.buildSensitiveMaps());
-        demo1.setSensitiveText(JSON.toJSONString(ObjectMaskPrinterTests.buildSensitiveMaps()));
+        demo1.setSensitiveText(WindJson.toJsonString(ObjectMaskPrinterTests.buildSensitiveMaps()));
 
         List<MaskRuleGroup> groups = MaskRuleGroup.builder()
                 .form(DefaultObjectSanitizerDemo2.class)
@@ -94,7 +94,7 @@ class ObjectDataMaskerTests {
     private DefaultObjectSanitizerDemo2 mockDemo2() {
         DefaultObjectSanitizerDemo2 result = new DefaultObjectSanitizerDemo2();
         result.setSensitiveMaps2(ObjectMaskPrinterTests.buildSensitiveMaps());
-        result.setSensitiveText2(JSON.toJSONString(ObjectMaskPrinterTests.buildSensitiveMaps()));
+        result.setSensitiveText2(WindJson.toJsonString(ObjectMaskPrinterTests.buildSensitiveMaps()));
         return result;
     }
 

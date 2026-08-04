@@ -1,8 +1,8 @@
 package com.wind.sentinel;
 
 import com.alibaba.csp.sentinel.datasource.AbstractDataSource;
-import com.alibaba.fastjson2.JSON;
 import com.wind.configcenter.core.ConfigRepository;
+import com.wind.jackson.WindJson;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.ArrayList;
@@ -34,7 +34,7 @@ public class ConfigCenterSentinelDataSource<T> extends AbstractDataSource<String
 
     public ConfigCenterSentinelDataSource(ConfigRepository configRepository, List<ConfigRepository.ConfigDescriptor> descriptors,
                                           Class<T> configType) {
-        super(source -> JSON.parseArray(source, configType));
+        super(source -> WindJson.parseArray(source, configType));
         this.configRepository = configRepository;
         this.configType = configType;
         this.descriptors = descriptors;
@@ -54,9 +54,9 @@ public class ConfigCenterSentinelDataSource<T> extends AbstractDataSource<String
     public String readSource() throws Exception {
         List<T> result = new ArrayList<>();
         descriptors.stream().map(configRepository::getTextConfig)
-                .map(text -> JSON.parseArray(text, this.configType))
+                .map(text -> WindJson.parseArray(text, this.configType))
                 .forEach(result::addAll);
-        return JSON.toJSONString(result);
+        return WindJson.toJsonString(result);
     }
 
     @Override

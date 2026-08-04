@@ -21,6 +21,7 @@ import tools.jackson.databind.json.JsonMapper;
 import tools.jackson.databind.module.SimpleModule;
 import tools.jackson.databind.type.TypeFactory;
 
+import java.lang.reflect.Type;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
@@ -97,6 +98,18 @@ class WindJsonTests {
     }
 
     @Test
+    void testParseObjectUsingReflectType() {
+        Type targetType = new TypeReference<List<JsonSample>>() {
+        }.getType();
+
+        List<JsonSample> values = WindJson.parseObject(
+                "[{\"name\":\"wind\",\"count\":1,\"status\":\"wire-ready\"}]",
+                targetType);
+
+        assertEquals(List.of(new JsonSample("wind", 1, SampleStatus.READY, null)), values);
+    }
+
+    @Test
     void testParseArrayUsingElementClass() {
         List<JsonSample> values = WindJson.parseArray(
                 "[{\"name\":\"wind\",\"count\":1,\"status\":\"wire-ready\"}]",
@@ -112,6 +125,7 @@ class WindJsonTests {
         TypeReference<List<JsonSample>> typeReference = new TypeReference<>() {
         };
         JavaType javaType = TypeFactory.createDefaultInstance().constructType(typeReference);
+        Type reflectType = typeReference.getType();
 
         assertEquals(new JsonSample("wind", 1, SampleStatus.READY, null),
                 WindJson.convertValue(source, JsonSample.class));
@@ -119,6 +133,8 @@ class WindJsonTests {
                 WindJson.convertValue(sources, typeReference));
         assertEquals(List.of(new JsonSample("wind", 1, SampleStatus.READY, null)),
                 WindJson.convertValue(sources, javaType));
+        assertEquals(List.of(new JsonSample("wind", 1, SampleStatus.READY, null)),
+                WindJson.convertValue(sources, reflectType));
     }
 
     @Test
@@ -217,8 +233,10 @@ class WindJsonTests {
         assertThrows(IllegalArgumentException.class, () -> WindJson.parseObject("{}", (Class<Object>) null));
         assertThrows(IllegalArgumentException.class,
                 () -> WindJson.parseObject("{}", (TypeReference<Object>) null));
+        assertThrows(IllegalArgumentException.class, () -> WindJson.parseObject("{}", (Type) null));
         assertThrows(IllegalArgumentException.class, () -> WindJson.parseObject("{}", (JavaType) null));
         assertThrows(IllegalArgumentException.class, () -> WindJson.parseArray("[]", null));
+        assertThrows(IllegalArgumentException.class, () -> WindJson.convertValue(null, (Type) null));
     }
 
     @Test

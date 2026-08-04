@@ -1,14 +1,10 @@
 package com.wind.common.config;
 
-import com.alibaba.fastjson2.JSON;
 import com.wind.common.WindConstants;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
 
 import java.util.Map;
-
-import static org.mockito.ArgumentMatchers.eq;
 
 /**
  * @author wuxp
@@ -16,7 +12,7 @@ import static org.mockito.ArgumentMatchers.eq;
  **/
 class WindSystemConfigRepositoryTests {
 
-    private final WindSystemConfigRepository repository = new WindSystemConfigRepository(mockStorage());
+    private final WindSystemConfigRepository repository = new WindSystemConfigRepository(testStorage());
 
     @Test
     void testRequireConfig() {
@@ -33,9 +29,16 @@ class WindSystemConfigRepositoryTests {
         Assertions.assertEquals("1", result.get("a"));
     }
 
-    private static SystemConfigStorage mockStorage() {
-        SystemConfigStorage result = Mockito.mock(SystemConfigStorage.class);
-        Mockito.when(result.getConfig(eq("EXAMPLE_JSON"))).thenReturn(JSON.toJSONString(Map.of("a", "1")));
-        return result;
+    private static SystemConfigStorage testStorage() {
+        return new SystemConfigStorage() {
+            @Override
+            public void saveConfig(String name, String group, String value) {
+            }
+
+            @Override
+            public String getConfig(String name) {
+                return "EXAMPLE_JSON".equals(name) ? "{\"a\":\"1\"}" : null;
+            }
+        };
     }
 }

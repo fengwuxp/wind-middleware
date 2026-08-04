@@ -2,8 +2,8 @@ package com.wind.sentinel;
 
 import com.alibaba.csp.sentinel.slots.block.flow.FlowRule;
 import com.alibaba.csp.sentinel.slots.block.flow.FlowRuleManager;
-import com.alibaba.fastjson2.JSON;
 import com.wind.configcenter.core.ConfigRepository;
+import com.wind.jackson.WindJson;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -75,12 +75,12 @@ class ConfigCenterSentinelDataSourceTests {
                 String configId = descriptor.getConfigId();
                 result = SentinelFlowTestUtils.mockFlowRules(configId, configId, configId);
             }
-            return JSON.toJSONString(result);
+            return WindJson.toJsonString(result);
         }
 
         public void mockPushConfig(ConfigDescriptor descriptor, Object value) {
             mockConfigs.put(descriptor, value);
-            listeners.get(descriptor).change(JSON.toJSONString(value));
+            listeners.get(descriptor).change(WindJson.toJsonString(value));
         }
     }
 }

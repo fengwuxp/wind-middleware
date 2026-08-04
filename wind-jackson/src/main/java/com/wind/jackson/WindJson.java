@@ -11,6 +11,7 @@ import tools.jackson.core.type.TypeReference;
 import tools.jackson.databind.JavaType;
 import tools.jackson.databind.json.JsonMapper;
 
+import java.lang.reflect.Type;
 import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.atomic.AtomicReference;
@@ -93,6 +94,23 @@ public final class WindJson {
     }
 
     /**
+     * 将 JSON 字符串反序列化为 Java 反射类型。
+     *
+     * @param json       JSON 字符串
+     * @param targetType Java 反射类型
+     * @param <T>        调用方期望的目标类型
+     * @return 反序列化结果，JSON 为 {@code null} 字面量时返回 {@code null}
+     * @throws IllegalArgumentException 参数为空或 JSON 为空白字符串
+     * @throws JacksonException         反序列化失败
+     */
+    public static <T> @Nullable T parseObject(@NonNull String json, @NonNull Type targetType) {
+        requireJson(json);
+        requireTargetType(targetType);
+        JsonMapper mapper = MAPPER.get();
+        return mapper.readValue(json, mapper.getTypeFactory().constructType(targetType));
+    }
+
+    /**
      * 将 JSON 字符串反序列化为运行时构造的 Jackson 类型。
      *
      * @param json       JSON 字符串
@@ -157,6 +175,22 @@ public final class WindJson {
         requireTargetType(targetType);
         JsonMapper mapper = MAPPER.get();
         return mapper.convertValue(value, targetType);
+    }
+
+    /**
+     * 将对象转换为 Java 反射类型。
+     *
+     * @param value      待转换对象
+     * @param targetType Java 反射类型
+     * @param <T>        调用方期望的目标类型
+     * @return 转换结果
+     * @throws IllegalArgumentException 目标类型为空或转换失败
+     * @throws JacksonException         转换失败
+     */
+    public static <T> @Nullable T convertValue(@Nullable Object value, @NonNull Type targetType) {
+        requireTargetType(targetType);
+        JsonMapper mapper = MAPPER.get();
+        return mapper.convertValue(value, mapper.getTypeFactory().constructType(targetType));
     }
 
     /**

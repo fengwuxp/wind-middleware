@@ -17,7 +17,7 @@ public interface WindTracer extends ScopeValueTracer, WritableContextVariables {
     /**
      * 默认的 tracer
      */
-    WindTracer TRACER = new DefaultScopeValueTracer();
+    WindTracer TRACER = new WindThreadTracer();
 
     /**
      * 获取当前 Scope 中的 trace context

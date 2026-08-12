@@ -18,6 +18,7 @@ import java.util.concurrent.Callable;
  * @author wuxp
  * @date 2023-12-29 09:57
  **/
+@Deprecated(forRemoval = true)
 final class WindThreadTracer implements WindTracer {
 
     /**

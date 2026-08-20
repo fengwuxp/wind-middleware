@@ -85,6 +85,11 @@ public final class WindHttpConstants {
     public static final String TRACE_USER_ID_ATTRIBUTE_NAME = "userId";
 
     /**
+     * 链路追踪 租户 ID 属性名称
+     */
+    public static final String TRACE_TENANT_ID_NAME_ATTRIBUTE_NAME = "tenantId";
+
+    /**
      * 链路追踪 租户名称属性名称
      */
     public static final String TRACE_TENANT_NAME_ATTRIBUTE_NAME = "tenant";

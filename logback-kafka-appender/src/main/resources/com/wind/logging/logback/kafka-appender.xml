@@ -24,6 +24,7 @@
                         "spanId": "%X{spanId:-}",
                         "parentSpanId": "%X{parentSpanId:-}",
                         "tenant": "%X{tenant:-}",
+                        "tenantId": "%X{tenantId:-}",
                         "userId": "%X{userId:-}",
                         "appName": "${APP_NAME}",
                         "env": "${SPRING_PROFILES_ACTIVE:-unkown}",

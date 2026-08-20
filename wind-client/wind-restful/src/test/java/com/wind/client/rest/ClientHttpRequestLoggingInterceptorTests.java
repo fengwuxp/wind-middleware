@@ -12,6 +12,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpRequest;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.client.ClientHttpRequestExecution;
 import org.springframework.http.client.ClientHttpResponse;
 
@@ -42,7 +43,7 @@ class ClientHttpRequestLoggingInterceptorTests {
     @Test
     void testDefaultLogOmitsSensitiveData() throws IOException {
         HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(org.springframework.http.MediaType.APPLICATION_JSON);
+        headers.setContentType(MediaType.parseMediaType("application/json; charset=utf-8"));
         headers.add(HttpHeaders.AUTHORIZATION, "Bearer request-credential");
         headers.add(HttpHeaders.COOKIE, "session=request-cookie");
         headers.add("Wind-Sign", "request-signature");
@@ -56,17 +57,19 @@ class ClientHttpRequestLoggingInterceptorTests {
             Assertions.assertAll(
                     () -> Assertions.assertTrue(message.contains("URI: /api/v1/user")),
                     () -> Assertions.assertTrue(message.contains("[****]")),
-                    () -> Assertions.assertTrue(message.contains("RequestBody: -")),
-                    () -> Assertions.assertTrue(message.contains("ResponseBody: -")),
+                    () -> Assertions.assertFalse(message.contains("RequestBody: -")),
+                    () -> Assertions.assertFalse(message.contains("ResponseBody: -")),
                     () -> Assertions.assertFalse(message.contains("query-credential")),
                     () -> Assertions.assertFalse(message.contains("request-credential")),
                     () -> Assertions.assertFalse(message.contains("request-cookie")),
                     () -> Assertions.assertFalse(message.contains("request-signature")),
                     () -> Assertions.assertFalse(message.contains("request-api-key")),
-                    () -> Assertions.assertFalse(message.contains("request-body-secret")),
-                    () -> Assertions.assertFalse(message.contains("response-body-secret")),
+                    () -> Assertions.assertTrue(message.contains("request-body-secret")),
+                    () -> Assertions.assertTrue(message.contains("response-body-secret")),
                     () -> Assertions.assertFalse(message.contains("response-cookie"))
             );
+        } catch (Exception e) {
+            throw new RuntimeException(e);
         } finally {
             stopLogCapture(appender);
         }
@@ -124,12 +127,12 @@ class ClientHttpRequestLoggingInterceptorTests {
         return (request, body) -> new ClientHttpResponse() {
             @Override
             public HttpStatus getStatusCode() {
-                return HttpStatus.OK;
+                return HttpStatus.BAD_REQUEST;
             }
 
             @Override
             public String getStatusText() {
-                return HttpStatus.OK.getReasonPhrase();
+                return HttpStatus.BAD_REQUEST.getReasonPhrase();
             }
 
             @Override

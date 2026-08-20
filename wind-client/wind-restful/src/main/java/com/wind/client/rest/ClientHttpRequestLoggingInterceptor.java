@@ -86,9 +86,11 @@ public class ClientHttpRequestLoggingInterceptor implements ClientHttpRequestInt
     }
 
     private void log(HttpRequest request, byte[] body, ClientHttpResponse response, long elapsed) throws IOException {
-        boolean printBody = Boolean.TRUE.equals(WindTracer.TRACER.getContextVariable(ENABLE_API_REQUEST_LOG_PRINT_VARIABLE_NAME));
-        String requestBody = printBody ? readBody(request.getHeaders().getContentType(), body, body.length) : "-";
-        String responseBody = printBody ? readResponseBody(response) : "-";
+        boolean enablePrintBody = Boolean.TRUE.equals(WindTracer.TRACER.getContextVariable(ENABLE_API_REQUEST_LOG_PRINT_VARIABLE_NAME));
+        boolean is2xxSuccessful = response.getStatusCode().is2xxSuccessful();
+        boolean printBody = enablePrintBody || !is2xxSuccessful;
+        String requestBody = printBody ? readBody(request.getHeaders().getContentType(), body, body.length) : WindConstants.DASHED;
+        String responseBody = printBody ? readResponseBody(response) : WindConstants.DASHED;
         String logFormat = """
                 URI: {}
                 Method: {}
@@ -103,7 +105,7 @@ public class ClientHttpRequestLoggingInterceptor implements ClientHttpRequestInt
                 request.getURI().getRawPath(), request.getMethod(), redactHeaders(request.getHeaders()), requestBody,
                 response.getStatusCode(), responseBody, redactHeaders(response.getHeaders()), elapsed
         };
-        if (printBody) {
+        if (enablePrintBody) {
             // 强制打印
             log.info(logFormat, arguments);
         } else {
@@ -116,6 +118,7 @@ public class ClientHttpRequestLoggingInterceptor implements ClientHttpRequestInt
             }
         }
     }
+
 
     private static String readResponseBody(ClientHttpResponse response) throws IOException {
         MediaType contentType = response.getHeaders().getContentType();

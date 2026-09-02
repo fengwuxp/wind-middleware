@@ -8,7 +8,10 @@ import tools.jackson.core.StreamReadConstraints;
 import tools.jackson.core.StreamReadFeature;
 import tools.jackson.core.json.JsonFactory;
 import tools.jackson.core.type.TypeReference;
+import tools.jackson.databind.DeserializationFeature;
 import tools.jackson.databind.JavaType;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.MapperFeature;
 import tools.jackson.databind.json.JsonMapper;
 
 import java.lang.reflect.Type;
@@ -57,6 +60,18 @@ public final class WindJson {
     public static @NonNull String toJsonString(@Nullable Object value) {
         JsonMapper mapper = MAPPER.get();
         return mapper.writeValueAsString(value);
+    }
+
+    /**
+     * 将对象序列化为 UTF-8 JSON 字节数组。
+     *
+     * @param value 待序列化对象
+     * @return JSON 字节数组，{@code value} 为 {@code null} 时返回 {@code "null"} 的 UTF-8 字节
+     * @throws JacksonException 序列化失败
+     */
+    public static @NonNull byte[] toJsonBytes(@Nullable Object value) {
+        JsonMapper mapper = MAPPER.get();
+        return mapper.writeValueAsBytes(value);
     }
 
     /**
@@ -143,6 +158,71 @@ public final class WindJson {
         JsonMapper mapper = MAPPER.get();
         JavaType targetType = mapper.getTypeFactory().constructCollectionType(List.class, elementType);
         return mapper.readValue(json, targetType);
+    }
+
+    /**
+     * 将 JSON 数组反序列化为带泛型信息的目标类型。
+     *
+     * @param json       JSON 数组字符串
+     * @param targetType Jackson 类型引用
+     * @param <T>        目标类型
+     * @return 反序列化结果，JSON 为 {@code null} 字面量时返回 {@code null}
+     * @throws IllegalArgumentException 参数为空或 JSON 为空白字符串
+     * @throws JacksonException         反序列化失败
+     */
+    public static <T> @Nullable T parseArray(@NonNull String json, @NonNull TypeReference<T> targetType) {
+        requireJson(json);
+        requireTargetType(targetType);
+        JsonMapper mapper = MAPPER.get();
+        return mapper.readValue(json, targetType);
+    }
+
+    /**
+     * 将 JSON 数组反序列化为 Java 反射类型。
+     *
+     * @param json       JSON 数组字符串
+     * @param targetType Java 反射类型
+     * @param <T>        目标类型
+     * @return 反序列化结果，JSON 为 {@code null} 字面量时返回 {@code null}
+     * @throws IllegalArgumentException 参数为空或 JSON 为空白字符串
+     * @throws JacksonException         反序列化失败
+     */
+    public static <T> @Nullable T parseArray(@NonNull String json, @NonNull Type targetType) {
+        requireJson(json);
+        requireTargetType(targetType);
+        JsonMapper mapper = MAPPER.get();
+        return mapper.readValue(json, mapper.getTypeFactory().constructType(targetType));
+    }
+
+    /**
+     * 将 JSON 数组反序列化为运行时构造的 Jackson 类型。
+     *
+     * @param json       JSON 数组字符串
+     * @param targetType Jackson 运行时类型
+     * @param <T>        目标类型
+     * @return 反序列化结果，JSON 为 {@code null} 字面量时返回 {@code null}
+     * @throws IllegalArgumentException 参数为空或 JSON 为空白字符串
+     * @throws JacksonException         反序列化失败
+     */
+    public static <T> @Nullable T parseArray(@NonNull String json, @NonNull JavaType targetType) {
+        requireJson(json);
+        requireTargetType(targetType);
+        JsonMapper mapper = MAPPER.get();
+        return mapper.readValue(json, targetType);
+    }
+
+    /**
+     * 将 JSON 字符串解析为 Jackson 树节点。
+     *
+     * @param json JSON 字符串
+     * @return JSON 树节点，JSON 为 {@code null} 字面量时返回 NullNode
+     * @throws IllegalArgumentException 参数为空或 JSON 为空白字符串
+     * @throws JacksonException         解析失败
+     */
+    public static @NonNull JsonNode parseTree(@NonNull String json) {
+        requireJson(json);
+        JsonMapper mapper = MAPPER.get();
+        return Objects.requireNonNull(mapper.readTree(json), "parsed JSON tree must not null");
     }
 
     /**
@@ -271,6 +351,9 @@ public final class WindJson {
         return JsonMapper.builder(jsonFactory)
                 .findAndAddModules()
                 .addModules(WindJacksonModules.iso8601LikeJavaTimeModule(), WindJacksonModules.apiModule())
+                // 具体目标类型已明确时，允许缺少仅由只读 getter 提供的多态类型标识
+                .disable(MapperFeature.REQUIRE_TYPE_ID_FOR_SUBTYPES)
+                .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
                 .build();
     }
 

@@ -1,5 +1,8 @@
 package com.wind.jackson;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonSubTypes;
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -13,10 +16,12 @@ import tools.jackson.core.type.TypeReference;
 import tools.jackson.databind.DatabindException;
 import tools.jackson.databind.JacksonModule;
 import tools.jackson.databind.JavaType;
+import tools.jackson.databind.JsonNode;
 import tools.jackson.databind.PropertyNamingStrategies;
 import tools.jackson.databind.SerializationFeature;
 import tools.jackson.databind.SerializationContext;
 import tools.jackson.databind.ValueSerializer;
+import tools.jackson.databind.exc.InvalidTypeIdException;
 import tools.jackson.databind.json.JsonMapper;
 import tools.jackson.databind.module.SimpleModule;
 import tools.jackson.databind.type.TypeFactory;
@@ -119,6 +124,45 @@ class WindJsonTests {
     }
 
     @Test
+    void testParseArrayUsingAllTypeForms() {
+        String json = "[{\"name\":\"wind\",\"count\":1,\"status\":\"wire-ready\"}]";
+        TypeReference<List<JsonSample>> typeReference = new TypeReference<>() {
+        };
+        JavaType javaType = TypeFactory.createDefaultInstance().constructType(typeReference);
+        Type reflectType = typeReference.getType();
+        List<JsonSample> expected = List.of(new JsonSample("wind", 1, SampleStatus.READY, null));
+
+        assertEquals(expected, WindJson.parseArray(json, typeReference));
+        assertEquals(expected, WindJson.parseArray(json, reflectType));
+        assertEquals(expected, WindJson.parseArray(json, javaType));
+    }
+
+    @Test
+    void testParseTreePreservesJsonNodeTypes() {
+        JsonNode tree = WindJson.parseTree("{\"items\":[{\"id\":1}],\"none\":null}");
+
+        assertTrue(tree.isObject());
+        assertTrue(tree.path("items").isArray());
+        assertEquals(1, tree.at("/items/0/id").intValue());
+        assertTrue(tree.path("none").isNull());
+        assertTrue(WindJson.parseTree("null").isNull());
+    }
+
+    @Test
+    void testParseTreeRejectsMalformedJson() {
+        assertThrows(StreamReadException.class, () -> WindJson.parseTree("not-json"));
+        assertThrows(DatabindException.class, () -> WindJson.parseTree("{}{}"));
+    }
+
+    @Test
+    void testSerializeToJsonBytesUsesUtf8() {
+        byte[] bytes = WindJson.toJsonBytes(Map.of("message", "测试"));
+
+        assertEquals("{\"message\":\"测试\"}", new String(bytes, java.nio.charset.StandardCharsets.UTF_8));
+        assertEquals("null", new String(WindJson.toJsonBytes(null), java.nio.charset.StandardCharsets.UTF_8));
+    }
+
+    @Test
     void testConvertValueUsingAllTypeForms() {
         Map<String, Object> source = Map.of("name", "wind", "count", 1, "status", "wire-ready");
         List<Map<String, Object>> sources = List.of(source);
@@ -159,6 +203,27 @@ class WindJsonTests {
                 JsonSample.class);
 
         assertEquals(new JsonSample("wind", 1, SampleStatus.READY, null), value);
+    }
+
+    @Test
+    void testComputedTypePropertyAllowsConcreteSubtypeWithoutTypeId() {
+        ComputedWebhookPayload value = WindJson.parseObject(
+                "{\"payload\":\"data\"}", ComputedWebhookPayload.class);
+
+        assertEquals("data", value.getPayload());
+    }
+
+    @Test
+    void testComputedTypePropertyStillRequiresTypeIdForBaseType() {
+        assertThrows(InvalidTypeIdException.class,
+                () -> WindJson.parseObject("{\"payload\":\"data\"}", ComputedWebhook.class));
+    }
+
+    @Test
+    void testComputedTypePropertyRejectsWrongTypeIdForConcreteSubtype() {
+        assertThrows(InvalidTypeIdException.class,
+                () -> WindJson.parseObject(
+                        "{\"webhookType\":\"OTHER\",\"payload\":\"data\"}", ComputedWebhookPayload.class));
     }
 
     @Test
@@ -235,7 +300,8 @@ class WindJsonTests {
                 () -> WindJson.parseObject("{}", (TypeReference<Object>) null));
         assertThrows(IllegalArgumentException.class, () -> WindJson.parseObject("{}", (Type) null));
         assertThrows(IllegalArgumentException.class, () -> WindJson.parseObject("{}", (JavaType) null));
-        assertThrows(IllegalArgumentException.class, () -> WindJson.parseArray("[]", null));
+        assertThrows(IllegalArgumentException.class, () -> WindJson.parseArray("[]", (Class<Object>) null));
+        assertThrows(IllegalArgumentException.class, () -> WindJson.parseTree("  "));
         assertThrows(IllegalArgumentException.class, () -> WindJson.convertValue(null, (Type) null));
     }
 
@@ -417,6 +483,36 @@ class WindJsonTests {
     }
 
     private record NamingSample(String displayName) {
+    }
+
+    @JsonTypeInfo(
+            use = JsonTypeInfo.Id.NAME,
+            include = JsonTypeInfo.As.EXISTING_PROPERTY,
+            property = "webhookType"
+    )
+    @JsonSubTypes(@JsonSubTypes.Type(value = ComputedWebhookPayload.class, name = "PAYLOAD"))
+    private interface ComputedWebhook {
+
+        @JsonProperty(value = "webhookType", access = JsonProperty.Access.READ_ONLY)
+        String getWebhookType();
+    }
+
+    private static final class ComputedWebhookPayload implements ComputedWebhook {
+
+        private String payload;
+
+        @Override
+        public String getWebhookType() {
+            return "PAYLOAD";
+        }
+
+        public String getPayload() {
+            return payload;
+        }
+
+        public void setPayload(String payload) {
+            this.payload = payload;
+        }
     }
 
     private static final class BrokenValue {

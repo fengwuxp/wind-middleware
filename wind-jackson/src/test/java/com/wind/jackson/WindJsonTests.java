@@ -1,5 +1,6 @@
 package com.wind.jackson;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
@@ -27,9 +28,12 @@ import tools.jackson.databind.module.SimpleModule;
 import tools.jackson.databind.type.TypeFactory;
 
 import java.lang.reflect.Type;
+import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.time.OffsetDateTime;
+import java.time.ZoneOffset;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -182,6 +186,26 @@ class WindJsonTests {
     }
 
     @Test
+    void testConvertJsonContainerTextUsingAllTypeForms() {
+        String json = "{\"name\":\"wind\",\"count\":1,\"status\":\"wire-ready\"}";
+        TypeReference<JsonSample> typeReference = new TypeReference<>() {
+        };
+        TypeReference<List<JsonSample>> listTypeReference = new TypeReference<>() {
+        };
+        JavaType javaType = TypeFactory.createDefaultInstance().constructType(typeReference);
+        Type reflectType = typeReference.getType();
+        JsonSample expected = new JsonSample("wind", 1, SampleStatus.READY, null);
+
+        assertEquals(expected, WindJson.convertValue(json, JsonSample.class));
+        assertEquals(expected, WindJson.convertValue(json, typeReference));
+        assertEquals(expected, WindJson.convertValue(json, javaType));
+        assertEquals(expected, WindJson.convertValue(json, reflectType));
+        assertEquals(List.of(expected), WindJson.convertValue("[" + json + "]", listTypeReference));
+        assertEquals("plain text", WindJson.convertValue("plain text", String.class));
+        assertEquals(json, WindJson.convertValue(json, Object.class));
+    }
+
+    @Test
     void testUseWindDateTimeFormats() {
         TimeSample value = new TimeSample(
                 LocalDateTime.of(2026, 8, 3, 9, 8, 7),
@@ -194,6 +218,70 @@ class WindJsonTests {
         assertTrue(json.contains("\"date\":\"2026-08-03\""));
         assertTrue(json.contains("\"time\":\"09:08:07\""));
         assertEquals(value, WindJson.parseObject(json, TimeSample.class));
+    }
+
+    @Test
+    void testParseWindDateTimeWithFractionalSeconds() {
+        TimeSample value = WindJson.parseObject(
+                "{\"dateTime\":\"2026-08-03 09:08:07.123456789\",\"date\":\"2026-08-03\",\"time\":\"09:08:07\"}",
+                TimeSample.class);
+
+        assertEquals(LocalDateTime.of(2026, 8, 3, 9, 8, 7, 123456789), value.dateTime());
+    }
+
+    @Test
+    void testSerializeWindDateTimeWithFractionalSeconds() {
+        LocalDateTime value = LocalDateTime.of(2026, 8, 3, 9, 8, 7, 123456789);
+
+        String json = WindJson.toJsonString(value);
+
+        assertEquals("\"2026-08-03 09:08:07.123456789\"", json);
+        assertEquals(value, WindJson.parseObject(json, LocalDateTime.class));
+    }
+
+    @Test
+    void testParseIsoLocalDateTimeWithFractionalSeconds() {
+        TimeSample value = WindJson.parseObject(
+                "{\"dateTime\":\"2026-08-03T09:08:07.123456789\",\"date\":\"2026-08-03\",\"time\":\"09:08:07\"}",
+                TimeSample.class);
+
+        assertEquals(LocalDateTime.of(2026, 8, 3, 9, 8, 7, 123456789), value.dateTime());
+    }
+
+    @Test
+    void testParseIsoOffsetDateTimeAndInstant() {
+        OffsetTimeSample value = WindJson.parseObject(
+                "{\"offset\":\"2026-08-03T09:08:07.123456789+08:00\",\"instant\":\"2026-08-03T01:08:07.123456789Z\"}",
+                OffsetTimeSample.class);
+
+        assertEquals(
+                OffsetDateTime.of(2026, 8, 3, 9, 8, 7, 123456789, ZoneOffset.ofHours(8)).toInstant(),
+                value.offset().toInstant());
+        assertEquals(Instant.parse("2026-08-03T01:08:07.123456789Z"), value.instant());
+    }
+
+    @Test
+    void testDoNotCoerceOffsetDateTimeIntoLocalDateTime() {
+        assertThrows(DatabindException.class,
+                () -> WindJson.parseObject(
+                        "{\"dateTime\":\"2026-08-03T09:08:07.123456789+08:00\",\"date\":\"2026-08-03\",\"time\":\"09:08:07\"}",
+                        TimeSample.class));
+    }
+
+    @Test
+    void testRejectLocalDateTimeWithoutSeconds() {
+        assertThrows(DatabindException.class,
+                () -> WindJson.parseObject(
+                        "{\"dateTime\":\"2026-08-03T09:08\",\"date\":\"2026-08-03\",\"time\":\"09:08:00\"}",
+                        TimeSample.class));
+    }
+
+    @Test
+    void testParseCompactLocalTimeWithPropertyFormat() {
+        CompactTimeSample value = WindJson.parseObject(
+                "{\"time\":\"33454\"}", CompactTimeSample.class);
+
+        assertEquals(LocalTime.of(3, 34, 54), value.getTime());
     }
 
     @Test
@@ -220,10 +308,26 @@ class WindJsonTests {
     }
 
     @Test
-    void testComputedTypePropertyRejectsWrongTypeIdForConcreteSubtype() {
+    void testComputedTypePropertyAllowsUnknownTypeIdForConcreteSubtype() {
+        ComputedWebhookPayload value = WindJson.parseObject(
+                "{\"webhookType\":\"OTHER\",\"payload\":\"data\"}", ComputedWebhookPayload.class);
+
+        assertEquals("data", value.getPayload());
+    }
+
+    @Test
+    void testComputedTypePropertyRejectsKnownDifferentSubtypeForConcreteSubtype() {
         assertThrows(InvalidTypeIdException.class,
                 () -> WindJson.parseObject(
-                        "{\"webhookType\":\"OTHER\",\"payload\":\"data\"}", ComputedWebhookPayload.class));
+                        "{\"webhookType\":\"OTHER_PAYLOAD\",\"payload\":\"data\"}",
+                        ComputedWebhookPayload.class));
+    }
+
+    @Test
+    void testComputedTypePropertyStillRejectsUnknownTypeIdForBaseType() {
+        assertThrows(InvalidTypeIdException.class,
+                () -> WindJson.parseObject(
+                        "{\"webhookType\":\"OTHER\",\"payload\":\"data\"}", ComputedWebhook.class));
     }
 
     @Test
@@ -473,6 +577,23 @@ class WindJsonTests {
     private record TimeSample(LocalDateTime dateTime, LocalDate date, LocalTime time) {
     }
 
+    private record OffsetTimeSample(OffsetDateTime offset, Instant instant) {
+    }
+
+    private static final class CompactTimeSample {
+
+        @JsonFormat(pattern = "HH:mm")
+        private LocalTime time;
+
+        public LocalTime getTime() {
+            return time;
+        }
+
+        public void setTime(LocalTime time) {
+            this.time = time;
+        }
+    }
+
     private record PrimitiveSample(int count) {
     }
 
@@ -490,7 +611,10 @@ class WindJsonTests {
             include = JsonTypeInfo.As.EXISTING_PROPERTY,
             property = "webhookType"
     )
-    @JsonSubTypes(@JsonSubTypes.Type(value = ComputedWebhookPayload.class, name = "PAYLOAD"))
+    @JsonSubTypes({
+            @JsonSubTypes.Type(value = ComputedWebhookPayload.class, name = "PAYLOAD"),
+            @JsonSubTypes.Type(value = OtherComputedWebhookPayload.class, name = "OTHER_PAYLOAD")
+    })
     private interface ComputedWebhook {
 
         @JsonProperty(value = "webhookType", access = JsonProperty.Access.READ_ONLY)
@@ -504,6 +628,24 @@ class WindJsonTests {
         @Override
         public String getWebhookType() {
             return "PAYLOAD";
+        }
+
+        public String getPayload() {
+            return payload;
+        }
+
+        public void setPayload(String payload) {
+            this.payload = payload;
+        }
+    }
+
+    private static final class OtherComputedWebhookPayload implements ComputedWebhook {
+
+        private String payload;
+
+        @Override
+        public String getWebhookType() {
+            return "OTHER_PAYLOAD";
         }
 
         public String getPayload() {

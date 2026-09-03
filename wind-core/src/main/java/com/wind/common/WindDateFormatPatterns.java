@@ -27,6 +27,11 @@ public final class WindDateFormatPatterns {
 
     public static final String YYYY_MM_DD_HH_MM_SS = "yyyy-MM-dd HH:mm:ss";
 
+    /**
+     * LocalDateTime 入参可使用空格或 {@code T} 作为日期和时间的分隔符。
+     */
+    public static final String LOCAL_DATETIME_SPACE_OR_T = "yyyy-MM-dd[ HH:mm:ss]['T'HH:mm:ss]";
+
     public static final String YYYY_MM_DD_HH_MM = "yyyy-MM-dd HH:mm";
 
     public static final String YYYY_MM_DD_HH = "yyyy-MM-dd HH";

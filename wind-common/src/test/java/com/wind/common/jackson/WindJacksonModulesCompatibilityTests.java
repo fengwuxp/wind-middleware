@@ -6,6 +6,7 @@ import com.wind.common.exception.ExceptionCode;
 import com.wind.common.query.supports.ImmutablePagination;
 import com.wind.common.query.supports.Pagination;
 import com.wind.common.query.supports.QueryType;
+import com.wind.jackson.WindJacksonModules;
 import org.junit.jupiter.api.Test;
 import tools.jackson.core.type.TypeReference;
 import tools.jackson.databind.DeserializationFeature;
@@ -17,7 +18,6 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 
-@SuppressWarnings("removal")
 class WindJacksonModulesCompatibilityTests {
 
     private final JsonMapper mapper = JsonMapper.builder()
@@ -26,7 +26,7 @@ class WindJacksonModulesCompatibilityTests {
             .build();
 
     @Test
-    void testLegacyTimeModuleDelegatesToWindJackson() {
+    void testWindTimeModuleProvidesWindDateTimeFormat() {
         LocalDateTime value = LocalDateTime.of(2026, 8, 3, 12, 34, 56);
 
         String json = mapper.writeValueAsString(value);
@@ -36,7 +36,7 @@ class WindJacksonModulesCompatibilityTests {
     }
 
     @Test
-    void testLegacyApiModulePreservesApiResponseGenericType() {
+    void testWindApiModulePreservesApiResponseGenericType() {
         String json = """
                 {"data":{"name":"wind"},"errorCode":"%s","errorMessage":null,"traceId":"trace-1"}
                 """.formatted(ExceptionCode.SUCCESSFUL.getCode());

@@ -231,14 +231,14 @@ public final class WindJson {
      * @param value      待转换对象
      * @param targetType 目标类型
      * @param <T>        目标类型
-     * @return 转换结果
+     * @return 转换结果；当输入为 JSON 对象或数组文本时，按 JSON 文本解析后转换
      * @throws IllegalArgumentException 目标类型为空或转换失败
      * @throws JacksonException         转换失败
      */
     public static <T> @Nullable T convertValue(@Nullable Object value, @NonNull Class<T> targetType) {
         requireTargetType(targetType);
         JsonMapper mapper = MAPPER.get();
-        return mapper.convertValue(value, targetType);
+        return convertValue(mapper, value, mapper.getTypeFactory().constructType(targetType));
     }
 
     /**
@@ -247,14 +247,14 @@ public final class WindJson {
      * @param value      待转换对象
      * @param targetType Jackson 类型引用
      * @param <T>        目标类型
-     * @return 转换结果
+     * @return 转换结果；当输入为 JSON 对象或数组文本时，按 JSON 文本解析后转换
      * @throws IllegalArgumentException 目标类型为空或转换失败
      * @throws JacksonException         转换失败
      */
     public static <T> @Nullable T convertValue(@Nullable Object value, @NonNull TypeReference<T> targetType) {
         requireTargetType(targetType);
         JsonMapper mapper = MAPPER.get();
-        return mapper.convertValue(value, targetType);
+        return convertValue(mapper, value, mapper.getTypeFactory().constructType(targetType));
     }
 
     /**
@@ -263,14 +263,14 @@ public final class WindJson {
      * @param value      待转换对象
      * @param targetType Java 反射类型
      * @param <T>        调用方期望的目标类型
-     * @return 转换结果
+     * @return 转换结果；当输入为 JSON 对象或数组文本时，按 JSON 文本解析后转换
      * @throws IllegalArgumentException 目标类型为空或转换失败
      * @throws JacksonException         转换失败
      */
     public static <T> @Nullable T convertValue(@Nullable Object value, @NonNull Type targetType) {
         requireTargetType(targetType);
         JsonMapper mapper = MAPPER.get();
-        return mapper.convertValue(value, mapper.getTypeFactory().constructType(targetType));
+        return convertValue(mapper, value, mapper.getTypeFactory().constructType(targetType));
     }
 
     /**
@@ -279,14 +279,14 @@ public final class WindJson {
      * @param value      待转换对象
      * @param targetType Jackson 运行时类型
      * @param <T>        调用方期望的目标类型
-     * @return 转换结果
+     * @return 转换结果；当输入为 JSON 对象或数组文本时，按 JSON 文本解析后转换
      * @throws IllegalArgumentException 目标类型为空或转换失败
      * @throws JacksonException         转换失败
      */
     public static <T> @Nullable T convertValue(@Nullable Object value, @NonNull JavaType targetType) {
         requireTargetType(targetType);
         JsonMapper mapper = MAPPER.get();
-        return mapper.convertValue(value, targetType);
+        return convertValue(mapper, value, targetType);
     }
 
     /**
@@ -353,8 +353,28 @@ public final class WindJson {
                 .addModules(WindJacksonModules.iso8601LikeJavaTimeModule(), WindJacksonModules.apiModule())
                 // 具体目标类型已明确时，允许缺少仅由只读 getter 提供的多态类型标识
                 .disable(MapperFeature.REQUIRE_TYPE_ID_FOR_SUBTYPES)
+                // 具体目标类型已明确时，未知 type id 回退到已声明的目标类型
+                .enable(MapperFeature.USE_BASE_TYPE_AS_DEFAULT_IMPL)
                 .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
                 .build();
+    }
+
+    private static <T> @Nullable T convertValue(JsonMapper mapper, @Nullable Object value, JavaType targetType) {
+        if (value instanceof String text && isJsonContainerText(text, targetType)) {
+            return mapper.readValue(text, targetType);
+        }
+        return mapper.convertValue(value, targetType);
+    }
+
+    private static boolean isJsonContainerText(String text, JavaType targetType) {
+        Class<?> rawTargetType = targetType.getRawClass();
+        if (rawTargetType == Object.class
+                || rawTargetType == String.class
+                || CharSequence.class.isAssignableFrom(rawTargetType)) {
+            return false;
+        }
+        String trimmed = text.trim();
+        return trimmed.startsWith("{") || trimmed.startsWith("[");
     }
 
     private static void requireJson(String json) {

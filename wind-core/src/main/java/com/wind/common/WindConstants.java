@@ -236,6 +236,7 @@ public final class WindConstants {
      */
     public static final String TRACE_ID_NAME = "traceId";
 
+
     /**
      * spanId 变量名称
      */
@@ -247,9 +248,15 @@ public final class WindConstants {
     public static final String PARENT_SPAND_ID_NAME = "parentSpanId";
 
     /**
+     * 测试标记属性名，用于标记整个上下文链路的数据属于测试数据
+     */
+    public static final String TRACE_TEST_DATA_CLASSIFICATION_ATTRIBUTE_NAME = "TRACE_TEST_DATA_CLASSIFICATION";
+
+    /**
      * trace id http header name
      */
     public static final String WIND_TRANCE_ID_HEADER_NAME = "Wind-Trace-Id";
+
 
     /**
      * http 请求 url 变量

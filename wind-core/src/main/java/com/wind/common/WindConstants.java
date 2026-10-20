@@ -250,7 +250,28 @@ public final class WindConstants {
     /**
      * 测试标记属性名，用于标记整个上下文链路的数据属于测试数据
      */
+    @Deprecated
     public static final String TRACE_TEST_DATA_CLASSIFICATION_ATTRIBUTE_NAME = "TRACE_TEST_DATA_CLASSIFICATION";
+
+    /**
+     * 租户标记属性名，用于标记整个上下文链路的数据归属的租户
+     */
+    public static final String ISOLATION_TENANT_ID_ATTRIBUTE_NAME = " ISOLATION_TENANT_ID";
+
+    /**
+     * 测试标记属性名，用于标记整个上下文链路的数据属于测试数据
+     */
+    public static final String ISOLATION_TEST_DATA_CLASSIFICATION_ATTRIBUTE_NAME = "ISOLATION_TEST_DATA_CLASSIFICATION";
+
+    /**
+     * 环境标记属性名，用于标记整个上下文链路的数据归属的环境
+     */
+    public static final String ISOLATION_ENV_ATTRIBUTE_NAME = "ISOLATION_ENV";
+
+    /**
+     * 工作空间标记属性名，用于标记整个上下文链路的数据归属的工作空间
+     */
+    public static final String ISOLATION_WORKSPACE_ID_ATTRIBUTE_NAME = "ISOLATION_WORKSPACE_ID";
 
     /**
      * trace id http header name

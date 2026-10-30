@@ -12,6 +12,7 @@ import org.springframework.context.support.GenericApplicationContext;
 import java.util.Date;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.function.Supplier;
 
 /**
  * spring 上下文 utils ，非常规用法，为了简化编码
@@ -53,6 +54,21 @@ public class SpringApplicationContextUtils implements ApplicationContextAware {
         ApplicationContext applicationContext = requireApplicationContext();
         AssertUtils.isInstanceOf(GenericApplicationContext.class, applicationContext, "argument applicationContext must be GenericApplicationContext");
         return applicationContext.getBean(clazz);
+    }
+
+    /**
+     * 获取指定类型的 Bean，仅在没有匹配 Bean 时使用默认值。
+     * 候选不唯一或 Bean 创建失败时，仍向调用方传播异常。
+     *
+     * @param clazz           Bean 类型
+     * @param defaultSupplier 默认值提供者
+     * @param <T>             Bean 类型
+     * @return 已注册的 Bean 或默认值
+     */
+    @NonNull
+    @Beta
+    static <T> T getBean(@NonNull Class<T> clazz, @NonNull Supplier<T> defaultSupplier) {
+        return requireApplicationContext().getBeanProvider(clazz).getIfAvailable(defaultSupplier);
     }
 
     @Override

@@ -2,6 +2,7 @@ package com.wind.common.spring;
 
 import com.google.common.annotations.Beta;
 import com.wind.common.exception.AssertUtils;
+import com.wind.common.util.ServiceInfoUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.jspecify.annotations.NonNull;
 import org.springframework.beans.BeansException;
@@ -80,6 +81,7 @@ public class SpringApplicationContextUtils implements ApplicationContextAware {
         }
         log.info("set spring application context, contextType = {}, start date = {}", applicationContext.getClass().getName(), new Date(applicationContext.getStartupDate()));
         CONTEXT_HOLDER.set(applicationContext);
+        ServiceInfoUtils.configure(SpringApplicationContextUtils::getProperty);
     }
 
     public static void markStarted() {

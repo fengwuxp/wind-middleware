@@ -1,12 +1,12 @@
 package com.wind.common.util;
 
-import com.google.common.collect.ImmutableSet;
 import com.wind.common.WindConstants;
-import com.wind.common.spring.SpringApplicationContextUtils;
 import org.jspecify.annotations.Nullable;
 import org.springframework.util.StringUtils;
 
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicReference;
+import java.util.function.Function;
 
 /**
  * 服务信息相关工具
@@ -16,7 +16,9 @@ import java.util.Set;
  **/
 public final class ServiceInfoUtils {
 
-    private static final Set<String> ONLINE_ENVS = ImmutableSet.of(WindConstants.PRE, WindConstants.PROD);
+    private static final AtomicReference<Function<String, String>> APPLICATION_PROPERTY_SUPPLIER = new AtomicReference<>(k -> null);
+
+    private static final Set<String> ONLINE_ENVS = Set.of(WindConstants.PRE, WindConstants.PROD);
 
     private ServiceInfoUtils() {
         throw new AssertionError();
@@ -54,7 +56,10 @@ public final class ServiceInfoUtils {
         if (StringUtils.hasText(result)) {
             return result;
         }
-        return SpringApplicationContextUtils.getProperty(key);
+        return APPLICATION_PROPERTY_SUPPLIER.get().apply(key);
     }
 
+    public static void configure(Function<String, String> propertySupplier) {
+        APPLICATION_PROPERTY_SUPPLIER.set(propertySupplier);
+    }
 }

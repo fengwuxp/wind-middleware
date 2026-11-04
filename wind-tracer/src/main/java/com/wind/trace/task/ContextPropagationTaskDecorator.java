@@ -34,17 +34,18 @@ public abstract class ContextPropagationTaskDecorator implements TaskDecorator {
     @NonNull
     public Runnable decorate(@NonNull Runnable task) {
         AssertUtils.notNull(task, "argument task must not null");
-        // 获取当前 trace context
-        WindTraceContext context = WindTracer.TRACER.currentContext().orElseGet(WindTraceContext::root);
-        // 获取业务上下文
-        Map<String, Object> businessContext = snapshotContextVariables();
+        // 获取当前 Trace Context
+        WindTraceContext parentContext = WindTracer.TRACER.currentContext().orElseGet(WindTraceContext::root);
+        // 快照业务 Context
+        Map<String, Object> snapshotContext = snapshotContextVariables();
         Runnable execution = () -> {
             try {
                 if (log.isDebugEnabled()) {
-                    log.debug("task decorate, parent context = {}", context);
+                    log.debug("task decorate, parent context = {}", parentContext);
                 }
-                restoreContextVariables(businessContext);
-                task.run();
+                restoreContextVariables(snapshotContext);
+                // 恢复业务上下文，并执行任务
+                runWithSnapshot(snapshotContext, task);
             } catch (Throwable throwable) {
                 if (printExceptionLog) {
                     log.error("execute task exception, message = {}", throwable.getMessage(), throwable);
@@ -57,7 +58,7 @@ public abstract class ContextPropagationTaskDecorator implements TaskDecorator {
                 clearContextVariables();
             }
         };
-        return WindTracer.wrap(context, execution);
+        return WindTracer.wrap(parentContext, execution);
     }
 
     /**
@@ -70,10 +71,24 @@ public abstract class ContextPropagationTaskDecorator implements TaskDecorator {
     }
 
     /**
+     * 使用已快照的上下文执行任务。
+     * 默认直接执行，兼容仅覆写恢复和清理钩子的子类。
+     * 覆写实现应将上下文绑定限定在任务执行期间，并在正常返回或异常退出时恢复原上下文。
+     *
+     * @param snapshotContext 已捕获的上下文快照
+     * @param action          在该上下文中执行的任务
+     */
+    protected void runWithSnapshot(Map<String, Object> snapshotContext, Runnable action) {
+        action.run();
+    }
+
+    /**
      * 线程切换，恢复上下文 ，traceId 也在 contextVariables 中
+     * 保留旧实现的恢复行为，新作用域实现可覆写 {@link #runWithSnapshot(Map, Runnable)}。
      *
      * @param contextVariables copy 的上下文
      */
+    @Deprecated(forRemoval = true)
     protected void restoreContextVariables(Map<String, Object> contextVariables) {
         if (log.isDebugEnabled()) {
             log.debug("task decorate, restore contextVariables = {}", contextVariables);
@@ -83,8 +98,8 @@ public abstract class ContextPropagationTaskDecorator implements TaskDecorator {
     /**
      * 清除线程上下文
      */
+    @Deprecated(forRemoval = true)
     protected void clearContextVariables() {
-
     }
 
     public static TaskDecorator of() {

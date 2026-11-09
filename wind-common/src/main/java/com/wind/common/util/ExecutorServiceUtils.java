@@ -27,6 +27,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.RejectedExecutionHandler;
+import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
@@ -176,6 +177,8 @@ public final class ExecutorServiceUtils {
 
         private BlockingQueue<Runnable> workQueue = new ArrayBlockingQueue<>(DEFAULT_WORK_QUEUE_SIZE);
 
+        private ThreadFactory threadFactory;
+
         private RejectedExecutionHandler rejectedExecutionHandler = new ThreadPoolExecutor.AbortPolicy();
 
         private boolean useVirtualThreads = false;
@@ -219,6 +222,11 @@ public final class ExecutorServiceUtils {
 
         public ExecutorBuilder rejectedExecutionHandler(RejectedExecutionHandler rejectedExecutionHandler) {
             this.rejectedExecutionHandler = rejectedExecutionHandler;
+            return this;
+        }
+
+        public ExecutorBuilder threadFactory(ThreadFactory threadFactory) {
+            this.threadFactory = threadFactory;
             return this;
         }
 
@@ -293,7 +301,7 @@ public final class ExecutorServiceUtils {
                 result = Executors.newThreadPerTaskExecutor(Thread.ofVirtual().name(threadNamePrefix, 0).factory());
             } else {
                 result = new ThreadPoolExecutor(corePoolSize, maximumPoolSize, keepAlive.getSeconds(), TimeUnit.SECONDS, workQueue,
-                        new CustomizableThreadFactory(threadNamePrefix), rejectedExecutionHandler);
+                        threadFactory == null ? new CustomizableThreadFactory(threadNamePrefix) : threadFactory, rejectedExecutionHandler);
             }
             if (enableMetrics) {
                 // 增加线程池监控

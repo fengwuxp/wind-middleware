@@ -1,6 +1,7 @@
 package com.wind.common.exception;
 
 
+import com.wind.common.WindConstants;
 import com.wind.common.message.MessageFormatter;
 import com.wind.common.message.MessagePlaceholder;
 import lombok.Getter;
@@ -135,6 +136,11 @@ public class BaseException extends RuntimeException {
 
     public static BaseException common(MessagePlaceholder message) {
         return new BaseException(message);
+    }
+
+    public static BaseException common(Throwable cause) {
+        String message = cause == null || cause.getMessage() == null ? WindConstants.EMPTY : cause.getMessage();
+        return new BaseException(DefaultExceptionCode.COMMON_ERROR, message, cause);
     }
 
     /**

@@ -51,15 +51,18 @@ public class TraceFilter extends OncePerRequestFilter {
 
     /**
      * client 真实 ip 头名称
+     * X-Envoy-External-Address 属于服务网格 ASM（Alibaba Service Mesh）或 Envoy 代理相关的请求头字段 用于标识客户端的真实 IP 地址
+     * X-Forwarded-For 客户端自己填的，可以随意伪造
      */
     private static final List<String> CLIENT_IP_HEAD_NAMES = Arrays.asList(
+            "X-Envoy-External-Address",
             "X-Forwarded-For",
+            "HTTP_X_FORWARDED_FOR",
             "Proxy-Client-IP",
             "WL-Proxy-Client-IP",
             "X-Real-IP",
             "REMOTE-HOST",
-            "HTTP_CLIENT_IP",
-            "HTTP_X_FORWARDED_FOR"
+            "HTTP_CLIENT_IP"
     );
 
     @Override

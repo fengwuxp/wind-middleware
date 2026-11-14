@@ -1,31 +1,37 @@
 package com.wind.server.web.security;
 
+import com.wind.common.util.IpAddressUtils;
 import com.wind.server.web.restful.RestfulApiRespFactory;
 import com.wind.web.util.HttpResponseMessageUtils;
 import com.wind.web.util.HttpServletRequestUtils;
-import com.wind.web.util.HttpTraceVariableUtils;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.AllArgsConstructor;
-import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.jspecify.annotations.NonNull;
 import org.springframework.http.HttpHeaders;
 import org.springframework.security.web.util.matcher.IpAddressMatcher;
 import org.springframework.util.CollectionUtils;
+import org.springframework.util.StringUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.List;
 import java.util.function.Function;
 
 import static com.wind.common.WindHttpConstants.HTTP_REQUEST_IP_ATTRIBUTE_NAME;
 
 /**
- * 请求来源 ip 访问控制
+ * 请求来源 IP 访问控制过滤器。
+ *
+ * <p>过滤器从 {@value com.wind.common.WindHttpConstants#HTTP_REQUEST_IP_ATTRIBUTE_NAME} 请求属性读取来源 IP；该属性通常由前置的请求追踪过滤器写入。</p>
+ * <p>非严格模式下，来源 IP 缺失或为空时直接放行；严格模式下，来源 IP 必须是合法的 IPv4 或 IPv6 地址。</p>
+ * <p>完成来源 IP 校验后，黑名单优先于白名单：黑名单命中时拒绝请求；白名单非空时仅允许命中的请求；两者均为空时放行。</p>
+ * <p>白名单和黑名单支持单个 IP、CIDR 网段等 {@link IpAddressMatcher} 支持的表达式。</p>
  *
  * @author wuxp
  * @date 2024-03-15 17:55
@@ -36,8 +42,34 @@ public class IpAccessControlFilter extends OncePerRequestFilter {
 
     private final Function<HttpServletRequest, IpAccessControlConfig> ipConfigSupplier;
 
+    private final boolean strict;
+
+    /**
+     * 创建兼容历史行为的非严格 IP 访问控制过滤器。
+     *
+     * @param config 白名单和黑名单配置，可以为 null
+     */
     public IpAccessControlFilter(IpAccessControlConfig config) {
-        this(request -> config);
+        this(config, false);
+    }
+
+    /**
+     * 按请求动态获取 IP 访问控制配置，默认使用非严格模式。
+     *
+     * @param ipConfigSupplier 配置提供者，返回 null 表示不限制 IP 名单
+     */
+    public IpAccessControlFilter(Function<HttpServletRequest, IpAccessControlConfig> ipConfigSupplier) {
+        this(ipConfigSupplier, false);
+    }
+
+    /**
+     * 创建 IP 访问控制过滤器。
+     *
+     * @param config 白名单和黑名单配置，可以为 null
+     * @param strict 是否启用严格模式；严格模式拒绝缺失或非法来源 IP
+     */
+    public IpAccessControlFilter(IpAccessControlConfig config, boolean strict) {
+        this(request -> config, strict);
     }
 
     @Override
@@ -46,15 +78,23 @@ public class IpAccessControlFilter extends OncePerRequestFilter {
             chain.doFilter(request, response);
         } else {
             log.error("client source ip not allow access, request ip = {}, request host = {}",
-                    HttpTraceVariableUtils.getRequestSourceIp(), HttpServletRequestUtils.getHeader(HttpHeaders.HOST));
+                    HttpServletRequestUtils.getRequestAttribute(HTTP_REQUEST_IP_ATTRIBUTE_NAME, request), HttpServletRequestUtils.getHeader(HttpHeaders.HOST));
             HttpResponseMessageUtils.writeApiResp(response, RestfulApiRespFactory.badRequest("client source ip not allow access"));
         }
     }
 
     private boolean isAllow(HttpServletRequest request) {
         String clientIp = HttpServletRequestUtils.getRequestAttribute(HTTP_REQUEST_IP_ATTRIBUTE_NAME, request);
-        if (clientIp == null || clientIp.isEmpty()) {
-            return true;
+        if (strict) {
+            // 严格模式下必须要有合法的来源 ip
+            if (!IpAddressUtils.isValidIp(clientIp)) {
+                return false;
+            }
+        } else {
+            // 非严格模式允许为空的 来源 ip
+            if (!StringUtils.hasText(clientIp)) {
+                return true;
+            }
         }
         IpAccessControlConfig config = this.ipConfigSupplier.apply(request);
         if (config == null || (CollectionUtils.isEmpty(config.getWhitelist()) && CollectionUtils.isEmpty(config.getBlacklist()))) {
@@ -72,21 +112,46 @@ public class IpAccessControlFilter extends OncePerRequestFilter {
         return requestMatchers.stream().anyMatch(matcher -> matcher.matches(clientIp));
     }
 
-    @Getter
-    public static class IpAccessControlConfig {
+    /**
+     * IP 访问控制规则配置。
+     *
+     * <p>record 组件保存原始规则表达式；{@link #getWhitelist()} 和 {@link #getBlacklist()} 保留历史 getter，
+     * 返回可直接用于匹配的 {@link IpAddressMatcher} 集合。</p>
+     *
+     * @param whitelist 白名单 IP 或 CIDR 表达式
+     * @param blacklist 黑名单 IP 或 CIDR 表达式
+     */
+    public record IpAccessControlConfig(Collection<String> whitelist, Collection<String> blacklist) {
 
-        private final Collection<IpAddressMatcher> whitelist;
-
-        private final Collection<IpAddressMatcher> blacklist;
-
-        public IpAccessControlConfig(Collection<String> whitelist, Collection<String> blacklist) {
-            this.whitelist = nullSafeGet(whitelist).stream().map(IpAddressMatcher::new).toList();
-            this.blacklist = nullSafeGet(blacklist).stream().map(IpAddressMatcher::new).toList();
+        public IpAccessControlConfig {
+            whitelist = List.copyOf(nullSafeGet(whitelist));
+            blacklist = List.copyOf(nullSafeGet(blacklist));
         }
 
-        @NonNull
+        /**
+         * 保留历史 getter，避免原有调用方从 Lombok getter 迁移到 record accessor。
+         *
+         * @return 白名单匹配器
+         */
+        public Collection<IpAddressMatcher> getWhitelist() {
+            return toMatchers(whitelist);
+        }
+
+        /**
+         * 保留历史 getter，避免原有调用方从 Lombok getter 迁移到 record accessor。
+         *
+         * @return 黑名单匹配器
+         */
+        public Collection<IpAddressMatcher> getBlacklist() {
+            return toMatchers(blacklist);
+        }
+
         private static Collection<String> nullSafeGet(Collection<String> ips) {
             return ips == null ? Collections.emptyList() : ips;
+        }
+
+        private static Collection<IpAddressMatcher> toMatchers(Collection<String> patterns) {
+            return patterns.stream().map(IpAddressMatcher::new).toList();
         }
     }
 }

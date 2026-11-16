@@ -20,7 +20,6 @@ import org.springframework.web.filter.OncePerRequestFilter;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.List;
 import java.util.function.Function;
 
 import static com.wind.common.WindHttpConstants.HTTP_REQUEST_IP_ATTRIBUTE_NAME;
@@ -97,15 +96,15 @@ public class IpAccessControlFilter extends OncePerRequestFilter {
             }
         }
         IpAccessControlConfig config = this.ipConfigSupplier.apply(request);
-        if (config == null || (CollectionUtils.isEmpty(config.getWhitelist()) && CollectionUtils.isEmpty(config.getBlacklist()))) {
+        if (config == null || (CollectionUtils.isEmpty(config.whitelist()) && CollectionUtils.isEmpty(config.blacklist()))) {
             // 配置为 null 或 空
             return true;
         }
-        if (matches(config.getBlacklist(), clientIp)) {
+        if (matches(config.blacklist(), clientIp)) {
             // 黑名单优先级高，匹配则拒绝访问
             return false;
         }
-        return matches(config.getWhitelist(), clientIp);
+        return matches(config.whitelist(), clientIp);
     }
 
     private boolean matches(Collection<IpAddressMatcher> requestMatchers, String clientIp) {
@@ -115,35 +114,21 @@ public class IpAccessControlFilter extends OncePerRequestFilter {
     /**
      * IP 访问控制规则配置。
      *
-     * <p>record 组件保存原始规则表达式；{@link #getWhitelist()} 和 {@link #getBlacklist()} 保留历史 getter，
+     * <p>record 组件保存原始规则表达式；{@link #whitelist()} 和 {@link #blacklist()} 保留历史 getter，
      * 返回可直接用于匹配的 {@link IpAddressMatcher} 集合。</p>
      *
-     * @param whitelist 白名单 IP 或 CIDR 表达式
-     * @param blacklist 黑名单 IP 或 CIDR 表达式
+     * @param whitelist 白名单 ip 地址匹配器列表
+     * @param blacklist 黑名单 ip 地址匹配器列表
      */
-    public record IpAccessControlConfig(Collection<String> whitelist, Collection<String> blacklist) {
-
-        public IpAccessControlConfig {
-            whitelist = List.copyOf(nullSafeGet(whitelist));
-            blacklist = List.copyOf(nullSafeGet(blacklist));
-        }
+    public record IpAccessControlConfig(@NonNull Collection<IpAddressMatcher> whitelist, @NonNull Collection<IpAddressMatcher> blacklist) {
 
         /**
-         * 保留历史 getter，避免原有调用方从 Lombok getter 迁移到 record accessor。
-         *
-         * @return 白名单匹配器
+         * @param whitelist 白名单 IP 或 CIDR 表达式
+         * @param blacklist 黑名单 IP 或 CIDR 表达式
+         * @return IpAccessControlConfig
          */
-        public Collection<IpAddressMatcher> getWhitelist() {
-            return toMatchers(whitelist);
-        }
-
-        /**
-         * 保留历史 getter，避免原有调用方从 Lombok getter 迁移到 record accessor。
-         *
-         * @return 黑名单匹配器
-         */
-        public Collection<IpAddressMatcher> getBlacklist() {
-            return toMatchers(blacklist);
+        public static IpAccessControlConfig of(Collection<String> whitelist, Collection<String> blacklist) {
+            return new IpAccessControlConfig(toMatchers(nullSafeGet(whitelist)), toMatchers(nullSafeGet(blacklist)));
         }
 
         private static Collection<String> nullSafeGet(Collection<String> ips) {
@@ -151,7 +136,7 @@ public class IpAccessControlFilter extends OncePerRequestFilter {
         }
 
         private static Collection<IpAddressMatcher> toMatchers(Collection<String> patterns) {
-            return patterns.stream().map(IpAddressMatcher::new).toList();
+            return patterns.stream().distinct().map(IpAddressMatcher::new).toList();
         }
     }
 }
